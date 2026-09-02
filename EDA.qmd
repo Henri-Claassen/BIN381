@@ -1,0 +1,163 @@
+---
+title: "EDA For Datasets"
+author: "Group 5"
+date: today
+format:
+  html: 
+    toc: true #Gives a table of contents
+    code-fold: show #Code chunks visible by default but can be collapsed
+execute:
+  warning: false #Makes warnings not appear to keep text clean in the file will appear in console when run
+  message: false
+---
+
+## Install packages if they are not installed:
+
+```{r}
+#| label: Install Packages
+#install.packages(c("tidyverse", "skimr", "janitor", "visdat"))
+```
+
+## Loading the packages we need:
+
+```{r}
+#| label: package setup
+library(tidyverse)
+library(skimr)
+library(janitor)
+library(visdat)
+```
+
+### This is the file path variable for the data set folder:
+
+```{r}
+#| label: data Directory
+directory <- "Datasets/"
+```
+
+## Creating the data frames for all the data sets:
+
+```{r}
+#| label: Data Frame Creation
+D01 <- read_csv(file.path(directory,"D01_Population_Profile.csv"),show_col_types = FALSE) |> clean_names() #clean_names() is used to change all column names into a consistent form for example Household ID becomes household_id
+D02 <- read_csv(file.path(directory,"D02_Learning_Profile.csv"),show_col_types = FALSE) |> clean_names()
+D03 <- read_csv(file.path(directory,"D03_Economic_Participation.csv"),show_col_types = FALSE) |> clean_names()
+D04 <- read_csv(file.path(directory,"D04_Dwelling_Conditions.csv"),show_col_types = FALSE) |> clean_names()
+D05 <- read_csv(file.path(directory,"D05_Basic_Services.csv"),show_col_types = FALSE) |> clean_names()
+D06 <- read_csv(file.path(directory,"D06_Household_Energy.csv"),show_col_types = FALSE) |> clean_names()
+D07 <- read_csv(file.path(directory,"D07_Household_Wellbeing.csv"),show_col_types = FALSE)
+D08 <- read_csv(file.path(directory,"D08_Connectivity_Access.csv"),show_col_types = FALSE) |> clean_names()
+D09 <- read_csv(file.path(directory,"D09_Household_Resources.csv"),show_col_types = FALSE) |> clean_names()
+D10 <- read_csv(file.path(directory,"D10_Mobility_Access.csv"),show_col_types = FALSE) |> clean_names()
+D11 <- read_csv(file.path(directory,"D11_Labour_Market.csv"),show_col_types = FALSE) |> clean_names()
+```
+
+### Finding the one or more parsing issues:
+
+```{r}
+#| label: find issues
+problems(D01)
+problems(D02)
+problems(D03)
+problems(D04)
+problems(D05)
+problems(D06)
+problems(D07)
+problems(D08)
+problems(D09)
+problems(D10)
+problems(D11)
+```
+
+#### We see that Data set 11 has a few problems in column 30, lets inspect what column it is:
+
+```{r}
+#| label: column names
+names(D11)[30] #Gives column name of col 30
+nrow(problems(D11)) #Shows how many problems there are
+```
+
+> This tells us that 45 rows in the hours_worked_raw column has issues in data set 11 that need to be resolved in the pre-processing
+
+## Quick summary about column and row counts for all datasets
+
+```{r}
+#| label: tibble summary
+#Tibble creates a small dataframe from scratch from 3 vectors that are manually defined, used to show the dataframe name, col count and row count
+tibble(
+  dataset = c("D01","D02","D03","D04","D05","D06","D07","D08","D09","D10","D11"),
+  rows = c(nrow(D01),nrow(D02),nrow(D03),nrow(D04),nrow(D05),nrow(D06),nrow(D07),nrow(D08),nrow(D09),nrow(D10),nrow(D11)),
+  cols = c(ncol(D01),ncol(D02),ncol(D03),ncol(D04),ncol(D05),ncol(D06),ncol(D07),ncol(D08),ncol(D09),ncol(D10),ncol(D11))
+)
+```
+
+> From this quick tibble summary we can see that D04 - D10 (All are around 20,000) are Household based, where D01 - D03 is person based (Around 70,000) and then we have D11 with around 170,000 which is also likely to do with people
+
+## Exploring the data:
+
+```{r}
+#| label: exploring D01
+#View(D01)
+head(D01,5)
+skim(D01)
+```
+
+```{r}
+#| label: exploring D02
+head(D02,5)
+skim(D02)
+```
+
+```{r}
+#| label: exploring D03
+head(D03,5)
+skim(D03)
+```
+
+```{r}
+#| label: exploring D04
+head(D04,5)
+skim(D04)
+```
+
+```{r}
+#| label: exploring D05
+head(D05,5)
+skim(D05)
+```
+
+```{r}
+#| label: exploring D06
+head(D06,5)
+skim(D06)
+```
+
+```{r}
+#| label: exploring D07
+head(D07,5)
+skim(D07)
+```
+
+```{r}
+#| label: exploring D08
+head(D08,5)
+skim(D08)
+```
+
+```{r}
+#| label: exploring D09
+head(D09,5)
+skim(D09)
+```
+
+```{r}
+#| label: exploring D10
+head(D10,5)
+skim(D10)
+```
+
+```{r}
+#| label: exploring D11
+head(D11,5)
+skim(D11)
+```
