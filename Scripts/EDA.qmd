@@ -83,7 +83,7 @@ nrow(problems(D11)) #Shows how many problems there are
 
 ```{r}
 #| label: tibble summary
-#Tibble creates a small dataframe from scratch from 3 vectors that are manually defined, used to show the dataframe name, col count and row count
+#Tibble creates a small dataframe from scratch modern way of doing data.frame
 tibble(
   dataset = c("D01","D02","D03","D04","D05","D06","D07","D08","D09","D10","D11"),
   rows = c(nrow(D01),nrow(D02),nrow(D03),nrow(D04),nrow(D05),nrow(D06),nrow(D07),nrow(D08),nrow(D09),nrow(D10),nrow(D11)),
