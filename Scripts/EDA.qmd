@@ -32,7 +32,7 @@ library(visdat)
 
 ```{r}
 #| label: data Directory
-directory <- "Datasets/"
+directory <- "../Datasets/"
 ```
 
 ## Creating the data frames for all the data sets:
@@ -45,7 +45,7 @@ D03 <- read_csv(file.path(directory,"D03_Economic_Participation.csv"),show_col_t
 D04 <- read_csv(file.path(directory,"D04_Dwelling_Conditions.csv"),show_col_types = FALSE) |> clean_names()
 D05 <- read_csv(file.path(directory,"D05_Basic_Services.csv"),show_col_types = FALSE) |> clean_names()
 D06 <- read_csv(file.path(directory,"D06_Household_Energy.csv"),show_col_types = FALSE) |> clean_names()
-D07 <- read_csv(file.path(directory,"D07_Household_Wellbeing.csv"),show_col_types = FALSE)
+D07 <- read_csv(file.path(directory,"D07_Household_Wellbeing.csv"),show_col_types = FALSE) |> clean_names()
 D08 <- read_csv(file.path(directory,"D08_Connectivity_Access.csv"),show_col_types = FALSE) |> clean_names()
 D09 <- read_csv(file.path(directory,"D09_Household_Resources.csv"),show_col_types = FALSE) |> clean_names()
 D10 <- read_csv(file.path(directory,"D10_Mobility_Access.csv"),show_col_types = FALSE) |> clean_names()
