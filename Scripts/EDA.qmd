@@ -162,4 +162,64 @@ head(D11,5)
 skim(D11)
 ```
 
-## Keep going here
+## Which Datasets we choose:
+
+D01 - This dataset data about population information about people, for example (age,sex,province,population group) helps us link the other datasets to each other.
+
+D02 - This dataset provides data about education level, this is required to see the level of education attained when we compare it with connectivity level.
+
+D03 - This dataset covers employment data, which is required to see how connectivity compares with job. Chosen over D11 since the row count is similar with consistent id and person number.
+
+D08 - This dataset shows connectivity, this is required to see which households have internet or not it is the core way to determine if there is a link between education, employment and internet connectivity.
+
+## Which Datasets we dont choose: (Still needs descriptions as to why not chosen)
+
+D04 - Dwelling conditions (Could affect whether they have internet or not, maybe we need it?)
+
+D05 - Basic services
+
+D06 - Household energy
+
+D07 - Household wellbeing
+
+D09 - Household resources
+
+D10 - Mobility access
+
+D11 - Labour market
+
+### 
+
+## Check intersect comparison to see if the datasets are compatible with each other:
+
+#### Now we need to confirm that the datasets we chose are related to each other and can be linked
+
+```{r}
+intersect(D01$household_id, D03$household_id) |> length()
+intersect(D01$household_id, D02$household_id) |> length()
+intersect(D01$household_id, D08$household_id) |> length()
+intersect(D01$household_id, D11$household_id) |> length()
+```
+
+We see that for household level, that D01,D02,D03,D08 are very closely related meaning they have the same household ids so they can be used for analysis and comparison
+
+```{r}
+20684 / n_distinct(D01$household_id) * 100
+```
+
+This tells us that 99% of the household ids have a match
+
+#### For person level checks we need to use composite keys so we first merge the household_id and person_id into a new id variable and then compare those values across datasets:
+
+```{r}
+D01_id <- paste(D01$household_id, D01$person_number)
+D02_id <- paste(D02$household_id, D02$person_number)
+D03_id <- paste(D03$household_id, D03$person_number)
+
+intersect(D01_id, D02_id) |> length()
+intersect(D01_id, D03_id) |> length()
+```
+
+We see that the values are very close to the total length of the datasets (70000 and change) meaning alot of the composite keys match so we can use this data for comparisons and analysis
+
+D08 is house hold level so we can not compare it at the person level with the others.
