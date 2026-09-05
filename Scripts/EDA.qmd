@@ -464,8 +464,244 @@ intersect(D01_id, D03_id) |> length()
 >
 > D08 is house hold level so we can not compare it at the person level with the others.
 
-# Graphing our chosen graphs:
+# Analysis of our chosen datasets:
+
+## Check for Empty string columns
+
+```{r}
+#| label: check-for-empty-strings
+D01 |>
+  summarise(across(where(is.character), ~sum(.x == "", na.rm=TRUE)))
+D02 |>
+  summarise(across(where(is.character), ~sum(.x == "", na.rm=TRUE)))
+D03 |>
+  summarise(across(where(is.character), ~sum(.x == "", na.rm=TRUE)))
+D08 |>
+  summarise(across(where(is.character), ~sum(.x == "", na.rm=TRUE)))
+```
+
+> We see that there are no empty strings in any of our selected datasets
+
+## Check for Negative values in age
+
+```{r}
+#| label: check-negative-ages
+paste0("D01: ", sum(D01$age < 0, na.rm = TRUE))#na.rm means should NA values be counted or not TRUE means skip we dont want it messing with our values so we remove it
+paste0("D02: ", sum(D02$age < 0, na.rm = TRUE))
+paste0("D03: ", sum(D03$age < 0, na.rm = TRUE))
+```
+
+```{r}
+#| label: which-rownr-negative-ages
+which(D01$age < 0) #Which is used to see which row numbers are below 0 for age
+```
+
+```{r}
+#| label: filter dataset-1-age
+D01 |>
+  filter(D01$age < 0)
+```
+
+## Check for invalid values in the columns
+
+### Dataset 1:
+
+```{r}
+#| label: dataset-1-valid-values-check
+paste0("province_code: ", sum(!D01$province_code %in% c(1,2,3,4,5,6,7,8,9), na.rm = TRUE))
+
+paste0("sex_code: ", sum(!D01$sex_code %in% c(1,2), na.rm = TRUE))
+
+paste0("age_group_code: ", sum(!D01$age_group_code %in% c(01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16), na.rm =TRUE))
+
+paste0("population_group_code: ", sum(!D01$population_group_code %in% c(1,2,3,4,5), na.rm = TRUE))
+
+paste0("language_code: ", sum(!D01$language_code %in% c(01,02,03,04,05,06,07,08,09,10,11,12,13,14), na.rm = TRUE))
+
+paste0("relationship_to_head_code: ", sum(!D01$relationship_to_head_code %in% c(1,2,3,4,5,6,7,8,9,99), na.rm = TRUE))
+
+paste0("marital_status_code: ", sum(!D01$marital_status_code %in% c(1,2,3,4,5,6,7,8,9), na.rm = TRUE))
+
+
+paste0("geo_type_code: ", sum(!D01$geo_type_code %in% c(1,2,3), na.rm = TRUE))
+
+paste0("metro_code: ", sum(!D01$metro_code %in% c(01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17), na.rm = TRUE))
+
+paste0("metro_indicator: ", sum(!D01$metro_indicator %in% c(1,2), na.rm = TRUE))
+```
+
+### Dataset 2:
+
+```{r}
+#| label: dataset-2-valid-values-check
+paste0("province_code: ", sum(!D02$province_code %in% c(1,2,3,4,5,6,7,8,9), na.rm = TRUE))
+
+paste0("sex_code: ", sum(!D02$sex_code %in% c(1,2), na.rm = TRUE))
+
+paste0("education_level_code: ", sum(!D02$education_level_code %in% c(98,00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29), na.rm = TRUE))
+
+paste0("education_attendance_code: ", sum(!D02$education_attendance_code %in% c(1,2,3,8), na.rm = TRUE))
+
+paste0("reason_not_attending_code: ", sum(!D02$reason_not_attending_code %in% c(01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,88), na.rm = TRUE))
+
+paste0("institution_type_code: ", sum(!D02$institution_type_code %in% c(1,2,3,4,5,6,7,8,9,88), na.rm = TRUE))
+
+paste0("public_private_institution_code: ", sum(!D02$public_private_institution_code %in% c(1,2,3,8), na.rm = TRUE))
+
+paste0("transport_mode_to_education_code: ", sum(!D02$transport_mode_to_education_code %in% c(1,2,3,4,5,6,7,8,9,10,88), na.rm = TRUE))
+
+paste0("travel_time_to_education: ", sum(!D02$travel_time_to_education %in% c(1,2,3,4,5,6,7,8), na.rm = TRUE))
+
+paste0("total_education_fees: ", sum(!D02$total_education_fees %in% c(00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,88), na.rm = TRUE))
+
+paste0("no_fees_school_code: ", sum(!D02$no_fees_school_code %in% c(1,2,3,4,5,6,7,8), na.rm = TRUE))
+
+paste0("grade_code: ", sum(!D02$grade_code %in% c(00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,88), na.rm = TRUE))
+
+paste0("school_food_programme_code: ", sum(!D02$school_food_programme_code %in% c(1,2,3,8), na.rm = TRUE))
+
+paste0("absence_code: ", sum(!D02$absence_code %in% c(1,2,3,4,8), na.rm = TRUE))
+
+paste0("absence_days: ", sum(!D02$absence_days %in% c(1,2,3,4,5,8), na.rm = TRUE))
+
+paste0("geo_type_code: ", sum(!D02$geo_type_code %in% c(1,2,3), na.rm = TRUE))
+```
+
+#### Exploring the invalid values we have in columns
+
+```{r}
+#| label: dataset-2-explore-invalid-values
+D02 |> 
+  filter(!D02$education_level_code %in% c(98,00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29))
+D02 |> 
+  filter(!D02$education_attendance_code %in% c(1,2,3,8))
+```
+
+### Dataset 3:
+
+```{r}
+#| label: dataset-3-valid-values-check
+paste0("province_code: ", sum(!D03$province_code %in% c(1,2,3,4,5,6,7,8,9), na.rm = TRUE))
+
+paste0("sex_code: ", sum(!D03$sex_code %in% c(1,2), na.rm = TRUE))
+
+paste0("education_level_code: ", sum(!D03$education_level_code %in% c(98,00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29), na.rm = TRUE))
+
+paste0("wage_work_code: ", sum(!D03$wage_work_code %in% c(1,2,8), na.rm = TRUE))
+
+paste0("business_work_code: ", sum(!D03$business_work_code %in% c(1,2,8), na.rm = TRUE))
+
+paste0("volunteer_work_code: ", sum(!D03$volunteer_work_code %in% c(1,2,8), na.rm = TRUE))
+
+paste0("retired_code: ", sum(!D03$retired_code %in% c(1,2,8), na.rm = TRUE))
+
+paste0("salary_amount_raw: ", sum(D03$salary_amount_raw < 0, na.rm = TRUE))
+
+paste0("salary_period_code: ", sum(!D03$salary_period_code %in% c(1,2,3,8), na.rm = TRUE))
+
+paste0("salary_category_code: ", sum(!D03$salary_category_code %in% c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,88), na.rm = TRUE))
+
+paste0("transport_to_work_code: ", sum(!D03$transport_to_work_code %in% c(1,2,3,4,5,6,7,8,9,10,11,88), na.rm = TRUE))
+
+paste0("minutes_to_work: ", sum(!D03$minutes_to_work %in% c(1,2,3,4,5,6,8), na.rm = TRUE))
+
+paste0("sector_code: ", sum(!D03$sector_code %in% c(1,2,3,8), na.rm = TRUE))
+
+paste0("looking_for_work_code: ", sum(!D03$looking_for_work_code %in% c(1,2,8), na.rm = TRUE))
+
+paste0("could_start_work_code: ", sum(!D03$could_start_work_code %in% c(1,2,3,8), na.rm = TRUE))
+
+paste0("employment_status1code: ", sum(!D03$employment_status1code %in% c(1,2,8,9), na.rm = TRUE))
+
+paste0("employment_status2code: ", sum(!D03$employment_status2code %in% c(1,2,3,8), na.rm = TRUE))
+
+paste0("lab_salary_raw: ", sum(D03$lab_salary_raw < 0, na.rm = TRUE))
+```
+
+```{r}
+#| label: dataset-3-explore-invalid-values
+D03 |> 
+  filter(!D03$education_level_code %in% c(98,00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29))
+D03 |>
+  filter(!D03$wage_work_code %in% c(1,2,8))
+D03 |>
+  filter(!D03$business_work_code %in% c(1,2,8))
+D03 |>
+  filter(!D03$volunteer_work_code %in% c(1,2,8))
+D03 |>
+  filter(!D03$minutes_to_work %in% c(1,2,3,4,5,6,8))
+D03 |>
+  filter(!D03$employment_status1code %in% c(1,2,8,9))
+```
+
+### Dataset 8:
+
+```{r}
+#| label: dataset-8-valid-values-check
+paste0("province_code: ", sum(!D08$province_code %in% c(1,2,3,4,5,6,7,8,9), na.rm = TRUE))
+
+paste0("telephone_code: ", sum(!D08$telephone_code %in% c(1,2), na.rm = TRUE))
+
+paste0("cellphone_code: ", sum(!D08$cellphone_code %in% c(1,2), na.rm = TRUE))
+
+paste0("fixed_internet_code: ", sum(!D08$fixed_internet_code %in% c(1,2), na.rm = TRUE))
+
+paste0("mobile_internet_code: ", sum(!D08$mobile_internet_code %in% c(1,2), na.rm = TRUE))
+
+paste0("public_wi_fi_internet_code: ", sum(!D08$public_wi_fi_internet_code %in% c(1,2), na.rm = TRUE))
+
+paste0("study_internet_code: ", sum(!D08$study_internet_code %in% c(1,2), na.rm = TRUE))
+
+paste0("work_internet_code: ", sum(!D08$work_internet_code %in% c(1,2), na.rm = TRUE))
+
+paste0("library_internet_code: ", sum(!D08$library_internet_code %in% c(1,2), na.rm = TRUE))
+
+paste0("cafe_internet_code: ", sum(!D08$cafe_internet_code %in% c(1,2), na.rm = TRUE))
+
+paste0("household_mobile_phones: ", sum(!D08$household_mobile_phones %in% c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15), na.rm = TRUE))
+
+paste0("household_smartphones: ", sum(!D08$household_smartphones %in% c(0,1,2,3,4,5,6,7,8,9,10,11,12,13), na.rm = TRUE))
+
+paste0("computer_asset_code: ", sum(!D08$computer_asset_code %in% c(1,2,9), na.rm = TRUE))
+
+paste0("geo_type_code: ", sum(!D08$geo_type_code %in% c(1,2,3), na.rm = TRUE))
+```
+
+```{r}
+#| label: dataset-8-explore-invalid-values
+D08 |>
+  filter(!D08$telephone_code %in% c(1,2))
+
+D08 |>
+  filter(!D08$fixed_internet_code %in% c(1,2))
+
+D08 |>
+  filter(!D08$mobile_internet_code %in% c(1,2))
+
+D08 |>
+  filter(!D08$public_wi_fi_internet_code %in% c(1,2))
+
+D08 |>
+  filter(!D08$study_internet_code %in% c(1,2))
+
+D08 |>
+  filter(!D08$work_internet_code %in% c(1,2))
+
+D08 |>
+  filter(!D08$library_internet_code %in% c(1,2))
+
+D08 |>
+  filter(!D08$cafe_internet_code %in% c(1,2))
+
+D08 |>
+  filter(!D08$household_smartphones %in% c(0,1,2,3,4,5,6,7,8,9,10,11,12,13))
+```
+
+# Graphs for our chosen datasets:
 
 ```{r}
 #| label: dataset-1-graphs
+
 ```
+
+# What to handle in preprocessing:
