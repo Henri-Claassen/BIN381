@@ -38,7 +38,7 @@ directory <- "../Datasets/"
 ## Creating the data frames for all the data sets:
 
 ```{r}
-#| label: Data Frame Creation
+#| label: data-frame-creation
 D01 <- read_csv(file.path(directory, "D01_Population_Profile.csv"), show_col_types = FALSE, col_types = cols(HouseholdID = col_character())) |> clean_names() #clean_names() is used to change all column names into a consistent form for example Household ID becomes household_id
 D02 <- read_csv(file.path(directory, "D02_Learning_Profile.csv"), show_col_types = FALSE, col_types = cols(HouseholdID = col_character())) |> clean_names()
 D03 <- read_csv(file.path(directory, "D03_Economic_Participation.csv"), show_col_types = FALSE, col_types = cols(HouseholdID = col_character())) |> clean_names()
@@ -499,7 +499,7 @@ which(D01$age < 0) #Which is used to see which row numbers are below 0 for age
 ```{r}
 #| label: filter dataset-1-age
 D01 |>
-  filter(D01$age < 0)
+  filter(age < 0)
 ```
 
 ## Check for invalid values in the columns
@@ -705,3 +705,5 @@ D08 |>
 ```
 
 # What to handle in preprocessing:
+
+# Initial Hypotheses
