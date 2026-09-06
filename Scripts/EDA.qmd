@@ -955,4 +955,21 @@ D08 |>
 
 # What to handle in preprocessing:
 
+1.  **Handle large values,** for example Household ID. It was read in as character to prevent the large numeric value from being rounded, this needs to be properly addressed in preprocessing.
+
+2.  **Missing Values,** D01 (115 missing), D02 (120 missing), D03 (100 missing), D08 (60 missing) all have missing values that need to be dropped.
+
+3.  **Duplicate Rows,** D01 (Na household ids create duplicate rows 23 duplicate rows), D02 (44 duplicate rows), D03 (40 duplicate rows), D08 has no duplicate rows nothing to be handled, duplicated rows need to be dropped.
+
+4.  **Invalid/out-of-range values,** D02,D03,D08 have invalid entries in some of their columns these need to be dropped, then the negative values for age in D01 also need to be dropped.
+
+5.  **Province naming inconsistencies,** other columns might also have invalid naming consistencies so run consistency validator on all columns to be safe.
+
+6.  **Remove extreme outliers,** columns like age have outliers way outside of the range which need to be removed. Perform scaling and outlier removal on all columns to be safe.
+
 # Initial Hypotheses:
+
+1.  Higher education may be associated with a higher likelihood of employment.
+2.  Household internet / computer access may allow for education to lead to a better chance of employment.
+3.  Some provinces like gauteng might have better internet and more job opportunities, which means location might be the cause for higher education or better employment rate.
+4.  A higher income may be related to higher education and internet connectivity. However, the data here is weak since alot of records are missing, so this is more exploratory.
