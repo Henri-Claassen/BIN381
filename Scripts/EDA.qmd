@@ -699,11 +699,102 @@ D08 |>
 
 # Graphs for our chosen datasets:
 
+## Dataset 1 Graphs:
+
 ```{r}
 #| label: dataset-1-graphs
+boxplot(D01$age)
+hist(D01$age)
+```
+
+For age we can see there are a couple of outliers at about 90, nothing to major though, we can also see that most people are around the age of 20, we also see some values below 0 that need to be dropped alongside the outliers
+
+```{r}
+summary(D01$age)
+```
+
+After a bit further investigation we see that the average age is 30 and that the majority of people are aged 28
+
+```{r}
+D01 |>
+  ggplot(aes(x=province)) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Province Distribution",
+       x = "Province",
+       y = "Count") +
+  theme(axis.text.x = element_text(angle=45, hjust = 1))
+```
+
+This graph tells us that the spelling for all the different provinces are different.
+
+```{r}
+unique(D01$province)
+```
+
+By running unique province we prove this and we see there is a naming convention problem
+
+```{r}
+D01 <- D01 |> mutate(province = str_to_title(province))
+```
+
+To fix it we mutate the province with str_to_title to normalize the capitalization of all the words
+
+```{r}
+unique(D01$province)
+```
+
+```{r}
+D01 |>
+  ggplot(aes(x=province)) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Province Distribution",
+       x = "Province",
+       y = "Count") +
+  theme(axis.text.x = element_text(angle=45, hjust = 1))
+```
+
+Our graph now looks nice, and we can see majority of the people live in Gauteng.
+
+## Dataset 2 Graphs:
+
+```{r}
+D02 |>
+  ggplot(aes(D02$education_level_code)) + 
+  geom_histogram(bins = 50, binwidth = 1, fill = "steelblue", color="white") +
+  labs(title = "Education Distribution",
+       x = "Education Code",
+       y = "count")
+```
+
+The rows the graphs has removed are the NA values that need to be dropped in the preprocessing stage.
+
+From this graph however we can see that majority lies at around Code 10
+
+```{r}
+education_counts <- table(D02$education_level_code)
+paste0("Most common code: ", names(which.max(education_counts)))
+paste0("Frequency of the code: ", max(education_counts))
+```
+
+```{r}
+data.frame(education_counts) |>
+  arrange(desc(Freq))
+```
+
+After further exploration we see that code 12 is most common education which is Grade 12, with code 98 close behind it with 9378 records which means no schooling
+
+## Dataset 3 Graphs:
+
+```{r}
+
+```
+
+## Dataset 4 Graphs:
+
+```{r}
 
 ```
 
 # What to handle in preprocessing:
 
-# Initial Hypotheses
+# Initial Hypotheses:
