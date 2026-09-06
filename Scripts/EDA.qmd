@@ -11,7 +11,7 @@ execute:
   message: false
 ---
 
-## Install packages if they are not installed:
+# Install packages if they are not installed:
 
 ```{r}
 #| label: install-packages
@@ -28,14 +28,14 @@ library(janitor)
 library(visdat)
 ```
 
-### This is the file path variable for the data set folder:
+# This is the file path variable for the data set folder:
 
 ```{r}
 #| label: data-directory
 directory <- "../Datasets/"
 ```
 
-## Creating the data frames for all the data sets:
+# Creating the data frames for all the data sets:
 
 ```{r}
 #| label: data-frame-creation
@@ -52,7 +52,7 @@ D10 <- read_csv(file.path(directory, "D10_Mobility_Access.csv"), show_col_types 
 D11 <- read_csv(file.path(directory, "D11_Labour_Market.csv"), show_col_types = FALSE, col_types = cols(HouseholdID = col_character())) |> clean_names()
 ```
 
-### Finding the one or more parsing issues:
+## Finding the one or more parsing issues:
 
 ```{r}
 #| label: find-issues
@@ -69,7 +69,7 @@ problems(D10)
 problems(D11)
 ```
 
-#### We see that Data set 11 has a few problems in column 30, lets inspect what column it is:
+### We see that Data set 11 has a few problems in column 30, lets inspect what column it is:
 
 ```{r}
 #| label: column-names
@@ -79,7 +79,7 @@ nrow(problems(D11)) #Shows how many problems there are
 
 > This tells us that 45 rows in the hours_worked_raw column has issues in data set 11 that need to be resolved in the pre-processing
 
-## Quick summary about column and row counts for all datasets
+# Quick summary about column and row counts for all datasets
 
 ```{r}
 #| label: tibble-summary
@@ -93,7 +93,7 @@ tibble(
 
 > From this quick tibble summary we can see that D04 - D10 (All are around 20,000) are Household based, where D01 - D03 is person based (Around 70,000) and then we have D11 with around 170,000 which is also likely to do with people
 
-## Exploring the data:
+# Exploring the data:
 
 ```{r}
 #| label: exploring-D01
@@ -164,7 +164,7 @@ skim(D11)
 
 # Check For missing Data:
 
-### Total missing values for each dataset
+## Total missing values for each dataset
 
 ```{r}
 #| label: total-missing-values
@@ -264,7 +264,7 @@ data.frame(missing=colSums(is.na(D11)))
 
 # Checking for duplicate Rows:
 
-### Total duplicated values for each dataset
+## Total duplicated values for each dataset
 
 ```{r}
 #| label: total-duplicated-values
@@ -395,7 +395,7 @@ D11 |>
 
 > Dataset 11 has 60 rows of duplicate data
 
-## Which Datasets we choose:
+# Which Datasets we choose:
 
 > D01 - This dataset data about population information about people, for example (age,sex,province,population group) helps us link the other datasets to each other.
 >
@@ -405,7 +405,7 @@ D11 |>
 >
 > D08 - This dataset shows connectivity, this is required to see which households have internet or not it is the core way to determine if there is a link between education, employment and internet connectivity.
 
-## Which Datasets we dont choose:
+# Which Datasets we dont choose:
 
 > D09 - Household resources
 >
@@ -425,7 +425,7 @@ D11 |>
 >
 > D04,D05,D06,D07,D10,D11 will not be selected for this scenario since they do not greatly affect whether a household has internet, and they also do not help us realize if internet has an affect on education or acquiring a job.
 
-## Check intersect comparison to see if the datasets are compatible with each other:
+# Check intersect comparison to see if the datasets are compatible with each other:
 
 > Now we need to confirm that the datasets we chose are related to each other and can be linked
 
@@ -439,7 +439,7 @@ intersect(D01$household_id, D11$household_id) |> length()
 
 > We see that for household level, that D01,D02,D03,D08 are very closely related meaning they have the same household ids so they can be used for analysis and comparison
 
-### Check the household ID matching %
+## Check the household ID matching %
 
 ```{r}
 #| label: percent-of-household-ids-that-match
@@ -448,7 +448,7 @@ intersect(D01$household_id, D11$household_id) |> length()
 
 > This tells us that 98.77% of the household ids have a match. This means that out of the total number of household ids in dataset 1, 98.77% of them match with the household ids in data set 2,3 and 8.
 
-#### For person level checks we need to use composite keys so we first merge the household_id and person_id into a new id variable and then compare those values across datasets:
+### For person level checks we need to use composite keys so we first merge the household_id and person_id into a new id variable and then compare those values across datasets:
 
 ```{r}
 #| label: person-level-ID-comparison
@@ -618,6 +618,8 @@ paste0("employment_status2code: ", sum(!D03$employment_status2code %in% c(1,2,3,
 paste0("lab_salary_raw: ", sum(D03$lab_salary_raw < 0, na.rm = TRUE))
 ```
 
+#### Exploring the invalid values we have in columns
+
 ```{r}
 #| label: dataset-3-explore-invalid-values
 D03 |> 
@@ -666,6 +668,8 @@ paste0("computer_asset_code: ", sum(!D08$computer_asset_code %in% c(1,2,9), na.r
 
 paste0("geo_type_code: ", sum(!D08$geo_type_code %in% c(1,2,3), na.rm = TRUE))
 ```
+
+#### Exploring the invalid values we have in columns
 
 ```{r}
 #| label: dataset-8-explore-invalid-values
