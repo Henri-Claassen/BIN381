@@ -497,7 +497,7 @@ which(D01$age < 0) #Which is used to see which row numbers are below 0 for age
 ```
 
 ```{r}
-#| label: filter dataset-1-age
+#| label: filter-dataset-1-age
 D01 |>
   filter(age < 0)
 ```
@@ -703,19 +703,25 @@ D08 |>
 
 ```{r}
 #| label: dataset-1-graphs
-boxplot(D01$age)
-hist(D01$age)
+boxplot(D01$age, xlab = "Frequency", ylab = "Ages")
+hist(D01$age, xlab = "Ages", ylab = "Counts")
 ```
 
 For age we can see there are a couple of outliers at about 90, nothing to major though, we can also see that most people are around the age of 20, we also see some values below 0 that need to be dropped alongside the outliers
 
+### Summary of D01 Ages
+
 ```{r}
+#| label: summary-D01-age
 summary(D01$age)
 ```
 
 After a bit further investigation we see that the average age is 30 and that the majority of people are aged 28
 
+### Province Distribution
+
 ```{r}
+#| label: province-distribution
 D01 |>
   ggplot(aes(x=province)) +
   geom_bar(fill = "steelblue") +
@@ -727,23 +733,35 @@ D01 |>
 
 This graph tells us that the spelling for all the different provinces are different.
 
+### Finding Problem Province Naming
+
 ```{r}
+#| label: finding-province-naming-error
 unique(D01$province)
 ```
 
 By running unique province we prove this and we see there is a naming convention problem
 
+### Fixing Provinces
+
 ```{r}
+#| label: fixing-province-naming-error
 D01 <- D01 |> mutate(province = str_to_title(province))
 ```
 
 To fix it we mutate the province with str_to_title to normalize the capitalization of all the words
 
+### Fixed Provinces
+
 ```{r}
+#| label: confirming-fix-worked
 unique(D01$province)
 ```
 
+### Province Distribution
+
 ```{r}
+#| label: plot-fixed-province-distribution
 D01 |>
   ggplot(aes(x=province)) +
   geom_bar(fill = "steelblue") +
@@ -758,6 +776,7 @@ Our graph now looks nice, and we can see majority of the people live in Gauteng.
 ## Dataset 2 Graphs:
 
 ```{r}
+#| label: dataset-2-graphs
 D02 |>
   ggplot(aes(D02$education_level_code)) + 
   geom_histogram(bins = 50, binwidth = 1, fill = "steelblue", color="white") +
@@ -770,13 +789,19 @@ The rows the graphs has removed are the NA values that need to be dropped in the
 
 From this graph however we can see that majority lies at around Code 10
 
+### Showing Most Frequent Education Code
+
 ```{r}
+#| label: finding-most-frequent-codes
 education_counts <- table(D02$education_level_code)
 paste0("Most common code: ", names(which.max(education_counts)))
 paste0("Frequency of the code: ", max(education_counts))
 ```
 
+### Showing All Education Code Counts
+
 ```{r}
+#| label: display-education-counts
 data.frame(education_counts) |>
   arrange(desc(Freq))
 ```
@@ -786,13 +811,142 @@ After further exploration we see that code 12 is most common education which is 
 ## Dataset 3 Graphs:
 
 ```{r}
-
+#| label: dataset-3-graphs
+D03 |>
+  ggplot(aes(x = factor(employment_status1code))) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Employment Status",
+       x = "Employment Status Code",
+       y = "Count")
 ```
 
-## Dataset 4 Graphs:
+From this graph we can see Code 9 is the most with Code 8 being a close second Code 9 is unspecified and 8 is not applicable.
+
+### Finding Most Frequent Employment Code
 
 ```{r}
+#| label: finding-highest-employment-code
+employment_codes_count <- table(D03$employment_status1code)
+names(which.max(employment_codes_count))
+max(employment_codes_count)
+```
 
+### Showing Employment Codes
+
+```{r}
+#| label: showing-all-employment-codes
+data.frame(employment_codes_count) |>
+  arrange(desc(Freq))
+```
+
+We have now confirmed that Code 9 and 8 are the most with code 1 being a close second and code 2 being the least.
+
+### Plotting Salaries
+
+```{r}
+#| label: plotting-salaries
+D03 |> 
+  ggplot(aes(x = salary_amount_raw)) +
+  geom_histogram(bins = 30, fill = "steelblue", color = "white") +
+  scale_x_log10() +
+  labs(title = "Salary Distribution",
+       x = "Salary",
+       y = "Count")
+```
+
+When we look at SalaryAmountRaw, these figures do not add up for actual salaries, the values are way too small
+
+### Salary Summary
+
+```{r}
+#| label: salary-summary
+D03 |>
+  filter(!lab_salary_raw %in% c(888888888, 999999999)) |>
+  pull(lab_salary_raw) |>
+  summary()
+```
+
+The mean is larger than the median so a log would be appropriate to use on the graph
+
+### Finding Unusable Salary Rows
+
+```{r}
+#| label: find-unusable-salary-rows
+placeholders <- c(888888888, 999999999)
+D03 |>
+  filter(lab_salary_raw %in% placeholders) |>
+  nrow()
+```
+
+### Finding Unusable Salary Row %
+
+```{r}
+#| label: finding-percent-of-unusable-salary-rows
+nrow(D03)
+52145 / nrow(D03) * 100
+```
+
+Out of 70460 rows 52145 are unusable, which is approximately 74%
+
+### Fixed Salary Graph
+
+```{r}
+#| label: using-fixed-salary-graph
+placeholders <- c(888888888, 999999999)
+
+D03 |> 
+  filter(!lab_salary_raw %in% placeholders) |> 
+  ggplot(aes(x = lab_salary_raw)) +
+  geom_histogram(bins = 30, fill = "steelblue", color = "white") +
+  scale_x_log10() +
+  labs(title = "Salary Distribution",
+       x = "Salary",
+       y = "Count")
+```
+
+We had to scale the values using log to get a better shaped graph and we had to remove the placeholder 888..etc and 999..etc so that the graph wouldnt get compressed too much
+
+## Dataset 8 Graphs:
+
+```{r}
+#| label: dataset-8-graphs
+D08 |> 
+  ggplot(aes(x=factor(fixed_internet_code))) +
+  geom_bar(fill = "steelblue") +
+  labs( title = "Fixed Internet Access (1 = Yes, 2 = No)",
+        x = "Has Fixed Internet",
+        y = "Count of Households"
+  )
+```
+
+We can see alot less people have fixed internet than those who do not have fixed internet.
+
+### Mobile Internet Access
+
+```{r}
+#| label: plotting-mobile-internet-access
+D08 |> 
+  ggplot(aes(x=factor(mobile_internet_code))) +
+  geom_bar(fill = "steelblue") +
+  labs( title = "Mobile Internet Access (1 = Yes, 2 = No)",
+        x = "Has Mobile Internet",
+        y = "Count of Households"
+  )
+```
+
+We can see alot more people have Mobile internet than those who do not have mobile internet.
+
+### Household Smartphones
+
+```{r}
+#| label: plotting-household-smartphones
+D08 |> 
+  ggplot(aes(x = household_smartphones)) +
+  geom_histogram(binwidth = 1, boundary = 0.5, fill = "steelblue", color = "white") +
+  coord_cartesian(xlim = c(-5, 10)) + # zooms visibile window to the range -5 -> 10
+  labs(title = "Household Smartphone Count",
+       x = "Number of Smartphones",
+       y = "Count")
 ```
 
 # What to handle in preprocessing:
