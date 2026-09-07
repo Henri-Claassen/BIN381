@@ -1,0 +1,69 @@
+{
+  "name": "DashboardBlueTheme",
+  "dataColors": [
+    "#5B9BD5",
+    "#2E75B6",
+    "#1F4E79",
+    "#9DC3E6",
+    "#BDD7EE",
+    "#4472C4",
+    "#8FAADC",
+    "#264478"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#252423",
+  "tableAccent": "#5B9BD5",
+  "good": "#548235",
+  "neutral": "#BFBFBF",
+  "bad": "#C00000",
+  "maximum": "#1F4E79",
+  "center": "#9DC3E6",
+  "minimum": "#EAF1FA",
+  "null": "#BFBFBF",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "title": [
+          {
+            "fontColor": {
+              "solid": {
+                "color": "#252423"
+              }
+            },
+            "background": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            }
+          }
+        ],
+        "*": [
+          {
+            "fontColor": {
+              "solid": {
+                "color": "#252423"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "textClasses": {
+    "title": {
+      "color": "#FFFFFF",
+      "fontFace": "Segoe UI",
+      "fontSize": 24
+    },
+    "header": {
+      "color": "#252423",
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 12
+    },
+    "label": {
+      "color": "#252423",
+      "fontFace": "Segoe UI",
+      "fontSize": 10
+    }
+  }
+}
