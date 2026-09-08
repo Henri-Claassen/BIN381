@@ -6,6 +6,8 @@ format:
   html: 
     toc: true #Gives a table of contents
     code-fold: show #Code chunks visible by default but can be collapsed
+  pdf:
+    toc: true
 execute:
   warning: false #Makes warnings not appear to keep text clean in the file will appear in console when run
   message: false
