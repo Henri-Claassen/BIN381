@@ -1,0 +1,762 @@
+---
+title: "Data Preprocessing For Datasets"
+author: "Group 5"
+date: today
+format:
+  html:
+    toc: true #Gives a table of contents
+    code-fold: show
+    df-print: kable
+  pdf:
+    toc: true
+    df-print: kable
+execute:
+  warning: false #Makes warnings not appear to keep text clean in the file will appear in console when run
+  message: false
+---
+
+## Loading the packages we need:
+
+```{r}
+#| label: Package Setup
+
+library(tidyverse)
+library(janitor)
+```
+
+## File path for the dataset folder:
+
+```{r}
+#| label: File-Path Declarations
+
+directory <- "../Datasets/"
+```
+
+# 1.1 Import with explicit column types
+
+**Problem:** `HouseholdID` is an 18-digit number. R stores numbers as doubles, which are only exact up to about 15–16 digits, so letting `read_csv()` guess the type rounds the IDs (Milestone 1, section 8.3). `PersonNumber` is stored as "01", "02", … and must have the same type in every file for joins to match. `EducationAttendanceCode` and `MinutesToWork` contain text placeholders mixed into numeric codes.
+
+**Treatment:** read every file with explicit types: IDs as text (`col_character()`) in all four files, and the two contaminated columns as text so no value is silently lost. `clean_names()` converts all column names to snake_case. The datasets are named D01, D02, D03 and D08, as in the ERD and the EDA, and are cleaned step by step under the same names. A summary of each uncleaned dataset is recorded in 1.2, before anything changes, for the before/after comparisons.
+
+```{r}
+#| label: Import Datasets
+
+D01 <- read_csv(file.path(directory, "D01_Population_Profile.csv"), show_col_types = FALSE,
+                col_types = cols(HouseholdID = col_character(), PersonNumber = col_character())) |> clean_names()
+
+D02 <- read_csv(file.path(directory, "D02_Learning_Profile.csv"), show_col_types = FALSE,
+                col_types = cols(HouseholdID = col_character(), PersonNumber = col_character(), EducationAttendanceCode = col_character())) |> clean_names()
+
+D03 <- read_csv(file.path(directory, "D03_Economic_Participation.csv"), show_col_types = FALSE,
+                col_types = cols(HouseholdID = col_character(), PersonNumber = col_character(),MinutesToWork = col_character())) |> clean_names()
+
+D08 <- read_csv(file.path(directory, "D08_Connectivity_Access.csv"), show_col_types = FALSE,
+                col_types = cols(HouseholdID = col_character())) |> clean_names()
+```
+
+
+**Verification:** no parsing problems, IDs stored as text with all 18 digits intact.
+
+
+```{r}
+#| label: Verify Imports
+
+tibble(
+  dataset = c("D01", "D02", "D03", "D08"),
+  parsing_problems = c(nrow(problems(D01)), nrow(problems(D02)), nrow(problems(D03)), nrow(problems(D08))),
+  
+  household_id_type = c(class(D01$household_id), class(D02$household_id), class(D03$household_id), class(D08$household_id)),
+  
+  shortest_id = c(min(nchar(D01$household_id), na.rm = TRUE), min(nchar(D02$household_id)),
+                  min(nchar(D03$household_id)), min(nchar(D08$household_id))),
+  
+  longest_id = c(max(nchar(D01$household_id), na.rm = TRUE), max(nchar(D02$household_id)),
+                 max(nchar(D03$household_id)), max(nchar(D08$household_id))),
+  
+  distinct_households = c(n_distinct(D01$household_id, na.rm = TRUE), n_distinct(D02$household_id),
+                          n_distinct(D03$household_id), n_distinct(D08$household_id)),
+  
+  distinct_if_stored_as_number = c(n_distinct(as.numeric(D01$household_id), na.rm = TRUE), n_distinct(as.numeric(D02$household_id)),
+                                   n_distinct(as.numeric(D03$household_id)), n_distinct(as.numeric(D08$household_id)))
+)
+```
+
+**Effect:** the last column shows what would have happened without this treatment. Stored as numbers, D08's `r format(n_distinct(D08$household_id), big.mark = ",")` distinct households would collapse to `r format(n_distinct(as.numeric(D08$household_id)), big.mark = ",")`, merging different households together. This is exactly the count behind the EDA's 98.77% household match, so that figure was caused by the rounding problem rather than by missing households. As text, every ID keeps all 18 digits.
+
+
+# 1.2 Uncleaned "before" summary
+
+**Problem:** the rubric requires before-and-after evidence for every major preprocessing decision.
+
+**Treatment:** record the size, missing values, key uniqueness and duplicates of each uncleaned dataset in `uncleaned_summary`, so Part 1 and Part 2 can compare the cleaned data against the uncleaned data.
+
+```{r}
+#| label: Uncleaned Datasets Summary
+
+uncleaned_summary <- tibble(
+  dataset = c("D01", "D02", "D03", "D08"),
+  
+  rows = c(nrow(D01), nrow(D02), nrow(D03), nrow(D08)),
+  
+  cols = c(ncol(D01), ncol(D02), ncol(D03), ncol(D08)),
+  
+  missing_values = c(sum(is.na(D01)), sum(is.na(D02)), sum(is.na(D03)), sum(is.na(D08))),
+  
+  missing_household_id = c(sum(is.na(D01$household_id)), sum(is.na(D02$household_id)),
+                           sum(is.na(D03$household_id)), sum(is.na(D08$household_id))),
+  
+  distinct_keys = c(nrow(distinct(D01, household_id, person_number)), nrow(distinct(D02, household_id, person_number)),
+                    nrow(distinct(D03, household_id, person_number)), n_distinct(D08$household_id)),
+  
+  exact_duplicate_rows = c(nrow(D01) - nrow(distinct(D01)), nrow(D02) - nrow(distinct(D02)),
+                           nrow(D03) - nrow(distinct(D03)), nrow(D08) - nrow(distinct(D08)))
+)
+
+uncleaned_summary
+```
+
+Columns with missing values in each uncleaned dataset:
+
+```{r}
+#| label: Missing Values in Datasets
+
+
+bind_rows(
+  D01 = enframe(colSums(is.na(D01)), name = "column", value = "missing"),
+  D02 = enframe(colSums(is.na(D02)), name = "column", value = "missing"),
+  D03 = enframe(colSums(is.na(D03)), name = "column", value = "missing"),
+  D08 = enframe(colSums(is.na(D08)), name = "column", value = "missing"),
+  .id = "dataset"
+) |>
+  filter(missing > 0) |> #Only show columns that have missing values
+  left_join(select(uncleaned_summary, dataset, rows), by = "dataset") |>
+  mutate(percent_of_rows = round(missing / rows * 100, 2))
+```
+
+# 1.3 Grain and key checks
+
+**Problem:** before any join, the unit of observation (grain) and the key of every dataset must be confirmed, and it must be shown that the datasets can legitimately be linked.
+
+**Treatment:** compare row counts with distinct keys, check how many households each dataset shares with D01, and confirm that D11 cannot be linked.
+
+```{r}
+#| label: Grain Check/Verification
+
+D01_repeated_keys <- D01 |> filter(!is.na(household_id)) |> count(household_id, person_number) |> filter(n > 1) |> nrow()
+D02_repeated_keys <- D02 |> count(household_id, person_number) |> filter(n > 1) |> nrow()
+D03_repeated_keys <- D03 |> count(household_id, person_number) |> filter(n > 1) |> nrow()
+D08_repeated_keys <- D08 |> count(household_id) |> filter(n > 1) |> nrow()
+
+tibble(
+  dataset = c("D01", "D02", "D03", "D08"),
+  
+  grain = c("person", "person", "person", "household"),
+  
+  key = c("household_id + person_number", "household_id + person_number", "household_id + person_number", "household_id"),
+  
+  rows = c(nrow(D01), nrow(D02), nrow(D03), nrow(D08)),
+  
+  distinct_keys = c(nrow(distinct(filter(D01, !is.na(household_id)), household_id, person_number)),
+                    nrow(distinct(D02, household_id, person_number)),
+                    nrow(distinct(D03, household_id, person_number)),
+                    n_distinct(D08$household_id)),
+  
+  keys_appearing_more_than_once = c(D01_repeated_keys, D02_repeated_keys, D03_repeated_keys, D08_repeated_keys),
+  
+  rows_missing_household_id = c(sum(is.na(D01$household_id)), sum(is.na(D02$household_id)),
+                                sum(is.na(D03$household_id)), sum(is.na(D08$household_id)))
+)
+```
+
+
+```{r}
+#| label: Shared Households Check
+
+D11_ids <- read_csv(file.path(directory, "D11_Labour_Market.csv"), show_col_types = FALSE,
+                    col_select = HouseholdID, col_types = cols(.default = col_character())) |> clean_names()
+
+D01_households <- unique(na.omit(D01$household_id)) #Distinct household IDs in D01
+
+tibble(
+  compared_with = c("D02", "D03", "D08", "D11"),
+  
+  households_in_dataset = c(n_distinct(D02$household_id), n_distinct(D03$household_id),
+                            n_distinct(D08$household_id), n_distinct(D11_ids$household_id, na.rm = TRUE)),
+  
+  shared_with_D01 = c(length(intersect(D01_households, D02$household_id)),
+                      length(intersect(D01_households, D03$household_id)),
+                      length(intersect(D01_households, D08$household_id)),
+                      length(intersect(D01_households, D11_ids$household_id))),
+  
+  percent_of_D01 = round(shared_with_D01 / length(D01_households) * 100, 2)
+)
+```
+
+```{r}
+#| label: People per Household Check
+
+D01 |>
+  filter(!is.na(household_id)) |>
+  count(household_id, name = "persons") |>
+  summarise(households = n(), mean_persons = round(mean(persons), 2), median_persons = median(persons), max_persons = max(persons))
+```
+
+**Effect / Verification:** D01, D02 and D03 are one row per person and D08 is exactly one row per household (`r format(nrow(D08), big.mark = ",")` rows, `r format(n_distinct(D08$household_id), big.mark = ",")` distinct IDs). All `r format(length(D01_households), big.mark = ",")` D01 households appear in D02, D03 and D08 (100%). This corrects the 98.77% reported in the EDA: its count of `r format(n_distinct(as.numeric(D08$household_id)), big.mark = ",")` is the number of distinct IDs left after rounding (step 1.1). D11 shares **0** households with D01, which confirms its exclusion. Household IDs repeat in the person files because a household contains several people. These are legitimate repeats in a one-to-many relationship, not duplicates. The keys that appear more than once in D02 and D03, and the missing IDs in D01, are treated in steps 1.4 and 1.5.
+
+# 1.4 Recover the missing household IDs in D01
+
+**Problem:** `r sum(is.na(D01$household_id))` rows in D01 have a missing `household_id`. These people cannot be linked to their education, employment or household connectivity. Exactly the same number of people appear in D03 (and D02) but not in D01, which suggests these are the same people with their ID blanked out.
+
+**Treatment:** match each D01 row with a missing ID to one of the people missing from D01, using `person_number`, `sex_code`, `province_code` and `person_weight`. The survey weight is identical for the same person across D01–D03 and has thousands of distinct values, so it is highly specific. The match is then checked with two attributes that were **not** used to match: the PSU (sampling cluster) must equal the first 11 digits of the recovered household ID, and the age must agree with D03.
+
+```{r}
+#| label: Identify Missing People
+
+D01_key_duplicates_before <- get_dupes(D01, household_id, person_number) 
+
+missing_from_D01 <- D03 |>
+  distinct() |> #
+  anti_join(filter(D01, !is.na(household_id)), by = c("household_id", "person_number")) |> 
+  select(household_id, person_number, sex_code, province_code, person_weight, age_d03 = age)
+
+rows_missing_id <- D01 |>
+  mutate(row_id = row_number()) |> 
+  filter(is.na(household_id)) |>
+  select(-household_id)
+
+recovered <- rows_missing_id |>
+  inner_join(missing_from_D01, by = c("person_number", "sex_code", "province_code", "person_weight"))
+```
+
+**Verification:** every D01 row with a missing ID matches exactly one person, every candidate is used exactly once, and both independent checks agree for every match.
+
+```{r}
+#| label: Verifification of Missing People 
+
+tibble(
+  
+  D01_rows_missing_id = nrow(rows_missing_id),
+  
+  people_missing_from_D01 = nrow(missing_from_D01),
+  
+  matches_found = nrow(recovered),
+  
+  each_d01_row_matched_once = n_distinct(recovered$row_id) == nrow(rows_missing_id),
+  
+  each_person_used_once = nrow(distinct(recovered, household_id, person_number)) == nrow(recovered),
+  
+  psu_agrees_with_id = sum(sprintf("%.0f", recovered$psu) == str_sub(recovered$household_id, 1, 11)), 
+  
+  age_agrees_with_D03 = sum(recovered$age == recovered$age_d03, na.rm = TRUE)
+)
+```
+
+```{r}
+#| label: Recover Missing People
+
+D01 <- D01 |>
+  mutate(row_id = row_number()) |>
+  
+  left_join(select(recovered, row_id, recovered_id = household_id), by = "row_id") |>
+  
+  mutate(
+    household_id_flag = if_else(is.na(household_id) & !is.na(recovered_id), "recovered by matching to D03", NA_character_),
+    household_id = coalesce(household_id, recovered_id)
+  ) |>
+ 
+  select(-row_id, -recovered_id)
+
+tibble(
+  missing_household_id_before = uncleaned_summary$missing_household_id[1], 
+
+  missing_household_id_after = sum(is.na(D01$household_id)),
+  
+  rows_before = uncleaned_summary$rows[1],
+  
+  rows_after = nrow(D01),
+  
+  D01_keys_identical_to_D02 = setequal(paste(D01$household_id, D01$person_number),
+                                       paste(D02$household_id, D02$person_number))
+)
+```
+
+**Effect:** all `r nrow(recovered)` IDs are recovered with no rows added or removed, and D01 now contains exactly the same set of people as D02. Recovered rows are marked in `household_id_flag`.
+
+
+# 1.5 Duplicates
+
+**Problem:** the EDA found `r nrow(D01_key_duplicates_before)` (D01), `r nrow(get_dupes(D02, household_id, person_number))` (D02) and `r nrow(get_dupes(D03, household_id, person_number))` (D03) rows sharing a person key. These must be separated into genuine duplicate records (the same record entered twice) and legitimate repeated identifiers.
+
+**Investigation:** every one of D01's key "duplicates" had a missing household ID. Rows with a missing ID and the same person number were grouped together, even though they are different people.
+
+```{r}
+#| label: False Duplicates in D01
+
+D01_key_duplicates_before |> count(household_id_missing = is.na(household_id), name = "rows")
+```
+
+After the recovery in 1.4, check each dataset for exact copies (every column identical) and for keys that still repeat with different values (conflicts):
+
+```{r}
+#| label: Duplicate Check
+
+#Rows that share their key with at least one other row
+D01_key_duplicate_rows <- nrow(get_dupes(D01, household_id, person_number))
+D02_key_duplicate_rows <- nrow(get_dupes(D02, household_id, person_number))
+D03_key_duplicate_rows <- nrow(get_dupes(D03, household_id, person_number))
+D08_key_duplicate_rows <- nrow(get_dupes(D08, household_id))
+
+#Exact copies: rows where every column is identical to another row
+D01_exact_duplicates <- nrow(D01) - nrow(distinct(D01))
+D02_exact_duplicates <- nrow(D02) - nrow(distinct(D02))
+D03_exact_duplicates <- nrow(D03) - nrow(distinct(D03))
+D08_exact_duplicates <- nrow(D08) - nrow(distinct(D08))
+
+#Keys that still repeat once exact copies are removed, meaning the same person with conflicting values
+D01_conflicting_keys <- distinct(D01) |> count(household_id, person_number) |> filter(n > 1) |> nrow()
+D02_conflicting_keys <- distinct(D02) |> count(household_id, person_number) |> filter(n > 1) |> nrow()
+D03_conflicting_keys <- distinct(D03) |> count(household_id, person_number) |> filter(n > 1) |> nrow()
+D08_conflicting_keys <- distinct(D08) |> count(household_id) |> filter(n > 1) |> nrow()
+
+tibble(
+  dataset = c("D01", "D02", "D03", "D08"),
+  
+  rows_before = c(nrow(D01), nrow(D02), nrow(D03), nrow(D08)),
+  
+  rows_in_key_duplicate_groups = c(D01_key_duplicate_rows, D02_key_duplicate_rows, D03_key_duplicate_rows, D08_key_duplicate_rows),
+  
+  exact_duplicate_rows = c(D01_exact_duplicates, D02_exact_duplicates, D03_exact_duplicates, D08_exact_duplicates),
+  
+  conflicting_keys_after_removing_exact_copies = c(D01_conflicting_keys, D02_conflicting_keys, D03_conflicting_keys, D08_conflicting_keys)
+)
+```
+
+**Treatment:** every key duplicate in D02 and D03 is an exact copy of another row, with no conflicting values, so they are genuine duplicate records. Exact copies are removed with `distinct()`. D01 and D08 contain none.
+
+```{r}
+#| label: Remove Duplicates
+
+D01 <- distinct(D01)
+D02 <- distinct(D02)
+D03 <- distinct(D03)
+D08 <- distinct(D08)
+
+tibble(
+  dataset = c("D01", "D02", "D03", "D08"),
+  
+  rows_before = uncleaned_summary$rows,
+  
+  rows_after = c(nrow(D01), nrow(D02), nrow(D03), nrow(D08)),
+  
+  rows_removed = rows_before - rows_after,
+  
+  keys_unique_after = c(nrow(distinct(D01, household_id, person_number)) == nrow(D01),
+                        nrow(distinct(D02, household_id, person_number)) == nrow(D02),
+                        nrow(distinct(D03, household_id, person_number)) == nrow(D03),
+                        n_distinct(D08$household_id) == nrow(D08))
+)
+```
+
+**Effect / Verification:** D02 loses `r D02_exact_duplicates` rows and D03 loses `r D03_exact_duplicates`. All three person datasets now contain exactly `r format(nrow(D01), big.mark = ",")` people, and every key is unique in every dataset. Repeated `household_id` values remain in the person files, because they are legitimate: one household, several people.
+
+# 1.6 Text placeholders and data types
+
+**Problem:** a code column should contain only numbers. Listing the text columns in each dataset shows which columns contain text where codes are expected (the `_flag` columns created in this pipeline are text by design and are left out):
+
+```{r}
+#| label: Text Columns Explanation
+
+bind_rows(
+  D01 = enframe(sapply(D01, class), name = "column", value = "type"),
+  D02 = enframe(sapply(D02, class), name = "column", value = "type"),
+  D03 = enframe(sapply(D03, class), name = "column", value = "type"),
+  D08 = enframe(sapply(D08, class), name = "column", value = "type"),
+  .id = "dataset"
+) |>
+  filter(type == "character", !str_ends(column, "_flag")) |> 
+  group_by(column) |>
+  summarise(datasets = paste(dataset, collapse = ", ")) |> 
+  mutate(why_text = case_when(
+    column %in% c("household_id", "person_number") ~ "Key, read as text on purpose in 1.1",
+    column == "province" ~ "Province name (rebuilt from province_code, dropped in 1.8)",
+    TRUE ~ "Code column containing text placeholders"
+  ))
+```
+
+Apart from IDs and the province name, only two columns are text: `education_attendance_code` (D02, kept) and `minutes_to_work` (D03, dropped as leakage in 1.8, so it is not treated). `education_attendance_code` mixes numeric codes with three text placeholders, the same problem Milestone 1 found in D11's `hours_worked_raw`:
+
+```{r}
+#| label: Initial Student Attendance
+
+D02 |> count(education_attendance_code)
+```
+
+None of the placeholders appears in the data dictionary. "not recorded" and "Unknown" are non-response. "N/A" cannot be assumed to mean code 8 ("not applicable"): comparing ages shows that code 8 is only used for children aged 0–4, while the placeholders occur at ages up to 72:
+
+```{r}
+#| label: Attendance Codes Placeholder Verification
+
+attendance_text <- c("N/A", "not recorded", "Unknown")
+D02 |>
+  filter(education_attendance_code %in% c("8", attendance_text)) |>
+  group_by(value = education_attendance_code) |>
+  summarise(rows = n(), min_age = min(age), median_age = median(age), max_age = max(age))
+```
+
+**Treatment:** set the text placeholders to missing, record why in `education_attendance_flag`, and convert the column to integer.
+
+```{r}
+#| label: Fixing Broken Attendance Codes
+
+D02 <- D02 |>
+  mutate(
+    education_attendance_flag = if_else(education_attendance_code %in% attendance_text,
+                                        paste0("text placeholder '", education_attendance_code, "' set to missing"), NA_character_),
+    
+    education_attendance_code = as.integer(if_else(education_attendance_code %in% attendance_text, NA_character_, education_attendance_code))
+  )
+```
+
+**Verification:**
+
+```{r}
+#| label: Fixed Attendance Codes
+
+D02 |> count(education_attendance_code, education_attendance_flag)
+class(D02$education_attendance_code)
+```
+
+**Effect:** `education_attendance_code` is now an integer column holding only dictionary codes (1, 2, 3, 8) or missing. The `r sum(!is.na(D02$education_attendance_flag))` former placeholders are traceable through the flag. Code 3 ("do not know") is handled in Part 2 with the other special codes.
+
+# 1.7 Repairs from other datasets
+
+## Age (D01)
+
+**Problem:** the data dictionary gives a valid age range of 0–110. D01 has `r sum(is.na(D01$age))` missing ages and `r sum(D01$age < 0 | D01$age > 110, na.rm = TRUE)` ages outside that range. D02 and D03 record the age of the same people.
+
+**Investigation:** check that D02 and D03 agree with each other, and that D01 agrees with D03 wherever D01's age is valid:
+
+```{r}
+#| label: Ages Inspection
+
+age_check <- D01 |>
+  left_join(select(D03, household_id, person_number, age_d03 = age), by = c("household_id", "person_number")) |>
+  left_join(select(D02, household_id, person_number, age_d02 = age), by = c("household_id", "person_number"))
+
+age_check |>
+  summarise(
+    rows = n(),
+    
+    d02_vs_d03_mismatches = sum(age_d02 != age_d03),
+    
+    d03_ages_outside_0_110 = sum(age_d03 < 0 | age_d03 > 110),
+    
+    d01_valid_ages_agreeing_with_d03 = sum(age == age_d03 & between(age, 0, 110), na.rm = TRUE),
+    
+    d01_valid_ages_disagreeing_with_d03 = sum(age != age_d03 & between(age, 0, 110), na.rm = TRUE),
+    
+    d01_missing = sum(is.na(age)),
+    
+    d01_invalid = sum(age < 0 | age > 110, na.rm = TRUE)
+  )
+
+age_check |>
+  filter(age < 0 | age > 110) |>
+  select(household_id, person_number, age_d01 = age, age_d02, age_d03)
+```
+
+D02 and D03 agree on every person and contain no invalid ages, and D01 agrees with them on every valid age. The only disagreements are D01's invalid values, so D03's age is a reliable replacement. Deleting these people would lose valid education and employment records for no reason.
+
+**Treatment:** replace D01's missing and invalid ages with D03's age and record which rows changed in `age_flag`.
+
+```{r}
+#| label: Fixed Ages
+
+D01 <- age_check |>
+  mutate(
+    
+    age_flag = case_when(is.na(age) ~ "missing - filled from D03",
+      age < 0 | age > 110 ~ paste0("invalid (", age, ") - replaced from D03")
+    ),
+    
+    age = if_else(is.na(age) | age < 0 | age > 110, age_d03, age)
+  ) |>
+  
+  select(-age_d02, -age_d03)
+```
+
+**Verification:**
+
+```{r}
+#| label: Verification of Ages after Fix
+
+tibble(
+  rows = nrow(D01),
+  
+  missing_age = sum(is.na(D01$age)),
+  
+  min_age = min(D01$age),
+  
+  max_age = max(D01$age),
+  
+  ages_differing_from_d03 = sum(D01$age != age_check$age_d03)
+)
+
+D01 |> count(age_flag = if_else(is.na(age_flag), "unchanged", str_remove(age_flag, " \\(.*\\)")))
+```
+
+**Effect:** `r sum(!is.na(D01$age_flag))` ages are repaired and none are deleted. D01's age now lies between 0 and 110 with no missing values, and agrees with D02 and D03 for every person.
+
+## Education level (D02)
+
+**Problem:** `education_level_code` in D02 has `r sum(is.na(D02$education_level_code))` missing values. D03 records the same variable for the same people.
+
+```{r}
+#| label: Education Dataset Inspection
+
+D02_education_missing_before <- sum(is.na(D02$education_level_code)) #Kept for the before/after check below
+
+education_check <- D02 |>
+  left_join(select(D03, household_id, person_number, education_d03 = education_level_code), by = c("household_id", "person_number"))
+
+education_check |>
+  summarise(
+    rows = n(),
+    
+    missing_in_d02 = sum(is.na(education_level_code)),
+    
+    missing_in_d03 = sum(is.na(education_d03)),
+    
+    agree_where_both_present = sum(education_level_code == education_d03, na.rm = TRUE),
+    
+    disagree_where_both_present = sum(education_level_code != education_d03, na.rm = TRUE),
+    
+    d02_missing_but_d03_present = sum(is.na(education_level_code) & !is.na(education_d03))
+  )
+```
+
+**Treatment:** D02 and D03 never disagree, and D03 has no missing values, so D02's gaps are filled from D03 and flagged in `education_level_flag`.
+
+```{r}
+#| label: Fixed Education Dataset 
+
+D02 <- education_check |>
+  mutate(
+    education_level_flag = if_else(is.na(education_level_code), "missing - filled from D03", NA_character_),
+    education_level_code = coalesce(education_level_code, education_d03)
+  ) |>
+  select(-education_d03)
+
+tibble(
+       missing_before = D02_education_missing_before,
+       
+       missing_after = sum(is.na(D02$education_level_code)),
+       
+       rows_flagged = sum(!is.na(D02$education_level_flag))
+       )
+```
+
+**Effect:** D02's education level is complete. Code 99, which appears in both D02 and D03 but not in the dictionary, is not a gap and cannot be filled from D03. It is treated with the other special codes in Part 2.
+
+# 1.8 Column selection
+
+**Problem:** the four datasets contain 83 columns, most of which do not measure a link in the research pathway, duplicate another dataset, or leak the outcome. The full reasoning for each column is in the Task 1 write-up (Data Selection and Analytical Grain). The evidence below supports the main drop decisions.
+
+## Evidence: columns that carry no information or duplicate another column
+
+```{r}
+#| label: Evidence of Province Mismatches
+
+tibble(
+  check = c("distinct survey_year values in D01", "distinct survey_year values in D02",
+            "distinct survey_year values in D03", "distinct survey_year values in D08",
+            "distinct province spellings in D01",
+            "distinct province spellings after trimming and case-fixing",
+            "distinct province_code values"),
+  
+  result = c(n_distinct(D01$survey_year), n_distinct(D02$survey_year),
+             n_distinct(D03$survey_year), n_distinct(D08$survey_year),
+             n_distinct(D01$province),
+             n_distinct(str_to_title(str_squish(D01$province))),
+             n_distinct(D01$province_code))
+)
+D01 |> distinct(province_code, province_clean = str_to_title(str_squish(province))) |> arrange(province_code)
+```
+
+```{r}
+#| label: Evidence of Duplicate Columns
+
+#One row per person with the D01, D02 and D03 versions of each shared column side by side
+persons <- D01 |>
+  inner_join(D02, by = c("household_id", "person_number"), suffix = c("", "_d02")) |>
+  inner_join(D03, by = c("household_id", "person_number"), suffix = c("", "_d03"))
+
+#How many people have a different value in D02 or D03 than in D01
+tibble(
+  column = c("sex_code", "province_code", "geo_type_code", "person_weight", "age"),
+  
+  people_compared = nrow(persons),
+  
+  mismatches_D01_vs_D02 = c(sum(persons$sex_code != persons$sex_code_d02),
+                            sum(persons$province_code != persons$province_code_d02),
+                            sum(persons$geo_type_code != persons$geo_type_code_d02),
+                            sum(persons$person_weight != persons$person_weight_d02),
+                            sum(persons$age != persons$age_d02)),
+  
+  mismatches_D01_vs_D03 = c(sum(persons$sex_code != persons$sex_code_d03),
+                            sum(persons$province_code != persons$province_code_d03),
+                            sum(persons$geo_type_code != persons$geo_type_code_d03),
+                            sum(persons$person_weight != persons$person_weight_d03),
+                            sum(persons$age != persons$age_d03))
+)
+
+#D08 against D01 at household level
+D01 |>
+  distinct(household_id, province_code, geo_type_code) |>
+  inner_join(D08, by = "household_id", suffix = c("", "_d08")) |>
+  summarise(households_compared = n(),
+  province_mismatch = sum(province_code != province_code_d08),
+  geo_type_mismatch = sum(geo_type_code != geo_type_code_d08))
+
+
+tibble(
+      age_group_matches_age = sum(as.integer(cut(D01$age, c(-Inf, seq(4, 74, 5), Inf))) == D01$age_group_code), 
+      
+      rows = nrow(D01)
+)
+
+```
+
+## Evidence: leakage (columns that reveal or define the employment outcome)
+
+```{r}
+#| label: Evidence of Leakage
+
+D03 |> count(employment_status1code, employment_status2code) 
+
+D03 |> count(wage_work_code, employment_status2code) 
+
+D03 |> count(looking_for_work_code, employment_status2code) 
+
+D03 |> count(sector_code, employment_status2code) 
+```
+
+## Evidence: unusable or redundant columns
+
+```{r}
+#| label: Evidence of Unusable/Redundant Columns
+
+D03 |> count(salary_amount_raw) #Only a handful of distinct values, so not Rand amounts
+
+D02 |>
+  filter(between(age, 15, 64), education_attendance_code == 1, grade_code %in% 1:12, education_level_code %in% 0:12) |>
+  count(grade_minus_education_level = grade_code - education_level_code) 
+
+D02 |>
+  filter(between(age, 15, 64)) |>
+  summarise(
+    across(c(public_private_institution_code, transport_mode_to_education_code, travel_time_to_education,
+                     bursary_code, total_education_fees, no_fees_school_code, school_food_programme_code,
+                     absence_code, absence_days),
+                   ~ round(mean(.x %in% c(8, 88)) * 100, 1))) |>
+  pivot_longer(everything(), names_to = "column", values_to = "percent_not_applicable_age_15_64")
+```
+
+## Evidence: education columns kept or dropped for Link A (digital access → education)
+
+```{r}
+#| label: Linking Digital Access to Education
+
+youth <- D02 |> filter(between(age, 15, 24))
+
+youth |> filter(education_attendance_code == 1) |> count(institution_type_code) 
+youth |> filter(education_attendance_code == 2) |> count(reason_not_attending_code, sort = TRUE) #Kept for descriptive use only
+
+youth |>
+  left_join(select(D08, household_id, study_internet_code), by = "household_id") |> 
+  filter(education_attendance_code %in% 1:2, study_internet_code %in% 1:2) |>
+  count(study_internet_code, education_attendance_code) 
+```
+
+**Treatment:** keep only the 20 selected columns plus the join keys and the traceability flags created in Part 1.
+
+```{r}
+#| label: Slecting which columns to keep
+
+#Column names before selection, kept to show which columns were dropped
+D01_columns_before <- names(D01)
+D02_columns_before <- names(D02)
+D03_columns_before <- names(D03)
+D08_columns_before <- names(D08)
+
+D01 <- D01 |>
+  select(household_id, person_number, psu, province_code, sex_code, age, population_group_code,
+         geo_type_code, metro_indicator, person_weight, household_id_flag, age_flag)
+
+D02 <- D02 |>
+  select(household_id, person_number, education_level_code, education_attendance_code, institution_type_code,
+         reason_not_attending_code, education_level_flag, education_attendance_flag)
+
+D03 <- D03 |>
+  select(household_id, person_number, employment_status2code, lab_salary_raw)
+
+D08 <- D08 |>
+  select(household_id, fixed_internet_code, mobile_internet_code, computer_asset_code, household_smartphones)
+```
+
+**Verification:**
+
+```{r}
+#| label: Comparing Before and After Column Selection
+
+tibble(
+  
+  dataset = c("D01", "D02", "D03", "D08"),
+  
+  columns_in_uncleaned_data = uncleaned_summary$cols,
+  
+  columns_before_selection = c(length(D01_columns_before), length(D02_columns_before), length(D03_columns_before), length(D08_columns_before)),
+  
+  columns_after_selection = c(ncol(D01), ncol(D02), ncol(D03), ncol(D08))
+)
+```
+
+Columns dropped from each dataset:
+
+```{r}
+#| label: Columns Dropped
+
+#Dropped columns for each dataset, stacked into one table
+bind_rows(
+  tibble(dataset = "D01", column = setdiff(D01_columns_before, names(D01))),
+  tibble(dataset = "D02", column = setdiff(D02_columns_before, names(D02))),
+  tibble(dataset = "D03", column = setdiff(D03_columns_before, names(D03))),
+  tibble(dataset = "D08", column = setdiff(D08_columns_before, names(D08)))
+) |>
+  
+  #Reason for dropping each column, matching the Task 1 write-up
+  mutate(reason = case_when(
+    column == "survey_year" ~ "No information (always 2024)",
+    column == "province" ~ "Messy text, rebuilt from province_code",
+    column %in% c("province_code", "age", "sex_code", "geo_type_code", "person_weight") ~ "Duplicate of D01",
+    column == "education_level_code" ~ "Duplicate of D02 (used to fill D02's gaps in 1.7)",
+    column %in% c("age_group_code", "employment_status1code", "grade_code") ~ "Duplicate of another column",
+    column %in% c("wage_work_code", "business_work_code", "volunteer_work_code", "retired_code",
+                  "looking_for_work_code", "could_start_work_code", "transport_to_work_code",
+                  "minutes_to_work", "sector_code", "work_internet_code", "study_internet_code") ~ "Leakage: reveals or defines an outcome",
+    column %in% c("language_code", "relationship_to_head_code", "marital_status_code") ~ "Not needed for any hypothesis",
+    column == "metro_code" ~ "Too detailed (disclosure risk)",
+    column %in% c("public_private_institution_code", "transport_mode_to_education_code", "travel_time_to_education",
+                  "bursary_code", "total_education_fees", "no_fees_school_code", "school_food_programme_code",
+                  "absence_code", "absence_days") ~ "Only recorded for people already attending",
+    column == "salary_amount_raw" ~ "Unusable (not Rand amounts)",
+    column %in% c("salary_period_code", "salary_category_code") ~ "Salary detail not needed (lab_salary_raw kept)",
+    column %in% c("telephone_code", "cellphone_code", "household_mobile_phones") ~ "Phones, not internet access",
+    column %in% c("public_wi_fi_internet_code", "library_internet_code", "cafe_internet_code") ~ "Internet access outside the home",
+    column == "household_weight" ~ "Household weight, not needed at person grain",
+    TRUE ~ "NOT CLASSIFIED" #Should never appear; shows up if a dropped column has no reason
+  )) |>
+  group_by(dataset, reason) |>
+  summarise(columns_dropped = n(), columns = paste(column, collapse = ", "), .groups = "drop")
+```
+
