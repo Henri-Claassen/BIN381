@@ -1430,7 +1430,7 @@ D03 |>
 
 ```
 
-**Effect:** `r sum(!is.na(D03$salary_flag))` of `r format(sum(!is.na(D03$salary)), big.mark = ",")` reported salaries are flagged and every salary value is unchanged, so later analyses can include or exclude the flagged rows.
+**Effect:** `r sum(!is.na(D03$salary_flag))` of `r format(sum(!is.na(D03$salary)), big.mark = ",")` reported salaries are flagged and every salary value is unchanged. Because the threshold is fixed, later analyses can include or exclude these rows with `salary < 100`, even without the flag column.
 
 `person_weight` is not touched: survey weights must never be trimmed or scaled. No scaling or transformation is applied during preprocessing; that belongs in Task 4, after the train/test split, to avoid leakage. The log scale above is for plotting only.
 
@@ -1571,22 +1571,25 @@ list(
 
 **Treatment:** save each cleaned dataset as a new `.csv` (required deliverable) in `Datasets/Cleaned/`. The original files are only read, never written. Missing values are written as empty cells rather than the text "NA", so that Power BI reads them as blanks instead of turning numeric columns such as `salary` into text. A CSV does not store column types or the order of factor levels. Anyone reading the CSVs, including Power BI, must therefore read `household_id` and `person_number` as text, and re-apply the level order listed above where the order matters.
 
+The `_flag` columns are left out of the saved files. Inside this pipeline they stay in the datasets, so every change remains traceable in the report and in the integration steps (section 9). They are removed from the analytical data in Task 4, because they are not predictors. The saved files contain only the analytical columns: the original codes, the cleaned values and the labels.
+
 Saving at this point, before the train/test split in Task 4, does not leak information between the future training and test rows. Every change so far either applies a fixed rule to each row (dictionary codes, the 15–64 age range, the R100 salary threshold, negative counts) or copies a value from the same person's record in another dataset. Nothing is estimated from the data as a whole: no means, quantiles, imputation models or scaling are used to change a value. Steps that learn from the data belong after the split, where they are fitted on the training rows only.
 
 ```{r}
 #| label: Save Cleaned Datasets
 
 #na = "" writes missing values as empty cells, which both R and Power BI read as missing
-write_csv(D01, file.path(cleaned_directory, "D01_clean.csv"), na = "")
+#select(-ends_with("_flag")) leaves the traceability flags out of the saved files; they stay in the datasets in memory
+write_csv(select(D01, -ends_with("_flag")), file.path(cleaned_directory, "D01_clean.csv"), na = "")
 
-write_csv(D02, file.path(cleaned_directory, "D02_clean.csv"), na = "")
+write_csv(select(D02, -ends_with("_flag")), file.path(cleaned_directory, "D02_clean.csv"), na = "")
 
-write_csv(D03, file.path(cleaned_directory, "D03_clean.csv"), na = "")
+write_csv(select(D03, -ends_with("_flag")), file.path(cleaned_directory, "D03_clean.csv"), na = "")
 
-write_csv(D08, file.path(cleaned_directory, "D08_clean.csv"), na = "")
+write_csv(select(D08, -ends_with("_flag")), file.path(cleaned_directory, "D08_clean.csv"), na = "")
 ```
 
-**Verification:** read the saved files back with the IDs as text, the same way later tasks should read them, and compare them with the datasets in memory.
+**Verification:** read the saved files back with the IDs as text, the same way later tasks should read them. Compare them with the datasets in memory without their flag columns, and confirm that no flag column was saved.
 
 ```{r}
 #| label: Saved Files Verification
@@ -1607,17 +1610,25 @@ tibble(
 
   rows_in_saved_file = c(nrow(D01_saved), nrow(D02_saved), nrow(D03_saved), nrow(D08_saved)),
 
-  same_columns = c(identical(names(D01_saved), names(D01)), identical(names(D02_saved), names(D02)),
-                   identical(names(D03_saved), names(D03)), identical(names(D08_saved), names(D08))),
+  flag_columns_in_saved_file = c(sum(str_ends(names(D01_saved), "_flag")), sum(str_ends(names(D02_saved), "_flag")),
+                                 sum(str_ends(names(D03_saved), "_flag")), sum(str_ends(names(D08_saved), "_flag"))),
+
+  same_columns_apart_from_flags = c(identical(names(D01_saved), names(select(D01, -ends_with("_flag")))),
+                                    identical(names(D02_saved), names(select(D02, -ends_with("_flag")))),
+                                    identical(names(D03_saved), names(select(D03, -ends_with("_flag")))),
+                                    identical(names(D08_saved), names(select(D08, -ends_with("_flag"))))),
 
   ids_identical = c(identical(D01_saved$household_id, D01$household_id) & identical(D01_saved$person_number, D01$person_number), identical(D02_saved$household_id, D02$household_id) & identical(D02_saved$person_number, D02$person_number), identical(D03_saved$household_id, D03$household_id) & identical(D03_saved$person_number, D03$person_number), identical(D08_saved$household_id, D08$household_id)),
 
-  missing_values_identical = c(sum(is.na(D01_saved)) == sum(is.na(D01)), sum(is.na(D02_saved)) == sum(is.na(D02)), sum(is.na(D03_saved)) == sum(is.na(D03)), sum(is.na(D08_saved)) == sum(is.na(D08)))
-  
+  missing_values_identical = c(sum(is.na(D01_saved)) == sum(is.na(select(D01, -ends_with("_flag")))),
+                               sum(is.na(D02_saved)) == sum(is.na(select(D02, -ends_with("_flag")))),
+                               sum(is.na(D03_saved)) == sum(is.na(select(D03, -ends_with("_flag")))),
+                               sum(is.na(D08_saved)) == sum(is.na(select(D08, -ends_with("_flag")))))
+
 )
 ```
 
-**Effect:** four new files are written to `Datasets/Cleaned/`. These four `write_csv()` calls are the only place the pipeline writes data, so the original files in `Datasets/` are left unchanged. Read back with the IDs as text, every saved file has the same rows, columns, IDs and missing values as the cleaned dataset in memory, so later tasks can start from these files instead of rerunning the pipeline.
+**Effect:** four new files are written to `Datasets/Cleaned/`. These four `write_csv()` calls are the only place the pipeline writes data, so the original files in `Datasets/` are left unchanged. Read back with the IDs as text, no saved file contains a flag column. Apart from the flags, every saved file has the same rows, columns, IDs and missing values as the cleaned dataset in memory, so later tasks can start from these files instead of rerunning the pipeline.
 
 # 9. Data Integration
 
