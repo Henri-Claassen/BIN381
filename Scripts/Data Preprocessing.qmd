@@ -760,3 +760,392 @@ bind_rows(
   summarise(columns_dropped = n(), columns = paste(column, collapse = ", "), .groups = "drop")
 ```
 
+#####################################################################################################################
+
+
+# Part 2: Validity, Recoding and Final Validation
+
+```{r}
+#| label: Output Folder
+
+cleaned_directory <- "../Datasets/Cleaned/" #Final cleaned datasets for Task 3 and Milestone 3
+dir.create(cleaned_directory, showWarnings = FALSE)
+```
+
+# 2.1 Special codes and salary reversal
+
+**Problem:** several coded columns mix valid categories, structural "not applicable" codes and non-response codes. `lab_salary_raw` mixes real Rand values with two placeholder codes.
+
+**Treatment:** classify each special code as valid, "Not applicable", or `NA`, applied via `factor()` levels in 2.3. For salary, cross-tabulate the placeholders against `employment_status2code` before deciding.
+
+```{r}
+#| label: Special Codes Check
+
+D02 |> count(education_level_code, sort = TRUE) |> filter(education_level_code %in% c(98, 99, 29, 28))
+D02 |> count(education_attendance_code)
+D02 |> count(institution_type_code == 88, name = "rows")
+D02 |> count(reason_not_attending_code == 88, name = "rows")
+D08 |> count(fixed_internet_code)
+D08 |> count(mobile_internet_code)
+D08 |> count(computer_asset_code)
+```
+
+Code 98 (No schooling) and 28 (Other) in `education_level_code` are valid categories. Codes 99 (not in dictionary) and 29 (do not know) become `NA`. Code 3 in `education_attendance_code` becomes `NA`; code 8 only occurs under age 15 and disappears after 2.2. `education_attendance_code` also has `r sum(is.na(D02$education_attendance_code))` genuinely missing values (present since the raw data, distinct from the text placeholders resolved in 1.6); these remain `NA` in the label column since there is no dictionary code to assign them. Code 88 in `institution_type_code`/`reason_not_attending_code` becomes "Not applicable", not missing. `fixed_internet_code` has `r sum(D08$fixed_internet_code == 9, na.rm = TRUE)` rows with code 9, which is not in the dictionary and becomes `NA`. `mobile_internet_code` has `r sum(is.na(D08$mobile_internet_code))` genuinely missing values, present since the raw data; these remain `NA` since there is no dictionary code to assign them. `computer_asset_code` 9 ("Unspecified") is a valid dictionary code and is kept as its own level.
+
+```{r}
+#| label: Salary Placeholder Cross-Tab
+
+D03 |>
+  mutate(salary_type = case_when(
+    lab_salary_raw == 888888888 ~ "888888888 (dont know/refused)",
+    lab_salary_raw == 999999999 ~ "999999999 (not applicable)",
+    TRUE ~ "Real salary value"
+  )) |>
+  count(employment_status2code, salary_type) |>
+  pivot_wider(names_from = employment_status2code, values_from = n, values_fill = 0)
+```
+
+888888888 acts as "not applicable" for everyone without a job, and 999999999 as non-response among the employed. `salary` and `salary_status` are derived from the value and `employment_status2code` together, not from the placeholder alone.
+
+```{r}
+#| label: Salary Reversal
+
+D03_salary_missing_before <- sum(D03$lab_salary_raw %in% c(888888888, 999999999))
+
+D03 <- D03 |>
+  mutate(
+    salary = if_else(lab_salary_raw %in% c(888888888, 999999999), NA_real_, lab_salary_raw),
+    salary_status = case_when(
+      !is.na(salary) ~ "Reported",
+      lab_salary_raw == 999999999 ~ "Non-response (employed)",
+      lab_salary_raw == 888888888 & employment_status2code == 1 ~ "Non-response (employed)",
+      lab_salary_raw == 888888888 ~ "Not applicable (not employed)",
+      TRUE ~ NA_character_
+    )
+  )
+```
+
+**Effect:** `r format(sum(!is.na(D03$salary) & D03$employment_status2code == 1), big.mark = ",")` of `r format(sum(D03$employment_status2code == 1), big.mark = ",")` employed people report a real salary (`r round(mean(!is.na(D03$salary[D03$employment_status2code == 1])) * 100)`%). This corrects Milestone 1's "74% unusable" figure, which counted people who cannot have a salary in the first place.
+
+**Verification:**
+
+```{r}
+#| label: Salary Reversal Verification
+
+D03 |> count(salary_status, has_salary = !is.na(salary))
+
+tibble(
+  placeholders_before = D03_salary_missing_before,
+  placeholders_remaining_in_salary = sum(D03$salary %in% c(888888888, 999999999), na.rm = TRUE)
+)
+```
+
+# 2.2 Record selection (ages 15–64)
+
+**Problem:** the analysis population is the working-age population, ages 15–64.
+
+**Treatment:** filter D01 on `between(age, 15, 64)`, then keep only matching people in D02 and D03 with `semi_join()`. All D08 households are kept; Task 3 reports the households with no working-age member.
+
+```{r}
+#| label: Record Selection
+
+D01_rows_before_selection <- nrow(D01)
+D01_under_15 <- sum(D01$age < 15)
+D01_65_plus <- sum(D01$age > 64)
+
+D01 <- D01 |> filter(between(age, 15, 64))
+D02 <- semi_join(D02, D01, by = c("household_id", "person_number"))
+D03 <- semi_join(D03, D01, by = c("household_id", "person_number"))
+```
+
+**Verification:**
+
+```{r}
+#| label: Record Selection Verification
+
+tibble(
+  dataset = c("D01", "D02", "D03"),
+  rows_before = D01_rows_before_selection,
+  rows_after = c(nrow(D01), nrow(D02), nrow(D03)),
+  removed_under_15 = D01_under_15,
+  removed_65_plus = D01_65_plus,
+  distinct_households = c(n_distinct(D01$household_id), n_distinct(D02$household_id), n_distinct(D03$household_id)),
+  identical_keys_to_D01 = c(TRUE,
+                            setequal(paste(D01$household_id, D01$person_number), paste(D02$household_id, D02$person_number)),
+                            setequal(paste(D01$household_id, D01$person_number), paste(D03$household_id, D03$person_number)))
+)
+```
+
+**Effect:** all three person files have `r format(nrow(D01), big.mark = ",")` rows and identical keys, covering `r format(n_distinct(D01$household_id), big.mark = ",")` households. `r format(D01_under_15, big.mark = ",")` people under 15 and `r format(D01_65_plus, big.mark = ",")` aged 65+ were removed.
+
+# 2.3 Recode into labelled factors
+
+**Problem:** `_code` columns are not analytically meaningful or safe to treat as numbers.
+
+**Treatment:** for every kept `_code` column, add a label column of the same name without the suffix, using `factor(..., levels =, labels =)`. Codes left out of `levels =` become `NA`, applying the 2.1 classification. `_code` columns are never modified.
+
+```{r}
+#| label: Recode D01
+
+D01_types_before <- sapply(D01, class)
+
+D01 <- D01 |>
+  mutate(
+    province = factor(province_code, levels = 1:9,
+                      labels = c("Western Cape", "Eastern Cape", "Northern Cape", "Free State",
+                                 "KwaZulu-Natal", "North West", "Gauteng", "Mpumalanga", "Limpopo")),
+    sex = factor(sex_code, levels = 1:2, labels = c("Male", "Female")),
+    population_group = factor(population_group_code, levels = 1:4,
+                              labels = c("Black African", "Coloured", "Indian/Asian", "White")),
+    geo_type = factor(geo_type_code, levels = 1:3, labels = c("Urban", "Traditional", "Farms")),
+    metro = factor(metro_indicator, levels = 1:2, labels = c("Metro", "Non-metro"))
+  )
+```
+
+```{r}
+#| label: Recode D02
+
+D02_types_before <- sapply(D02, class)
+
+D02 <- D02 |>
+  mutate(
+    education_level = factor(education_level_code,
+                             levels = c(98, 0:27, 28),
+                             labels = c(
+                               "No schooling",
+                               "Grade R/0", "Grade 1/Sub A/Class 1", "Grade 2/Sub B/Class 2",
+                               "Grade 3/Standard 1/ABET/AET 1", "Grade 4/Standard 2",
+                               "Grade 5/Standard 3/ABET/AET 2", "Grade 6/Standard 4",
+                               "Grade 7/Standard 5/ABET/AET 3", "Grade 8/Standard 6/Form 1",
+                               "Grade 9/Standard 7/Form 2/ABET/AET 4/NCV 1",
+                               "Grade 10/Standard 8/Form 3/NCV 2",
+                               "Grade 11/Standard 9/Form 4/NCV 3",
+                               "Grade 12/Standard 10/Form 5/NSC/Matric/NCV 4",
+                               "NTC I/N1/NQF 1", "NTC II/N2/NQF 2", "NTC III/N3/NQF 3",
+                               "N4/NTC 4/Occupational Cert NQF 5", "N5/NTC 5/Occupational Cert NQF 5",
+                               "N6/NTC 6/Occupational Cert NQF 5",
+                               "Certificate less than Grade 12", "Diploma less than Grade 12",
+                               "Higher/National/Advanced Certificate with Grade 12/NQF 5",
+                               "Diploma with Grade 12/Occupational Cert NQF 6",
+                               "Higher Diploma/B-Tech/Occupational Cert NQF 7",
+                               "Bachelor's Degree/Occupational Cert NQF 7",
+                               "Honours Degree/Postgrad Diploma/Occupational Cert NQF 8",
+                               "Post Higher Diploma (M-Tech/Master's) NQF 9",
+                               "Doctoral Degree (D-Tech/PhD) NQF 10",
+                               "Other"
+                             )),
+    education_attendance = factor(education_attendance_code, levels = 1:2, labels = c("Yes", "No")),
+    institution_type = factor(institution_type_code, levels = c(1:9, 88),
+                              labels = c(paste0("Institution type ", 1:9), "Not applicable")),
+    reason_not_attending = factor(reason_not_attending_code, levels = c(1:18, 88),
+                                  labels = c(paste0("Reason ", 1:18), "Not applicable"))
+  )
+```
+
+```{r}
+#| label: Recode D03
+
+D03_types_before <- sapply(D03, class)
+
+D03 <- D03 |>
+  mutate(
+    employment_status = factor(employment_status2code, levels = 1:3,
+                               labels = c("Employed", "Unemployed", "Not economically active"))
+  )
+```
+
+```{r}
+#| label: Recode D08
+
+D08_types_before <- sapply(D08, class)
+
+D08 <- D08 |>
+  mutate(
+    fixed_internet = factor(fixed_internet_code, levels = 1:2, labels = c("Yes", "No")),
+    mobile_internet = factor(mobile_internet_code, levels = 1:2, labels = c("Yes", "No")),
+    computer_asset = factor(computer_asset_code, levels = c(1, 2, 9), labels = c("Yes", "No", "Unspecified"))
+  )
+```
+
+**Verification:** every code maps to exactly one label.
+
+```{r}
+#| label: Recode Verification
+
+D01 |> count(province_code, province)
+D01 |> count(sex_code, sex)
+D01 |> count(population_group_code, population_group)
+D01 |> count(geo_type_code, geo_type)
+D01 |> count(metro_indicator, metro)
+
+D02 |> count(education_level_code, education_level)
+D02 |> count(education_attendance_code, education_attendance)
+D02 |> count(institution_type_code, institution_type)
+D02 |> count(reason_not_attending_code, reason_not_attending)
+
+D03 |> count(employment_status2code, employment_status)
+
+D08 |> count(fixed_internet_code, fixed_internet)
+D08 |> count(mobile_internet_code, mobile_internet)
+D08 |> count(computer_asset_code, computer_asset)
+```
+
+# 2.4 Outlier review
+
+**Problem:** `age`, `household_smartphones` and `salary` are the only kept columns that are real measurements rather than categories.
+
+```{r}
+#| label: Age Outlier Check
+
+summary(D01$age)
+
+ggplot(D01, aes(x = age)) +
+  geom_histogram(binwidth = 1) +
+  labs(title = "Age distribution after record selection", x = "Age", y = "Count")
+```
+
+**Decision:** age is bounded at 15–64 by 2.2. No further treatment needed.
+
+```{r}
+#| label: Smartphones Outlier Check
+
+summary(D08$household_smartphones)
+
+household_size <- D01 |> count(household_id, name = "household_size")
+
+D08 |>
+  left_join(household_size, by = "household_id") |>
+  filter(household_smartphones >= 10) |>
+  select(household_id, household_smartphones, household_size)
+```
+
+**Decision:** the range (0–13) matches the dictionary maximum. The `r sum(D08$household_smartphones >= 10, na.rm = TRUE)` households with 10+ smartphones are plausible against household size, so kept unchanged. `household_size` is not joined onto `D08` or saved; it is only used here for this check.
+
+```{r}
+#| label: Salary Outlier Check
+
+D03 |> filter(!is.na(salary)) |> summarise(
+  min = min(salary), p1 = quantile(salary, 0.01), median = median(salary),
+  p99 = quantile(salary, 0.99), max = max(salary)
+)
+
+D03 |>
+  filter(!is.na(salary)) |>
+  ggplot(aes(x = salary)) +
+  geom_histogram(bins = 50) +
+  scale_x_log10(labels = scales::comma) +
+  labs(title = "Reported salary (log scale)", x = "Salary (Rand, log scale)", y = "Count")
+```
+
+**Decision:** the top tail (up to R1.4 million) contains genuine high earners and is kept. Values under R100 cannot plausibly be a monthly salary and are flagged, not deleted, since the pay period is not documented in the source data.
+
+```{r}
+#| label: Flagging Low Salary Outliers
+
+D03 <- D03 |>
+  mutate(salary_flag = if_else(!is.na(salary) & salary < 100, "Implausibly low for a monthly salary", NA_character_))
+
+D03 |> filter(!is.na(salary_flag)) |> count(salary_flag)
+```
+
+`person_weight` is not touched: survey weights must never be trimmed or scaled. No scaling or transformation is applied in Part 2; that belongs in Task 4, after the train/test split, to avoid leakage. The log scale above is for plotting only.
+
+# 2.5 Final validation and save
+
+**Problem:** the rubric requires before-and-after evidence for every major preprocessing decision.
+
+```{r}
+#| label: Before vs After Part 2
+
+tibble(
+  dataset = c("D01", "D02", "D03", "D08"),
+  rows_raw = uncleaned_summary$rows,
+  rows_clean = c(nrow(D01), nrow(D02), nrow(D03), nrow(D08)),
+  cols_raw = uncleaned_summary$cols,
+  cols_clean = c(ncol(D01), ncol(D02), ncol(D03), ncol(D08)),
+  missing_values_raw = uncleaned_summary$missing_values,
+  missing_values_clean = c(sum(is.na(D01)), sum(is.na(D02)), sum(is.na(D03)), sum(is.na(D08))),
+  distinct_keys_raw = uncleaned_summary$distinct_keys,
+  distinct_keys_clean = c(nrow(distinct(D01, household_id, person_number)),
+                          nrow(distinct(D02, household_id, person_number)),
+                          nrow(distinct(D03, household_id, person_number)),
+                          n_distinct(D08$household_id)),
+  exact_duplicates_raw = uncleaned_summary$exact_duplicate_rows,
+  exact_duplicates_clean = c(nrow(D01) - nrow(distinct(D01)), nrow(D02) - nrow(distinct(D02)),
+                             nrow(D03) - nrow(distinct(D03)), nrow(D08) - nrow(distinct(D08)))
+)
+```
+
+**Note:** `missing_values_clean` is higher than `missing_values_raw` for D01–D03 because the clean datasets have more columns than the raw ones (new label and flag columns from 2.3 and Part 1), most of which are legitimately `NA` for rows that were never changed or that fall outside a structural category. This is not new data loss; the row-level missingness for the original analytical columns is covered in the Final Missingness table below.
+
+```{r}
+#| label: Types Before and After Part 2
+
+bind_rows(
+  D01 = enframe(D01_types_before, name = "column", value = "type_before") |>
+    full_join(enframe(sapply(D01, class), name = "column", value = "type_after"), by = "column"),
+  D02 = enframe(D02_types_before, name = "column", value = "type_before") |>
+    full_join(enframe(sapply(D02, class), name = "column", value = "type_after"), by = "column"),
+  D03 = enframe(D03_types_before, name = "column", value = "type_before") |>
+    full_join(enframe(sapply(D03, class), name = "column", value = "type_after"), by = "column"),
+  D08 = enframe(D08_types_before, name = "column", value = "type_before") |>
+    full_join(enframe(sapply(D08, class), name = "column", value = "type_after"), by = "column"),
+  .id = "dataset"
+) |>
+  filter(is.na(type_before) != is.na(type_after) | (!is.na(type_before) & !is.na(type_after) & type_before != type_after))
+```
+
+```{r}
+#| label: Final Missingness
+
+bind_rows(
+  D01 = enframe(colSums(is.na(D01)), name = "column", value = "missing"),
+  D02 = enframe(colSums(is.na(D02)), name = "column", value = "missing"),
+  D03 = enframe(colSums(is.na(D03)), name = "column", value = "missing"),
+  D08 = enframe(colSums(is.na(D08)), name = "column", value = "missing"),
+  .id = "dataset"
+) |>
+  filter(missing > 0) |>
+  mutate(reason = case_when(
+    column == "education_level" ~ "Codes 29/99 reclassified to NA in 2.1/2.3",
+    column == "education_attendance_code" ~ "Genuinely missing since raw data; no dictionary code to assign (noted in 2.1)",
+    column == "education_attendance" ~ "Code 3 reclassified to NA in 2.1/2.3, plus the pre-existing missing education_attendance_code values",
+    column == "fixed_internet" ~ "Code 9 reclassified to NA in 2.1/2.3",
+    column == "mobile_internet_code" ~ "Genuinely missing since raw data; no dictionary code to assign (noted in 2.1)",
+    column == "mobile_internet" ~ "Code 9 reclassified to NA in 2.1/2.3, plus the pre-existing missing mobile_internet_code values",
+    str_detect(column, "_flag$") ~ "Flags only filled in for rows that changed (expected)",
+    column == "salary" ~ "Placeholder codes reversed to NA in 2.1",
+    column == "salary_status" ~ "Could not be classified from value and employment status",
+    TRUE ~ "NOT CLASSIFIED"
+  ))
+```
+
+```{r}
+#| label: Final Category Levels
+
+list(
+  province = levels(D01$province), sex = levels(D01$sex), population_group = levels(D01$population_group),
+  geo_type = levels(D01$geo_type), metro = levels(D01$metro),
+  education_level = levels(D02$education_level), education_attendance = levels(D02$education_attendance),
+  institution_type = levels(D02$institution_type), reason_not_attending = levels(D02$reason_not_attending),
+  employment_status = levels(D03$employment_status),
+  fixed_internet = levels(D08$fixed_internet), mobile_internet = levels(D08$mobile_internet),
+  computer_asset = levels(D08$computer_asset)
+)
+```
+
+**Save:** both `.rds` (keeps factor levels and ID types) and `.csv` (required deliverable). Anyone reading the CSVs, including Power BI, must read `household_id` and `person_number` as text.
+
+```{r}
+#| label: Save Cleaned Datasets
+
+saveRDS(D01, file.path(cleaned_directory, "D01_clean.rds"))
+saveRDS(D02, file.path(cleaned_directory, "D02_clean.rds"))
+saveRDS(D03, file.path(cleaned_directory, "D03_clean.rds"))
+saveRDS(D08, file.path(cleaned_directory, "D08_clean.rds"))
+
+write_csv(D01, file.path(cleaned_directory, "D01_clean.csv"))
+write_csv(D02, file.path(cleaned_directory, "D02_clean.csv"))
+write_csv(D03, file.path(cleaned_directory, "D03_clean.csv"))
+write_csv(D08, file.path(cleaned_directory, "D08_clean.csv"))
+```
