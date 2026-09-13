@@ -36,7 +36,7 @@ cleaned_directory <- "../Datasets/Cleaned/" #Cleaned Datasets get stored here
 dir.create(cleaned_directory, showWarnings = FALSE)
 ```
 
-# 1. Data Import and Structure
+# 1. Data Import, Structure and Selection
 
 ## 1.1 Import with explicit column types
 
@@ -135,7 +135,7 @@ bind_rows(
 
 **Problem:** before any join, the unit of observation (grain) and the key of every dataset must be confirmed, and it must be shown that the datasets can legitimately be linked.
 
-**Treatment:** compare row counts with distinct keys, check how many households each dataset shares with D01, and confirm that D11 cannot be linked.
+**Treatment:** compare row counts with distinct keys, and check how many households each selected dataset shares with D01.
 
 ```{r}
 #| label: Grain Check/Verification
@@ -167,18 +167,15 @@ tibble(
 ```{r}
 #| label: Shared Households Check
 
-D11_ids <- read_csv(file.path(directory, "D11_Labour_Market.csv"), show_col_types = FALSE, col_select = HouseholdID, col_types = cols(.default = col_character())) |> clean_names()
-
 D01_households <- unique(na.omit(D01$household_id)) #Distinct household IDs in D01
 
 tibble(
-  
-  compared_with = c("D02", "D03", "D08", "D11"),
-  
-  households_in_dataset = c(n_distinct(D02$household_id), n_distinct(D03$household_id),
-                            n_distinct(D08$household_id), n_distinct(D11_ids$household_id, na.rm = TRUE)),
-  
-  shared_with_D01 = c(length(intersect(D01_households, D02$household_id)), length(intersect(D01_households, D03$household_id)), length(intersect(D01_households, D08$household_id)), length(intersect(D01_households, D11_ids$household_id))),
+
+  compared_with = c("D02", "D03", "D08"),
+
+  households_in_dataset = c(n_distinct(D02$household_id), n_distinct(D03$household_id), n_distinct(D08$household_id)),
+
+  shared_with_D01 = c(length(intersect(D01_households, D02$household_id)), length(intersect(D01_households, D03$household_id)), length(intersect(D01_households, D08$household_id))),
   
   percent_of_D01 = round(shared_with_D01 / length(D01_households) * 100, 2)
   
@@ -194,7 +191,127 @@ D01 |>
   summarise(households = n(), mean_persons = round(mean(persons), 2), median_persons = median(persons), max_persons = max(persons))
 ```
 
-**Effect / Verification:** D01, D02 and D03 are one row per person and D08 is exactly one row per household (`r format(nrow(D08), big.mark = ",")` rows, `r format(n_distinct(D08$household_id), big.mark = ",")` distinct IDs). All `r format(length(D01_households), big.mark = ",")` D01 households appear in D02, D03 and D08 (100%). This corrects the 98.77% reported in the EDA: its count of `r format(n_distinct(as.numeric(D08$household_id)), big.mark = ",")` is the number of distinct IDs left after rounding (step 1.1). D11 shares **0** households with D01, which confirms its exclusion. Household IDs repeat in the person files because a household contains several people. These are legitimate repeats in a one-to-many relationship, not duplicates. The keys that appear more than once in D02 and D03, and the missing IDs in D01, are treated in 2.1 and 2.2.
+**Effect / Verification:** D01, D02 and D03 are one row per person and D08 is exactly one row per household (`r format(nrow(D08), big.mark = ",")` rows, `r format(n_distinct(D08$household_id), big.mark = ",")` distinct IDs). All `r format(length(D01_households), big.mark = ",")` D01 households appear in D02, D03 and D08 (100%). This corrects the 98.77% reported in the EDA: its count of `r format(n_distinct(as.numeric(D08$household_id)), big.mark = ",")` is the number of distinct IDs left after rounding (step 1.1). Household IDs repeat in the person files because a household contains several people. These are legitimate repeats in a one-to-many relationship, not duplicates. The keys that appear more than once in D02 and D03, and the missing IDs in D01, are treated in 2.1 and 2.2.
+
+## 1.4 Datasets not selected
+
+**Problem:** eleven datasets are available, but a dataset should only be used if it measures a link in the research pathway (digital access → education → employment) and can be linked to the same people at the chosen grain: one row per person, identified by `household_id` + `person_number`. Using a dataset that fails either test adds variables with no role in the analysis, or attaches records to the wrong people.
+
+The seven datasets not selected in Task 1 are read here only to document why they are not used:
+
+```{r}
+#| label: Datasets Not Selected
+
+D04 <- read_csv(file.path(directory, "D04_Dwelling_Conditions.csv"), show_col_types = FALSE, col_types = cols(HouseholdID = col_character())) |> clean_names()
+
+D05 <- read_csv(file.path(directory, "D05_Basic_Services.csv"), show_col_types = FALSE, col_types = cols(HouseholdID = col_character())) |> clean_names()
+
+D06 <- read_csv(file.path(directory, "D06_Household_Energy.csv"), show_col_types = FALSE, col_types = cols(HouseholdID = col_character())) |> clean_names()
+
+D07 <- read_csv(file.path(directory, "D07_Household_Wellbeing.csv"), show_col_types = FALSE, col_types = cols(HouseholdID = col_character())) |> clean_names()
+
+D09 <- read_csv(file.path(directory, "D09_Household_Resources.csv"), show_col_types = FALSE, col_types = cols(HouseholdID = col_character())) |> clean_names()
+
+D10 <- read_csv(file.path(directory, "D10_Mobility_Access.csv"), show_col_types = FALSE, col_types = cols(HouseholdID = col_character())) |> clean_names()
+
+#D11 is large, so only its keys and quarter are read in full; its column names are read from the header
+D11 <- read_csv(file.path(directory, "D11_Labour_Market.csv"), show_col_types = FALSE, col_select = c(HouseholdID, PersonNumber, Quarter),
+                col_types = cols(.default = col_character())) |> clean_names()
+
+D11_columns <- read_csv(file.path(directory, "D11_Labour_Market.csv"), show_col_types = FALSE, n_max = 0) |> clean_names() |> names()
+
+tibble(
+
+  dataset = c("D04", "D05", "D06", "D07", "D09", "D10", "D11"),
+
+  measures = c("Dwelling type, materials and condition", "Water and sanitation", "Electricity and energy use",
+               "Food security and household income", "Income sources and household assets",
+               "Public transport and access to health facilities", "Employment, education and occupation"),
+
+  grain = c("household", "household", "household", "household", "household", "household", "person per quarter"),
+
+  rows = c(nrow(D04), nrow(D05), nrow(D06), nrow(D07), nrow(D09), nrow(D10), nrow(D11)),
+
+  distinct_households = c(n_distinct(D04$household_id), n_distinct(D05$household_id), n_distinct(D06$household_id),
+                          n_distinct(D07$household_id), n_distinct(D09$household_id), n_distinct(D10$household_id),
+                          n_distinct(D11$household_id)),
+
+  households_shared_with_D01 = c(length(intersect(D01_households, D04$household_id)),
+                                 length(intersect(D01_households, D05$household_id)),
+                                 length(intersect(D01_households, D06$household_id)),
+                                 length(intersect(D01_households, D07$household_id)),
+                                 length(intersect(D01_households, D09$household_id)),
+                                 length(intersect(D01_households, D10$household_id)),
+                                 length(intersect(D01_households, D11$household_id))),
+
+  reason_not_selected = c("Not a link in the pathway", "Not a link in the pathway", "Not a link in the pathway",
+                          "Not in the pathway; household income partly reveals the employment outcome",
+                          "Salary income reveals the employment outcome; computer_asset_code duplicates D08",
+                          "Not a link in the pathway",
+                          "Different sample: cannot be linked to any person in D01")
+)
+```
+
+D09's only digital-access column is a copy of the one already selected from D08:
+
+```{r}
+#| label: D09 Computer Column Check
+
+D09 |>
+  distinct(household_id, computer_asset_code_d09 = computer_asset_code) |>
+  inner_join(select(D08, household_id, computer_asset_code), by = "household_id") |>
+  summarise(households_compared = n(), values_that_differ_from_D08 = sum(computer_asset_code_d09 != computer_asset_code))
+```
+
+D11 is the only unselected dataset that measures the employment outcome, so the reasons it cannot be joined are checked directly:
+
+```{r}
+#| label: D11 Linkage Check
+
+tibble(
+  check = c("rows in D11",
+            "distinct people in D11",
+            "people recorded in more than one quarter",
+            "households shared with D01",
+            "PSUs (sampling areas) shared with D01",
+            "digital-access columns in D11"),
+
+  result = c(nrow(D11),
+             nrow(distinct(D11, household_id, person_number)),
+             sum(count(D11, household_id, person_number)$n > 1),
+             length(intersect(D11$household_id, D01_households)),
+             length(intersect(str_sub(D11$household_id, 1, 11), str_sub(D01_households, 1, 11))), #First 11 digits of an ID = PSU (2.1)
+             length(str_subset(D11_columns, "internet|phone|computer")))
+)
+
+#Levels of geography at which D11 could be linked to the four selected datasets
+selected_columns <- c(names(D01), names(D02), names(D03), names(D08))
+
+tibble(
+  geography_level = c("province", "geography type", "metro area"),
+
+  column_in_D11 = c(any(str_detect(D11_columns, "province")), any(str_detect(D11_columns, "geo_type")), any(str_detect(D11_columns, "metro"))),
+
+  column_in_selected_datasets = c(any(str_detect(selected_columns, "province")), any(str_detect(selected_columns, "geo_type")),
+                                  any(str_detect(selected_columns, "metro")))
+)
+```
+
+D11 shares only province and geography type with the selected datasets. It has no metro column, and its PSUs never match D01's (table above), so province and geography type are the most detailed levels at which D11 could be linked to our people.
+
+**Treatment:** select only D01, D02, D03 and D08, and remove the other seven from memory.
+
+- **D04, D05, D06, D07, D09 and D10** are household-level and share almost every household with D01, so they could technically be joined many-to-one. They are left out because of the topic, not because they cannot be linked. Dwelling conditions, water, energy and public transport are not links between digital access, education and employment. Household income (D07, D09) and salary income sources (D09) partly reveal whether someone in the household is employed, so they would leak the outcome. D09's only digital-access column duplicates D08's. D04, D07 and D09 also contain repeated household rows, which would duplicate people if joined without treatment.
+- **D11** would be useful, because it records employment status and education for working-age people. It cannot be integrated at the person grain, however. It shares no households and not even a single PSU with D01, so it is a separate sample of different people, not extra information about ours. Its rows are person-quarters, not persons: most people appear in more than one quarter, with separate quarterly and annual weights. The only way to join it would be to match people on shared characteristics such as province, age and sex, which would attach one person's labour-market record to a different person. This is exactly the misalignment that invalid joins create.
+- **Aggregation is not a useful alternative for D11 in this topic.** The only geography D11 shares with D01 is province and geography type. A D11 rate aggregated to province and attached to each person would be fully determined by `province_code`, which D01 already contains, so it adds no information at the person level. D11 also has no digital-access columns, so a parallel analysis could only repeat the education → employment link and could not test digital access or its moderating role.
+
+```{r}
+#| label: Remove Unselected Datasets
+
+rm(D04, D05, D06, D07, D09, D10, D11, D11_columns, selected_columns) #Only needed for the checks above
+```
+
+**Effect / Verification:** the tables confirm the decision. All six household datasets share almost all of D01's households, so their exclusion is a topic decision. D09's computer column never differs from D08's, and D11 shares 0 households and 0 PSUs with D01. The rest of the pipeline cleans and integrates only D01, D02, D03 and D08 (section 9). The employment outcome comes from a single source (D03), which is recorded as a limitation.
 
 # 2. Data Cleaning
 
@@ -1087,7 +1204,7 @@ The levels of `education_level` follow the dictionary order, which is not a rank
 
 # 7. Outlier Review
 
-`age`, `household_smartphones` and `salary` are the only kept columns that are real measurements rather than categories, so they are the only columns checked for outliers and impossible values.
+`age`, `household_smartphones` and `salary` are the only kept columns that are real measurements rather than categories, so they are the only columns checked for outliers and impossible values. Each is shown as a histogram and a boxplot. The boxplot's whiskers end at the fences, 1.5 × the interquartile range (IQR) beyond the quartiles, and points outside the fences are drawn separately as statistical outliers. A statistical outlier is only a candidate: it is kept unless domain evidence shows the value is impossible.
 
 ## 7.1 Age
 
@@ -1102,12 +1219,35 @@ ggplot(D01, aes(x = age)) +
   geom_histogram(binwidth = 1) +
   labs(title = "Age distribution after record selection", x = "Age", y = "Count")
 
-boxplot(D01$age,xlab = "Age",horizontal = TRUE)
+ggplot(D01, aes(x = age)) +
+  geom_boxplot() +
+  labs(title = "Age after record selection (boxplot)", x = "Age", y = NULL) +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+
+#Boxplot fences: 1.5 × IQR beyond the quartiles
+age_boxplot <- tibble(
+
+  q1 = quantile(D01$age, 0.25),
+
+  median = median(D01$age),
+
+  q3 = quantile(D01$age, 0.75),
+
+  lower_fence = q1 - 1.5 * (q3 - q1),
+
+  upper_fence = q3 + 1.5 * (q3 - q1),
+
+  points_below_fence = sum(D01$age < lower_fence),
+
+  points_above_fence = sum(D01$age > upper_fence)
+)
+
+age_boxplot
 ```
 
 **Treatment:** none. Invalid ages were already repaired in 2.4, and record selection (section 5) limits age to 15–64.
 
-**Effect / Verification:** the summary shows a minimum of `r min(D01$age)` and a maximum of `r max(D01$age)`, and the histogram shows no isolated values, so there are no age outliers left to treat.
+**Effect / Verification:** the summary shows a minimum of `r min(D01$age)` and a maximum of `r max(D01$age)`. The histogram shows no isolated values, and the boxplot has `r age_boxplot$points_below_fence + age_boxplot$points_above_fence` points outside its fences (`r age_boxplot$lower_fence` to `r age_boxplot$upper_fence`), so there are no age outliers left to treat.
 
 ## 7.2 Household smartphones
 
@@ -1118,6 +1258,31 @@ boxplot(D01$age,xlab = "Age",horizontal = TRUE)
 
 summary(D08$household_smartphones)
 
+ggplot(D08, aes(x = household_smartphones)) +
+  geom_boxplot() +
+  labs(title = "Household smartphones before treatment (boxplot)", x = "Smartphones in the household", y = NULL) +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+
+#Boxplot fences: 1.5 × IQR beyond the quartiles
+smartphones_boxplot <- tibble(
+
+  q1 = quantile(D08$household_smartphones, 0.25, na.rm = TRUE),
+
+  median = median(D08$household_smartphones, na.rm = TRUE),
+
+  q3 = quantile(D08$household_smartphones, 0.75, na.rm = TRUE),
+
+  lower_fence = q1 - 1.5 * (q3 - q1),
+
+  upper_fence = q3 + 1.5 * (q3 - q1),
+
+  points_below_fence = sum(D08$household_smartphones < lower_fence, na.rm = TRUE),
+
+  points_above_fence = sum(D08$household_smartphones > upper_fence, na.rm = TRUE)
+)
+
+smartphones_boxplot
+
 D08 |> filter(household_smartphones < 0) |> count(household_smartphones)
 
 D08 |>
@@ -1125,6 +1290,8 @@ D08 |>
   filter(household_smartphones >= 10) |>
   select(household_id, household_smartphones, household_size)
 ```
+
+In the boxplot, the `r smartphones_boxplot$points_below_fence` points below the lower fence are exactly the negative counts. Most households have 1 or 2 smartphones, so the box is narrow (an IQR of `r smartphones_boxplot$q3 - smartphones_boxplot$q1`). As a result, the 1.5 × IQR rule also marks every household with `r floor(smartphones_boxplot$upper_fence) + 1` or more smartphones as an outlier: `r format(smartphones_boxplot$points_above_fence, big.mark = ",")` households. These high points are a result of the narrow box, not evidence of errors, so they are checked against household size instead of being removed.
 
 The negative values cannot be repaired: no other kept dataset records smartphones, and removing the minus sign is not justified, because `r sum(D08$household_smartphones < -13, na.rm = TRUE)` of them would then exceed the dictionary maximum of 13. At the other end, every household with 10 or more smartphones has at least as many members as smartphones. `household_size` counts all members, including those outside the 15–64 range, because it was counted before record selection (section 5).
 
@@ -1168,11 +1335,16 @@ D08 |>
     max_after = max(household_smartphones, na.rm = TRUE),
 
     households_with_more_smartphones_than_members = sum(household_smartphones > household_size, na.rm = TRUE)
-    
+
   )
+
+ggplot(D08, aes(x = household_smartphones)) +
+  geom_boxplot() +
+  labs(title = "Household smartphones after treatment (boxplot)", x = "Smartphones in the household", y = NULL) +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
 ```
 
-**Effect:** the `r D08_negative_smartphones_before` impossible counts are now `NA` and traceable through `household_smartphones_flag`, and no household is removed. The remaining counts lie within the dictionary range of 0–13, and no household has more smartphones than members. `household_size` is not joined onto D08 or saved; it is only used for this check.
+**Effect:** the `r D08_negative_smartphones_before` impossible counts are now `NA` and traceable through `household_smartphones_flag`, and no household is removed. After treatment, the boxplot has no points below the box. The remaining counts lie within the dictionary range of 0–13, and no household has more smartphones than members, including the `r format(smartphones_boxplot$points_above_fence, big.mark = ",")` households above the upper fence, which are kept unchanged. `household_size` is not joined onto D08 or saved; it is only used for this check.
 
 ## 7.3 Salary
 
@@ -1192,9 +1364,45 @@ D03 |>
   geom_histogram(bins = 50) +
   scale_x_log10(labels = scales::comma) +
   labs(title = "Reported salary (log scale)", x = "Salary (Rand, log scale)", y = "Count")
+
+#Drawn on the log scale like the histogram; on the Rand scale the box is squashed against zero
+D03 |>
+  filter(!is.na(salary)) |>
+  ggplot(aes(x = salary)) +
+  geom_boxplot() +
+  geom_vline(xintercept = 100, linetype = "dashed") +
+  scale_x_log10(labels = scales::comma) +
+  labs(title = "Reported salary (boxplot, log scale)", subtitle = "Dashed line: R100 threshold used for salary_flag",
+       x = "Salary (Rand, log scale)", y = NULL) +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+
+#Boxplot fences on the log scale, converted back to Rand
+salary_boxplot <- D03 |>
+  filter(!is.na(salary)) |>
+  summarise(
+
+    log_q1 = quantile(log10(salary), 0.25),
+
+    log_q3 = quantile(log10(salary), 0.75),
+
+    lower_fence_rand = 10^(log_q1 - 1.5 * (log_q3 - log_q1)),
+
+    upper_fence_rand = 10^(log_q3 + 1.5 * (log_q3 - log_q1)),
+
+    points_below_fence = sum(salary < lower_fence_rand),
+
+    points_above_fence = sum(salary > upper_fence_rand),
+
+    of_which_under_R100 = sum(salary < 100)
+  ) |>
+  select(-log_q1, -log_q3)
+
+salary_boxplot
 ```
 
-**Treatment:** the top tail (up to R`r format(max(D03$salary, na.rm = TRUE), big.mark = ",")`) contains genuine high earners and is kept. Values under R100 cannot plausibly be a monthly salary and are flagged in `salary_flag`, not deleted, since the pay period is not documented in the source data.
+On the log scale, the boxplot marks `r salary_boxplot$points_below_fence` salaries below about R`r format(round(salary_boxplot$lower_fence_rand), big.mark = ",")` and `r salary_boxplot$points_above_fence` above about R`r format(round(salary_boxplot$upper_fence_rand), big.mark = ",")` as outliers.
+
+**Treatment:** the high outliers, up to R`r format(max(D03$salary, na.rm = TRUE), big.mark = ",")`, are genuine high earners and are kept. The low outliers are not all errors: values between R100 and about R`r format(round(salary_boxplot$lower_fence_rand), big.mark = ",")` are low but possible for casual or part-time work, and are kept unflagged. Only the `r salary_boxplot$of_which_under_R100` values under R100 cannot plausibly be a monthly salary. They are flagged in `salary_flag`, not deleted, since the pay period is not documented in the source data. The flag uses the fixed R100 threshold, not the boxplot fence, so it does not depend on the rest of the data.
 
 ```{r}
 #| label: Flagging Low Salary Outliers
@@ -1226,9 +1434,9 @@ D03 |>
 
 `person_weight` is not touched: survey weights must never be trimmed or scaled. No scaling or transformation is applied during preprocessing; that belongs in Task 4, after the train/test split, to avoid leakage. The log scale above is for plotting only.
 
-# 8. Final Validation and Save
+# 8. Validation and Save of the Cleaned Datasets
 
-## 8.1 Final validation
+## 8.1 Validation of the cleaned datasets
 
 **Problem:** the cleaned datasets will be used in every later task, so before saving them it must be shown that the pipeline as a whole did what the earlier sections claim. People must only have been removed by record selection, keys must still be unique, no duplicates may remain, and every remaining missing value must have a reason. The rubric also requires before-and-after evidence for every major preprocessing decision.
 
@@ -1361,18 +1569,21 @@ list(
 
 **Problem:** the cleaned datasets must be saved so that later tasks can use them without rerunning this pipeline. The original files in `Datasets/` must not be changed.
 
-**Treatment:** save each cleaned dataset as a new `.csv` (required deliverable) in `Datasets/Cleaned/`. The original files are only read, never written. A CSV does not store column types or the order of factor levels. Anyone reading the CSVs, including Power BI, must therefore read `household_id` and `person_number` as text, and re-apply the level order listed above where the order matters.
+**Treatment:** save each cleaned dataset as a new `.csv` (required deliverable) in `Datasets/Cleaned/`. The original files are only read, never written. Missing values are written as empty cells rather than the text "NA", so that Power BI reads them as blanks instead of turning numeric columns such as `salary` into text. A CSV does not store column types or the order of factor levels. Anyone reading the CSVs, including Power BI, must therefore read `household_id` and `person_number` as text, and re-apply the level order listed above where the order matters.
+
+Saving at this point, before the train/test split in Task 4, does not leak information between the future training and test rows. Every change so far either applies a fixed rule to each row (dictionary codes, the 15–64 age range, the R100 salary threshold, negative counts) or copies a value from the same person's record in another dataset. Nothing is estimated from the data as a whole: no means, quantiles, imputation models or scaling are used to change a value. Steps that learn from the data belong after the split, where they are fitted on the training rows only.
 
 ```{r}
 #| label: Save Cleaned Datasets
 
-write_csv(D01, file.path(cleaned_directory, "D01_clean.csv"))
+#na = "" writes missing values as empty cells, which both R and Power BI read as missing
+write_csv(D01, file.path(cleaned_directory, "D01_clean.csv"), na = "")
 
-write_csv(D02, file.path(cleaned_directory, "D02_clean.csv"))
+write_csv(D02, file.path(cleaned_directory, "D02_clean.csv"), na = "")
 
-write_csv(D03, file.path(cleaned_directory, "D03_clean.csv"))
+write_csv(D03, file.path(cleaned_directory, "D03_clean.csv"), na = "")
 
-write_csv(D08, file.path(cleaned_directory, "D08_clean.csv"))
+write_csv(D08, file.path(cleaned_directory, "D08_clean.csv"), na = "")
 ```
 
 **Verification:** read the saved files back with the IDs as text, the same way later tasks should read them, and compare them with the datasets in memory.
@@ -1407,3 +1618,213 @@ tibble(
 ```
 
 **Effect:** four new files are written to `Datasets/Cleaned/`. These four `write_csv()` calls are the only place the pipeline writes data, so the original files in `Datasets/` are left unchanged. Read back with the IDs as text, every saved file has the same rows, columns, IDs and missing values as the cleaned dataset in memory, so later tasks can start from these files instead of rerunning the pipeline.
+
+# 9. Data Integration
+
+The analytical grain chosen in the Task 1 write-up is one row per working-age person (15–64), identified by `household_id` + `person_number`. Section 1.4 explains why only D01, D02, D03 and D08 are used. They are joined here, after cleaning, because the keys are only reliable once the missing IDs are recovered (2.1) and the duplicates removed (2.2), and the population is only final after record selection (section 5). D01 is the base table, because it now defines exactly this population. This section confirms the key and cardinality of each join before it runs, and verifies the row counts and unmatched records before and after every join.
+
+## 9.1 Keys and cardinality before joining
+
+**Problem:** a join duplicates rows if the key is not unique on the side that should match only once, and it silently drops or misaligns people if keys are missing or do not match. The expected cardinality of every join must be confirmed before the join is run.
+
+```{r}
+#| label: Key Checks Before Joining
+
+tibble(
+
+  dataset = c("D01", "D02", "D03", "D08"),
+
+  key = c("household_id + person_number", "household_id + person_number", "household_id + person_number", "household_id"),
+
+  rows = c(nrow(D01), nrow(D02), nrow(D03), nrow(D08)),
+
+  distinct_keys = c(nrow(distinct(D01, household_id, person_number)), nrow(distinct(D02, household_id, person_number)),
+                    nrow(distinct(D03, household_id, person_number)), n_distinct(D08$household_id)),
+
+  missing_keys = c(sum(is.na(D01$household_id) | is.na(D01$person_number)), sum(is.na(D02$household_id) | is.na(D02$person_number)),
+                   sum(is.na(D03$household_id) | is.na(D03$person_number)), sum(is.na(D08$household_id))),
+
+  all_ids_18_digits = c(all(nchar(D01$household_id) == 18), all(nchar(D02$household_id) == 18),
+                        all(nchar(D03$household_id) == 18), all(nchar(D08$household_id) == 18))
+)
+```
+
+```{r}
+#| label: Expected Cardinality and Unmatched Keys
+
+#Households in D08 with no working-age member, and whether they had members before record selection (section 5)
+D08_households_without_D01 <- anti_join(D08, D01, by = "household_id")
+
+tibble(
+
+  join = c("D01 + D02", "D01 + D03", "D01 + D08"),
+
+  expected_cardinality = c("one-to-one", "one-to-one", "many-to-one"),
+
+  most_D01_rows_per_key = c(max(count(D01, household_id, person_number)$n), max(count(D01, household_id, person_number)$n),
+                            max(count(D01, household_id)$n)),
+
+  most_rows_per_key_in_joined_dataset = c(max(count(D02, household_id, person_number)$n), max(count(D03, household_id, person_number)$n),
+                                          max(count(D08, household_id)$n)),
+
+  D01_rows_without_a_match = c(nrow(anti_join(D01, D02, by = c("household_id", "person_number"))),
+                               nrow(anti_join(D01, D03, by = c("household_id", "person_number"))),
+                               nrow(anti_join(D01, D08, by = "household_id"))),
+
+  joined_dataset_rows_without_a_match = c(nrow(anti_join(D02, D01, by = c("household_id", "person_number"))),
+                                          nrow(anti_join(D03, D01, by = c("household_id", "person_number"))),
+                                          nrow(D08_households_without_D01))
+)
+
+tibble(
+  D08_households_without_a_working_age_member = nrow(D08_households_without_D01),
+
+  of_which_had_members_before_record_selection = sum(D08_households_without_D01$household_id %in% household_size$household_id)
+)
+```
+
+**Treatment:** D01 is the left table, so every working-age person is kept. D02 and D03 are joined one-to-one on `household_id` + `person_number`. D08 is joined many-to-one on `household_id`, so each person receives their own household's connectivity values. Each join states its expected cardinality in dplyr's `relationship` argument, which stops the pipeline with an error if any key matches more rows than expected. The D02 and D03 joins also use `unmatched = "error"`, which stops the pipeline if any of their rows would be dropped. D08 cannot use `unmatched = "error"`, because its unmatched households are expected (see below).
+
+**Effect / Verification:** every key is unique, complete and 18 digits long, and D01, D02 and D03 contain exactly the same people. Every person has a D08 household record, and each household appears once in D08, so no person can be duplicated. The only unmatched records are the `r format(nrow(D08_households_without_D01), big.mark = ",")` D08 households with no working-age member. All of them had members in D01 before record selection, so every one of their members is under 15 or over 64. They are outside the analysis population by design, not because of a key problem, and they remain available in `D08_clean.csv` for household-level description.
+
+## 9.2 Joins
+
+**Problem:** the brief requires row counts to be verified before and after each join, so the three joins are run one at a time.
+
+**Treatment:** join D02, then D03, then D08 onto D01, recording the row count before each join.
+
+```{r}
+#| label: Join D01 and D02
+
+integrated <- D01 |>
+  left_join(D02, by = c("household_id", "person_number"), relationship = "one-to-one", unmatched = "error")
+
+#education_level_code has no missing values in D02, so a missing value here would mean a person without a D02 match
+tibble(
+  join = "D01 + D02",
+
+  rows_before = nrow(D01),
+
+  rows_in_D02 = nrow(D02),
+
+  rows_after = nrow(integrated),
+
+  people_without_D02_match = sum(is.na(integrated$education_level_code)),
+
+  columns_after = ncol(integrated),
+
+  columns_expected = ncol(D01) + ncol(D02) - 2 #The two key columns appear once
+)
+```
+
+```{r}
+#| label: Join D03
+
+integrated_rows_before_D03 <- nrow(integrated)
+
+integrated <- integrated |>
+  left_join(D03, by = c("household_id", "person_number"), relationship = "one-to-one", unmatched = "error")
+
+#employment_status2code has no missing values in D03, so a missing value here would mean a person without a D03 match
+tibble(
+  join = "+ D03",
+
+  rows_before = integrated_rows_before_D03,
+
+  rows_in_D03 = nrow(D03),
+
+  rows_after = nrow(integrated),
+
+  people_without_D03_match = sum(is.na(integrated$employment_status2code)),
+
+  columns_after = ncol(integrated),
+
+  columns_expected = ncol(D01) + ncol(D02) - 2 + ncol(D03) - 2
+)
+```
+
+```{r}
+#| label: Join D08
+
+integrated_rows_before_D08 <- nrow(integrated)
+
+integrated <- integrated |>
+  left_join(D08, by = "household_id", relationship = "many-to-one")
+
+#computer_asset_code has no missing values in D08, so a missing value here would mean a person without a D08 match
+tibble(
+  join = "+ D08",
+
+  rows_before = integrated_rows_before_D08,
+
+  rows_in_D08 = nrow(D08),
+
+  rows_after = nrow(integrated),
+
+  people_without_D08_match = sum(is.na(integrated$computer_asset_code)),
+
+  households_in_integrated_data = n_distinct(integrated$household_id),
+
+  D08_households_not_joined = nrow(D08) - n_distinct(integrated$household_id),
+
+  columns_after = ncol(integrated),
+
+  columns_expected = ncol(D01) + ncol(D02) - 2 + ncol(D03) - 2 + ncol(D08) - 1
+)
+```
+
+**Effect:** the row count stays at `r format(nrow(integrated), big.mark = ",")` through all three joins, so no person is duplicated or lost. Every person matches a D02, D03 and D08 record, and no columns are duplicated. The only records not carried into the person-level dataset are the `r format(nrow(D08) - n_distinct(integrated$household_id), big.mark = ",")` households with no working-age member.
+
+## 9.3 Validation of the integrated dataset
+
+**Problem:** matching row counts do not prove that values were attached to the right people. A join on corrupted keys (for example, IDs rounded to 15 digits as described in 1.1) could keep the row count while attaching one household's values to another.
+
+**Treatment:** check the integrated dataset against its sources. Every person key must appear once, and no suffixed duplicate columns (`.x`/`.y`) may exist. Each household's members must share a single D08 record. The category counts must equal those in the source datasets: per person for D01, D02 and D03 columns, and per household for D08 columns.
+
+**Verification:**
+
+```{r}
+#| label: Integrated Dataset Checks
+
+tibble(
+  rows = nrow(integrated),
+
+  distinct_person_keys = nrow(distinct(integrated, household_id, person_number)),
+
+  columns = ncol(integrated),
+
+  suffixed_duplicate_columns = sum(str_detect(names(integrated), "\\.x$|\\.y$")),
+
+  households = n_distinct(integrated$household_id),
+
+  households_with_one_D08_record = nrow(distinct(integrated, household_id, fixed_internet_code, mobile_internet_code,
+                                                 computer_asset_code, household_smartphones))
+)
+```
+
+```{r}
+#| label: Values Carried Through Unchanged
+
+D08_matched_households <- semi_join(D08, D01, by = "household_id")
+
+tibble(
+  column = c("sex (D01, per person)", "age (D01, per person)", "education_level (D02, per person)",
+             "education_attendance (D02, per person)", "employment_status (D03, per person)", "salary_status (D03, per person)",
+             "fixed_internet (D08, per household)", "mobile_internet (D08, per household)",
+             "computer_asset (D08, per household)", "household_smartphones (D08, per household)"),
+
+  identical_to_source = c(identical(count(integrated, sex), count(D01, sex)),
+                          identical(count(integrated, age), count(D01, age)),
+                          identical(count(integrated, education_level), count(D02, education_level)),
+                          identical(count(integrated, education_attendance), count(D02, education_attendance)),
+                          identical(count(integrated, employment_status), count(D03, employment_status)),
+                          identical(count(integrated, salary_status), count(D03, salary_status)),
+                          identical(count(distinct(integrated, household_id, fixed_internet), fixed_internet), count(D08_matched_households, fixed_internet)),
+                          identical(count(distinct(integrated, household_id, mobile_internet), mobile_internet), count(D08_matched_households, mobile_internet)),
+                          identical(count(distinct(integrated, household_id, computer_asset), computer_asset), count(D08_matched_households, computer_asset)),
+                          identical(count(distinct(integrated, household_id, household_smartphones), household_smartphones),
+                                    count(D08_matched_households, household_smartphones)))
+)
+```
+
+**Effect:** the integrated dataset has `r format(nrow(integrated), big.mark = ",")` rows, one per working-age person, and `r ncol(integrated)` columns from D01, D02, D03 and D08. It covers `r format(n_distinct(integrated$household_id), big.mark = ",")` households, and every category count matches its source, so no value was duplicated or lost. Every join matched on complete, 18-digit keys, so each value belongs to the person or household it came from. Household-level values are repeated for each working-age member of the household, which is correct at the person grain. `person_weight` is the matching survey weight at this grain; `household_weight` was dropped in section 3.
