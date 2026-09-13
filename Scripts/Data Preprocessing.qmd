@@ -1279,10 +1279,13 @@ Columns added or changed in type since column selection (section 3):
 bind_rows(
   D01 = enframe(D01_types_before, name = "column", value = "type_before") |>
     full_join(enframe(sapply(D01, class), name = "column", value = "type_after"), by = "column"),
+  
   D02 = enframe(D02_types_before, name = "column", value = "type_before") |>
     full_join(enframe(sapply(D02, class), name = "column", value = "type_after"), by = "column"),
+  
   D03 = enframe(D03_types_before, name = "column", value = "type_before") |>
     full_join(enframe(sapply(D03, class), name = "column", value = "type_after"), by = "column"),
+  
   D08 = enframe(D08_types_before, name = "column", value = "type_before") |>
     full_join(enframe(sapply(D08, class), name = "column", value = "type_after"), by = "column"),
   .id = "dataset"
@@ -1301,18 +1304,30 @@ final_missingness <- bind_rows(
   .id = "dataset"
 ) |>
   filter(missing > 0) |>
-  mutate(reason = case_when(
+  mutate(
+    reason = case_when(
     column == "education_level" ~ "Codes 29/99 reclassified to NA in sections 4/6",
+    
     column == "education_attendance_code" ~ "Text placeholders ('N/A', 'Unknown', 'not recorded') set to NA and flagged in 2.3",
+    
     column == "education_attendance" ~ "Code 3 reclassified to NA in sections 4/6, plus the text placeholders set to NA in 2.3",
+    
     column == "fixed_internet" ~ "Code 9 reclassified to NA in sections 4/6",
+    
     column == "mobile_internet_code" ~ "Already missing in the uncleaned data; no dictionary code to assign (noted in section 4)",
+    
     column == "mobile_internet" ~ "Code 9 reclassified to NA in sections 4/6, plus the missing mobile_internet_code values",
+    
     column == "computer_asset" ~ "Code 9 ('Unspecified') reclassified to NA in sections 4/6",
+    
     column == "household_smartphones" ~ "Negative counts set to NA and flagged in 7.2",
+    
     str_detect(column, "_flag$") ~ "Flags only filled in for rows that changed (expected)",
+    
     column == "salary" ~ "Placeholder codes reversed to NA in section 4",
+    
     column == "salary_status" ~ "Could not be classified from value and employment status",
+    
     TRUE ~ "NOT CLASSIFIED"
   ))
 
@@ -1323,12 +1338,19 @@ final_missingness
 #| label: Final Category Levels
 
 list(
+  
   province = levels(D01$province), sex = levels(D01$sex), population_group = levels(D01$population_group),
+  
   geo_type = levels(D01$geo_type), metro = levels(D01$metro),
+  
   education_level = levels(D02$education_level), education_attendance = levels(D02$education_attendance),
+  
   institution_type = levels(D02$institution_type), reason_not_attending = levels(D02$reason_not_attending),
+  
   employment_status = levels(D03$employment_status),
+  
   fixed_internet = levels(D08$fixed_internet), mobile_internet = levels(D08$mobile_internet),
+  
   computer_asset = levels(D08$computer_asset)
 )
 ```
@@ -1345,8 +1367,11 @@ list(
 #| label: Save Cleaned Datasets
 
 write_csv(D01, file.path(cleaned_directory, "D01_clean.csv"))
+
 write_csv(D02, file.path(cleaned_directory, "D02_clean.csv"))
+
 write_csv(D03, file.path(cleaned_directory, "D03_clean.csv"))
+
 write_csv(D08, file.path(cleaned_directory, "D08_clean.csv"))
 ```
 
@@ -1355,16 +1380,16 @@ write_csv(D08, file.path(cleaned_directory, "D08_clean.csv"))
 ```{r}
 #| label: Saved Files Verification
 
-D01_saved <- read_csv(file.path(cleaned_directory, "D01_clean.csv"), show_col_types = FALSE,
-                      col_types = cols(household_id = col_character(), person_number = col_character()))
-D02_saved <- read_csv(file.path(cleaned_directory, "D02_clean.csv"), show_col_types = FALSE,
-                      col_types = cols(household_id = col_character(), person_number = col_character()))
-D03_saved <- read_csv(file.path(cleaned_directory, "D03_clean.csv"), show_col_types = FALSE,
-                      col_types = cols(household_id = col_character(), person_number = col_character()))
-D08_saved <- read_csv(file.path(cleaned_directory, "D08_clean.csv"), show_col_types = FALSE,
-                      col_types = cols(household_id = col_character()))
+D01_saved <- read_csv(file.path(cleaned_directory, "D01_clean.csv"), show_col_types = FALSE, col_types = cols(household_id = col_character(), person_number = col_character()))
+
+D02_saved <- read_csv(file.path(cleaned_directory, "D02_clean.csv"), show_col_types = FALSE, col_types = cols(household_id = col_character(), person_number = col_character()))
+
+D03_saved <- read_csv(file.path(cleaned_directory, "D03_clean.csv"), show_col_types = FALSE, col_types = cols(household_id = col_character(), person_number = col_character()))
+
+D08_saved <- read_csv(file.path(cleaned_directory, "D08_clean.csv"), show_col_types = FALSE, col_types = cols(household_id = col_character()))
 
 tibble(
+  
   dataset = c("D01", "D02", "D03", "D08"),
 
   rows_in_memory = c(nrow(D01), nrow(D02), nrow(D03), nrow(D08)),
@@ -1374,13 +1399,10 @@ tibble(
   same_columns = c(identical(names(D01_saved), names(D01)), identical(names(D02_saved), names(D02)),
                    identical(names(D03_saved), names(D03)), identical(names(D08_saved), names(D08))),
 
-  ids_identical = c(identical(D01_saved$household_id, D01$household_id) & identical(D01_saved$person_number, D01$person_number),
-                    identical(D02_saved$household_id, D02$household_id) & identical(D02_saved$person_number, D02$person_number),
-                    identical(D03_saved$household_id, D03$household_id) & identical(D03_saved$person_number, D03$person_number),
-                    identical(D08_saved$household_id, D08$household_id)),
+  ids_identical = c(identical(D01_saved$household_id, D01$household_id) & identical(D01_saved$person_number, D01$person_number), identical(D02_saved$household_id, D02$household_id) & identical(D02_saved$person_number, D02$person_number), identical(D03_saved$household_id, D03$household_id) & identical(D03_saved$person_number, D03$person_number), identical(D08_saved$household_id, D08$household_id)),
 
-  missing_values_identical = c(sum(is.na(D01_saved)) == sum(is.na(D01)), sum(is.na(D02_saved)) == sum(is.na(D02)),
-                               sum(is.na(D03_saved)) == sum(is.na(D03)), sum(is.na(D08_saved)) == sum(is.na(D08)))
+  missing_values_identical = c(sum(is.na(D01_saved)) == sum(is.na(D01)), sum(is.na(D02_saved)) == sum(is.na(D02)), sum(is.na(D03_saved)) == sum(is.na(D03)), sum(is.na(D08_saved)) == sum(is.na(D08)))
+  
 )
 ```
 
