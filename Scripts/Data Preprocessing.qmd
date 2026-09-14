@@ -1000,6 +1000,40 @@ tibble(
 
 **Treatment:** filter D01 on `between(age, 15, 64)`, then keep only matching people in D02 and D03 with `semi_join()`. All D08 households are kept; Task 3 reports the households with no working-age member. The number of people in each household is counted before the filter, because the smartphone check in section 7 needs the full household size, not just the working-age members.
 
+<!-- ======================================================================= -->
+<!-- CLAUDE-WRITTEN START (part 1 of 2): household composition for section 10 -->
+<!-- ======================================================================= -->
+
+**Household composition (used in section 10):** the household features in section 10.3.5 need the number of children (under 15) and older people (65+) in each household. The age filter below removes these people, so every member of each household is counted first.
+
+```{r}
+#| label: Household Composition Before Record Selection
+
+#CLAUDE-WRITTEN: counts all members of each household before the 15-64 filter removes children and people aged 65+
+household_composition <- D01 |>
+  group_by(household_id) |>
+  summarise(
+    household_size = n(),
+    n_children_under15 = sum(age < 15),
+    n_elderly_65plus = sum(age > 64),
+    .groups = "drop"
+  )
+
+tibble(
+  households = nrow(household_composition),
+
+  people_counted = sum(household_composition$household_size),
+
+  people_in_D01 = nrow(D01),
+
+  children_counted = sum(household_composition$n_children_under15),
+
+  aged_65_plus_counted = sum(household_composition$n_elderly_65plus)
+)
+```
+
+<!-- CLAUDE-WRITTEN END (part 1 of 2) -->
+
 ```{r}
 #| label: Record Selection
 
@@ -1839,3 +1873,792 @@ tibble(
 ```
 
 **Effect:** the integrated dataset has `r format(nrow(integrated), big.mark = ",")` rows, one per working-age person, and `r ncol(integrated)` columns from D01, D02, D03 and D08. It covers `r format(n_distinct(integrated$household_id), big.mark = ",")` households, and every category count matches its source, so no value was duplicated or lost. Every join matched on complete, 18-digit keys, so each value belongs to the person or household it came from. Household-level values are repeated for each working-age member of the household, which is correct at the person grain. `person_weight` is the matching survey weight at this grain; `household_weight` was dropped in section 3.
+
+<!-- ======================================================================= -->
+<!-- CLAUDE-WRITTEN START (part 2 of 2): everything from here to the end of  -->
+<!-- the file is new: section 10, feature engineering, transformation and    -->
+<!-- encoding                                                                -->
+<!-- ======================================================================= -->
+
+# 10. Feature Engineering, Transformation and Encoding
+
+The Milestone 1 analytics goal is to model employment status from education level, digital access and the interaction between the two, controlling for demographic and geographic factors, with a logistic regression and a tree-based method. This section turns the integrated dataset from section 9 into features for that goal:
+
+- 10.1 removes the traceability flags.
+- 10.2 recodes the yes/no columns to 0/1.
+- 10.3 builds the engineered features.
+- 10.4 applies the transformations and creates the modelling dataset.
+- 10.5 encodes the modelling dataset for the two model types.
+- 10.6 saves the analytical datasets.
+
+Every rule in this section is fixed in advance: a code mapping, a constant or a threshold. Nothing is estimated from the data as a whole, so these steps can run before the train/test split in Task 4 without leaking information from test rows into training rows.
+
+## 10.1 Remove the traceability flags
+
+**Problem:** the `_flag` columns record which values were repaired in sections 2–7. They were needed for the verification tables above, but they are not predictors, and a model could learn the repair pattern instead of a real relationship.
+
+**Treatment:** remove every column ending in `_flag` from the integrated dataset. The repairs remain documented in sections 2–7.
+
+```{r}
+#| label: Remove Flag Columns
+
+#CLAUDE-WRITTEN
+flag_columns <- str_subset(names(integrated), "_flag$")
+
+analytical <- integrated |> select(-ends_with("_flag"))
+
+tibble(
+  rows_before = nrow(integrated),
+
+  rows_after = nrow(analytical),
+
+  columns_before = ncol(integrated),
+
+  columns_after = ncol(analytical),
+
+  flag_columns_removed = paste(flag_columns, collapse = ", "),
+
+  flag_columns_remaining = sum(str_ends(names(analytical), "_flag"))
+)
+```
+
+**Effect / Verification:** `r length(flag_columns)` flag columns are removed and no rows are lost. The analytical dataset starts with `r ncol(analytical)` columns.
+
+## 10.2 Recode yes/no columns to 0/1
+
+**Problem:** the source codes yes/no questions as 1 = Yes and 2 = No, and the label factors from section 6 put "Yes" first. Used directly, `as.numeric()` would give 1 and 2 instead of 1 and 0, and a model would treat "Yes" as the baseline, which flips every odds ratio.
+
+**Treatment:** create a 0/1 integer column for each yes/no variable, with 1 = Yes and 0 = No, and 1 = Female for sex. Codes classified as non-response in section 4 (9) and missing codes stay `NA`. The original `_code` and label columns are not changed.
+
+```{r}
+#| label: Recode Yes No Columns
+
+#CLAUDE-WRITTEN: case_when() returns NA for any code not listed, so non-response codes stay missing
+analytical <- analytical |>
+  mutate(
+    female = case_when(sex_code == 2 ~ 1L, sex_code == 1 ~ 0L),
+
+    has_fixed_internet = case_when(fixed_internet_code == 1 ~ 1L, fixed_internet_code == 2 ~ 0L),
+
+    has_mobile_internet = case_when(mobile_internet_code == 1 ~ 1L, mobile_internet_code == 2 ~ 0L),
+
+    has_computer = case_when(computer_asset_code == 1 ~ 1L, computer_asset_code == 2 ~ 0L)
+  )
+```
+
+**Verification:** every code maps to exactly one 0/1 value.
+
+```{r}
+#| label: Recode Yes No Verification
+
+#CLAUDE-WRITTEN
+analytical |> count(sex_code, sex, female)
+analytical |> count(fixed_internet_code, fixed_internet, has_fixed_internet)
+analytical |> count(mobile_internet_code, mobile_internet, has_mobile_internet)
+analytical |> count(computer_asset_code, computer_asset, has_computer)
+```
+
+**Effect:** four 0/1 columns are added. 1 always means "Yes" (or Female), so model coefficients read in the natural direction.
+
+## 10.3 Engineered features
+
+Each feature below is justified with the employment pattern it captures. The helper function summarises this pattern for every level of a feature, using `person_weight` so that each person counts for the number of people they represent:
+
+- `percent_employed`: the share employed among all people aged 15–64.
+- `employment_rate_in_labour_force`: the share employed among people who are employed or unemployed, which is the modelling target in 10.4.
+
+```{r}
+#| label: Employment Share Helper
+
+#CLAUDE-WRITTEN: weighted employment percentages for each level of a feature (used only to justify features)
+employment_share <- function(data, feature) {
+  data |>
+    group_by({{ feature }}) |>
+    summarise(
+      people = n(),
+
+      percent_employed = round(sum(person_weight[employment_status == "Employed"]) / sum(person_weight) * 100, 1),
+
+      employment_rate_in_labour_force = round(sum(person_weight[employment_status == "Employed"]) /
+                                                sum(person_weight[employment_status != "Not economically active"]) * 100, 1),
+      .groups = "drop"
+    )
+}
+```
+
+### 10.3.1 Education: `education_band` and `matric_plus`
+
+**Problem:** `education_level` has 31 levels, many with very few people, and its level order is the dictionary order rather than a ranking (section 6). A model cannot estimate reliable effects for tiny levels, and the hypotheses are about levels of education, not individual certificates.
+
+**Treatment:**
+
+- `education_band` groups explicit codes into six ordered stages of education. Codes 13–15 (NTC I–III) and 19–20 (certificate or diploma without Grade 12) are below matric, so they join "Some secondary". Code 28 ("Other") is too small to stand alone and cannot be ranked, so it joins the codes classified as non-response in section 4 (29 and 99) in "Other/unknown".
+- `matric_plus` is 1 for matric or any post-school qualification and 0 below matric. It is `NA` for "Other/unknown", because that education level cannot be placed above or below matric.
+
+```{r}
+#| label: Education Features
+
+#CLAUDE-WRITTEN: codes that are not listed would become NA, and the verification below confirms there are none
+analytical <- analytical |>
+  mutate(
+    education_band = case_when(
+      education_level_code == 98 ~ "No schooling",
+      education_level_code %in% 0:7 ~ "Primary (Grade R-7)",
+      education_level_code %in% c(8:11, 13:15, 19:20) ~ "Some secondary",
+      education_level_code == 12 ~ "Matric",
+      education_level_code %in% c(16:18, 21:22) ~ "Post-school certificate/diploma",
+      education_level_code %in% 23:27 ~ "Degree",
+      education_level_code %in% c(28, 29, 99) ~ "Other/unknown"
+    ),
+
+    education_band = factor(education_band, levels = c("No schooling", "Primary (Grade R-7)", "Some secondary", "Matric",
+                                                        "Post-school certificate/diploma", "Degree", "Other/unknown")),
+
+    matric_plus = case_when(
+      education_level_code %in% c(12, 16:18, 21:27) ~ 1L,
+      education_level_code %in% c(98, 0:11, 13:15, 19:20) ~ 0L
+    )
+  )
+```
+
+**Verification:** every education code belongs to exactly one band, and `matric_plus` agrees with the bands.
+
+```{r}
+#| label: Education Features Verification
+
+#CLAUDE-WRITTEN
+analytical |>
+  group_by(education_band, matric_plus) |>
+  summarise(education_level_codes = paste(sort(unique(education_level_code)), collapse = ", "), people = n(), .groups = "drop")
+
+tibble(people_without_a_band = sum(is.na(analytical$education_band)))
+
+employment_share(analytical, education_band)
+```
+
+**Effect:** 31 sparse education levels become `r nlevels(analytical$education_band)` bands, and no person is left without a band. Below matric the three bands have similar employment percentages, and from matric upward the percentage rises sharply with every band. This break at matric is why `matric_plus` is used as the single education term in the interaction with digital access. In the labour force, the lowest bands show higher employment rates than "Some secondary". These bands contain mostly older people, and few of them are in the labour force, so this reflects age rather than education. It is one reason age is controlled for in the model (10.4, T2).
+
+### 10.3.2 Digital access: `any_home_internet` and `digital_access_score`
+
+**Problem:** digital access is spread over four columns. Mobile internet is very common, so on its own it separates people poorly, while fixed internet and computers are rare. A single yes/no hides how much access a household has, and four separate columns make the interaction test hard to read.
+
+**Treatment:**
+
+- `any_home_internet` is 1 if the household has fixed or mobile internet, and 0 only if both are "No". It is `NA` if one is "No" and the other is missing.
+- `digital_access_score` counts the forms of access the household has: fixed internet, mobile internet, a computer and at least one smartphone (0–4). It is `NA` if any of the four is missing.
+
+```{r}
+#| label: Digital Access Features
+
+#CLAUDE-WRITTEN
+analytical <- analytical |>
+  mutate(
+    any_home_internet = case_when(
+      has_fixed_internet == 1 | has_mobile_internet == 1 ~ 1L,
+      has_fixed_internet == 0 & has_mobile_internet == 0 ~ 0L
+    ),
+
+    digital_access_score = has_fixed_internet + has_mobile_internet + has_computer + as.integer(household_smartphones >= 1)
+  )
+```
+
+**Verification:**
+
+```{r}
+#| label: Digital Access Features Verification
+
+#CLAUDE-WRITTEN
+analytical |> count(has_fixed_internet, has_mobile_internet, any_home_internet)
+
+analytical |> count(digital_access_score)
+
+employment_share(analytical, any_home_internet)
+
+employment_share(analytical, digital_access_score)
+```
+
+**Effect:** `any_home_internet` is 1 only when at least one internet column is "Yes", and 0 only when both are "No". `digital_access_score` is missing for `r sum(is.na(analytical$digital_access_score))` people whose household has a missing digital answer. The weighted employment percentages rise with the score, with the largest increases at scores 3 and 4, so the score captures a gradient that a single yes/no column hides.
+
+### 10.3.3 Education × digital access: `edu_digital_group`
+
+**Problem:** the central question is whether internet access strengthens the effect of education on employment (reinforcement) or replaces it (substitution). A logistic regression tests this with the interaction term `matric_plus * any_home_internet`. Tree models and Power BI need the combination as a single column.
+
+**Treatment:** combine `matric_plus` and `any_home_internet` into four groups. People whose education is "Other/unknown" get their own level, so they are not silently dropped. The group is `NA` only when internet access is unknown.
+
+```{r}
+#| label: Education Digital Interaction Feature
+
+#CLAUDE-WRITTEN
+analytical <- analytical |>
+  mutate(
+    edu_digital_group = case_when(
+      is.na(any_home_internet) ~ NA_character_,
+      is.na(matric_plus) ~ "Education unknown",
+      matric_plus == 0 & any_home_internet == 0 ~ "Below matric, no internet",
+      matric_plus == 0 & any_home_internet == 1 ~ "Below matric, internet",
+      matric_plus == 1 & any_home_internet == 0 ~ "Matric+, no internet",
+      matric_plus == 1 & any_home_internet == 1 ~ "Matric+, internet"
+    ),
+
+    edu_digital_group = factor(edu_digital_group, levels = c("Below matric, no internet", "Below matric, internet",
+                                                              "Matric+, no internet", "Matric+, internet", "Education unknown"))
+  )
+```
+
+**Verification:**
+
+```{r}
+#| label: Education Digital Interaction Verification
+
+#CLAUDE-WRITTEN
+analytical |> count(matric_plus, any_home_internet, edu_digital_group)
+
+edu_digital_rates <- employment_share(analytical, edu_digital_group)
+edu_digital_rates
+
+#Difference in the labour-force employment rate between people with and without internet, within each education group
+internet_gap <- tibble(
+  internet_gap_below_matric = edu_digital_rates$employment_rate_in_labour_force[edu_digital_rates$edu_digital_group %in% "Below matric, internet"] -
+    edu_digital_rates$employment_rate_in_labour_force[edu_digital_rates$edu_digital_group %in% "Below matric, no internet"],
+
+  internet_gap_matric_plus = edu_digital_rates$employment_rate_in_labour_force[edu_digital_rates$edu_digital_group %in% "Matric+, internet"] -
+    edu_digital_rates$employment_rate_in_labour_force[edu_digital_rates$edu_digital_group %in% "Matric+, no internet"]
+)
+internet_gap
+```
+
+**Effect:** each combination of `matric_plus` and `any_home_internet` maps to exactly one group. In the labour force, people with internet have an employment rate `r internet_gap$internet_gap_below_matric` percentage points higher than those without it below matric, and `r internet_gap$internet_gap_matric_plus` points higher at matric or above. Internet is associated with a larger employment advantage for people with matric, the reinforcing pattern described in Milestone 1. The interaction term tests whether this difference between the two gaps is real. This section only builds the feature; whether the difference is statistically significant is tested in Milestone 3.
+
+### 10.3.4 Location and age group: `settlement_type` and `youth`
+
+**Problem:** `geo_type` and `metro` describe one thing, where a person lives, in two overlapping columns. Some combinations are very small (metro farms and metro traditional areas). The policy discussion also refers to youth, which no column identifies.
+
+**Treatment:**
+
+- `settlement_type` combines the two columns into four levels. Traditional areas and farms keep their own level whether or not they fall inside a metro, and urban areas are split into metro and non-metro.
+- `youth` is 1 for ages 15–34, the South African youth definition, for reporting in Power BI.
+
+```{r}
+#| label: Location And Youth Features
+
+#CLAUDE-WRITTEN
+analytical <- analytical |>
+  mutate(
+    settlement_type = case_when(
+      geo_type_code == 2 ~ "Traditional",
+      geo_type_code == 3 ~ "Farms",
+      geo_type_code == 1 & metro_indicator == 1 ~ "Metro urban",
+      geo_type_code == 1 & metro_indicator == 2 ~ "Non-metro urban"
+    ),
+
+    settlement_type = factor(settlement_type, levels = c("Metro urban", "Non-metro urban", "Traditional", "Farms")),
+
+    youth = as.integer(age <= 34)
+  )
+```
+
+**Verification:**
+
+```{r}
+#| label: Location And Youth Verification
+
+#CLAUDE-WRITTEN
+analytical |> count(geo_type, metro, settlement_type)
+
+analytical |> group_by(youth) |> summarise(min_age = min(age), max_age = max(age), people = n())
+
+employment_share(analytical, settlement_type)
+```
+
+**Effect:** every combination of `geo_type` and `metro` maps to one settlement type, with no missing values. The employment percentages differ clearly between settlement types, so the combined column keeps the location signal in one variable.
+
+### 10.3.5 Household features
+
+**Problem:** employment also depends on a person's household. Caring for children or older family members can keep people, especially women, out of work, and a household with educated members may help someone find work. Smartphone counts also mean little without household size: three phones for one person is not the same as three phones for eight people. None of these are measured directly.
+
+**Treatment:** join `household_composition` (counted in section 5 before the age filter) many-to-one on `household_id`, then build:
+
+- `n_working_age`: the number of people aged 15–64 in the household.
+- `elderly_in_household`: 1 if anyone aged 65+ lives in the household.
+- `dependency_ratio`: (children + people aged 65+) ÷ working-age members.
+- `female_x_children`: `female` × `n_children_under15`, so the effect of children can differ between women and men.
+- `smartphones_per_member`: smartphones ÷ all household members.
+- `smartphone_access`: the ratio grouped as "None", "Fewer than 1 per member" or "1 or more per member".
+- `other_member_matric`: whether another working-age member of the household has matric or higher. Members with unknown education count as not having matric.
+
+```{r}
+#| label: Household Features
+
+#CLAUDE-WRITTEN
+analytical_rows_before_household_join <- nrow(analytical)
+
+analytical <- analytical |>
+  left_join(household_composition, by = "household_id", relationship = "many-to-one") |>
+  add_count(household_id, name = "n_working_age") |>
+  group_by(household_id) |>
+  mutate(matric_members_in_household = sum(matric_plus == 1, na.rm = TRUE)) |>
+  ungroup() |>
+  mutate(
+    elderly_in_household = as.integer(n_elderly_65plus > 0),
+
+    dependency_ratio = (n_children_under15 + n_elderly_65plus) / n_working_age,
+
+    female_x_children = female * n_children_under15,
+
+    smartphones_per_member = household_smartphones / household_size,
+
+    smartphone_access = case_when(
+      household_smartphones == 0 ~ "None",
+      smartphones_per_member < 1 ~ "Fewer than 1 per member",
+      smartphones_per_member >= 1 ~ "1 or more per member"
+    ),
+
+    smartphone_access = factor(smartphone_access, levels = c("None", "Fewer than 1 per member", "1 or more per member")),
+
+    #Subtract the person's own matric so only other members are counted
+    other_member_matric = case_when(
+      n_working_age == 1 ~ "No other working-age member",
+      matric_members_in_household - coalesce(matric_plus, 0L) > 0 ~ "Yes",
+      .default = "No"
+    ),
+
+    other_member_matric = factor(other_member_matric, levels = c("No", "Yes", "No other working-age member"))
+  ) |>
+  select(-matric_members_in_household)
+```
+
+**Verification:** the join must not add or lose people. Every household size must equal its children plus working-age members plus people aged 65+.
+
+```{r}
+#| label: Household Features Verification
+
+#CLAUDE-WRITTEN
+tibble(
+  rows_before_join = analytical_rows_before_household_join,
+
+  rows_after_join = nrow(analytical),
+
+  people_without_household_composition = sum(is.na(analytical$household_size)),
+
+  household_size_equals_sum_of_age_groups = all(analytical$household_size ==
+                                                  analytical$n_children_under15 + analytical$n_working_age + analytical$n_elderly_65plus),
+
+  smallest_dependency_ratio = min(analytical$dependency_ratio),
+
+  largest_dependency_ratio = max(analytical$dependency_ratio),
+
+  highest_smartphones_per_member = max(analytical$smartphones_per_member, na.rm = TRUE)
+)
+
+analytical |> count(smartphone_access)
+
+employment_share(mutate(analytical, children = pmin(n_children_under15, 3)), children)
+
+#Children and employment for women and men aged 25-54, the reason for female_x_children
+analytical |>
+  filter(between(age, 25, 54)) |>
+  mutate(children = pmin(n_children_under15, 3)) |>
+  group_by(sex) |>
+  group_modify(~ employment_share(.x, children)) |>
+  ungroup()
+
+employment_share(analytical, elderly_in_household)
+
+employment_share(analytical, smartphone_access)
+
+employment_share(analytical, other_member_matric)
+```
+
+**Effect:** the row count stays at `r format(nrow(analytical), big.mark = ",")`, every person receives their household's composition, and every household size equals the sum of its age groups. The tables show the patterns these features capture: employment falls as the number of children rises, and more steeply for women than for men. Smartphone access and an educated household member are also associated with employment. `smartphone_access` is missing only for households whose smartphone count was set to missing in section 7.2.
+
+## 10.4 Transformations
+
+### T1 Target population: the labour force
+
+**Problem:** `employment_status` has three levels. "Not economically active" is largely made up of students and people close to retirement, who are not looking for work, so the digital job-search mechanism in the business problem does not apply to them. A binary target also gives the odds ratios required by the technical success criteria.
+
+**Treatment:** the modelling dataset keeps only the labour force, people who are employed or unemployed. The target `employed` is created and encoded in 10.5. The full working-age population stays in `analytical` for description and Power BI.
+
+### T2 Centred age and age squared
+
+**Problem:** employment does not change with age in a straight line. A single age term can only fit a straight line, and `age` and `age²` are almost perfectly correlated, which makes their regression coefficients unstable.
+
+**Treatment:** subtract a fixed 40 from age (close to the middle of the 15–64 range) to create `age_centred`, then square it to create `age_centred_squared`. A fixed constant is used instead of the sample mean, so nothing is estimated from the data and the step cannot leak test information into training. Tree models can use `age_centred` directly, because centring does not change the order of ages.
+
+```{r}
+#| label: Centre Age
+
+#CLAUDE-WRITTEN
+analytical <- analytical |>
+  mutate(
+    age_centred = age - 40,
+
+    age_centred_squared = age_centred^2
+  )
+```
+
+**Verification:**
+
+```{r}
+#| label: Centre Age Verification
+
+#CLAUDE-WRITTEN
+tibble(
+  correlation_age_with_age_squared = round(cor(analytical$age, analytical$age^2), 3),
+
+  correlation_centred_age_with_its_square = round(cor(analytical$age_centred, analytical$age_centred_squared), 3),
+
+  min_age_centred = min(analytical$age_centred),
+
+  max_age_centred = max(analytical$age_centred)
+)
+
+analytical |>
+  mutate(age_band = cut(age, breaks = c(14, 24, 34, 44, 54, 64), labels = c("15-24", "25-34", "35-44", "45-54", "55-64"))) |>
+  employment_share(age_band)
+```
+
+**Effect:** centring reduces the correlation between the age terms from `r round(cor(analytical$age, analytical$age^2), 3)` to `r round(cor(analytical$age_centred, analytical$age_centred_squared), 3)`. The age bands show why a curve is needed. Among all 15–64s, employment rises until 45–54 and then falls. In the labour force, the rate jumps from 15–24 to 25–34 and then increases more slowly. Neither pattern is a straight line, and the squared term lets a logistic regression fit the curve.
+
+### T6 Log salary (income question only)
+
+**Problem:** reported salaries are strongly right-skewed (section 7.3). A few very high salaries would dominate an income model, and the business success criteria ask whether internet access is associated with higher income among people who report it.
+
+**Treatment:** `log_salary` is the natural log of `salary` for employed people with a reported salary of at least R100. Section 7.3 found that values under R100 cannot plausibly be a monthly salary. Everyone else gets `NA`. `salary` itself is not changed.
+
+```{r}
+#| label: Log Salary
+
+#CLAUDE-WRITTEN
+analytical <- analytical |>
+  mutate(log_salary = if_else(employment_status == "Employed" & salary_status == "Reported" & salary >= 100, log(salary), NA_real_))
+```
+
+**Verification:**
+
+```{r}
+#| label: Log Salary Verification
+
+#CLAUDE-WRITTEN
+analytical |>
+  filter(!is.na(log_salary)) |>
+  summarise(
+    people = n(),
+
+    salary_mean = round(mean(salary)),
+
+    salary_median = median(salary),
+
+    salary_mean_divided_by_median = round(mean(salary) / median(salary), 2),
+
+    log_salary_mean = round(mean(log_salary), 2),
+
+    log_salary_median = round(median(log_salary), 2)
+  )
+
+analytical |>
+  filter(!is.na(log_salary)) |>
+  ggplot(aes(x = log_salary)) +
+  geom_histogram(bins = 50) +
+  labs(title = "Log salary (employed people with a reported salary of R100 or more)", x = "log(salary)", y = "Count")
+```
+
+**Effect:** on the Rand scale the mean is about twice the median, a sign of strong skew. On the log scale the mean and median almost coincide and the histogram is roughly bell-shaped, so no small group of high earners dominates the income model. The spikes in the histogram are most likely round amounts that respondents report (for example R5,000 or R10,000). They are genuine answers and are left unchanged.
+
+### T3, T4, T5 and leakage: build the modelling dataset
+
+**Problem:** the modelling dataset must contain only the target population (T1), usable predictors and no leakage. Some columns reveal the outcome directly:
+
+- `reason_not_attending` = "Working" can only be answered by someone who works.
+- The salary columns exist only for employed people.
+
+The evidence is below.
+
+```{r}
+#| label: Leakage Evidence
+
+#CLAUDE-WRITTEN
+analytical |>
+  filter(employment_status != "Not economically active") |>
+  mutate(reason_not_attending_is_working = reason_not_attending == "Working (at home, business or job)") |>
+  count(reason_not_attending_is_working, employment_status) |>
+  pivot_wider(names_from = employment_status, values_from = n, values_fill = 0)
+
+analytical |>
+  filter(employment_status != "Not economically active") |>
+  count(salary_status, employment_status) |>
+  pivot_wider(names_from = employment_status, values_from = n, values_fill = 0)
+```
+
+**Treatment:**
+
+- **T1:** keep the labour force only.
+- **T3:** unknown education is already kept as the "Other/unknown" level of `education_band` (10.3.1), because those people are not missing at random and dropping them would bias the sample.
+- **T4:** drop the few people whose household has a missing digital-access answer. There is no dictionary code to assign, and they are too few to justify an imputation model.
+- **T5:** rare levels were already merged by fixed rules in 10.3: "Other" education into "Other/unknown", and metro farms and traditional areas into "Farms" and "Traditional". No level is merged based on counts in the data.
+- **Leakage:** keep only the target, the predictors and two design columns. `household_id` is needed for the household-grouped train/test split in Task 4, and `person_weight` is the survey weight. Neither is used as a predictor.
+
+```{r}
+#| label: Build Model Data
+
+#CLAUDE-WRITTEN
+labour_force_rows <- sum(analytical$employment_status != "Not economically active")
+
+model_data <- analytical |>
+  filter(employment_status %in% c("Employed", "Unemployed")) |>
+  filter(!is.na(any_home_internet), !is.na(digital_access_score)) |>
+  transmute(
+    #Design columns: household-grouped split and survey weights in Task 4, never predictors
+    household_id, person_weight,
+
+    #Target
+    employed = employment_status,
+
+    #Demographic and location predictors
+    age_centred, age_centred_squared, female, population_group, province, settlement_type,
+
+    #Education predictors
+    education_band, matric_plus,
+
+    #Digital access predictors
+    has_fixed_internet, has_mobile_internet, has_computer, any_home_internet, digital_access_score, smartphone_access,
+
+    #Education x digital access
+    edu_digital_group,
+
+    #Household predictors
+    household_size, n_children_under15, elderly_in_household, dependency_ratio, female_x_children, other_member_matric
+  )
+```
+
+**Verification:** row counts at each step, remaining missing values, and a documented reason for every column that is left out.
+
+```{r}
+#| label: Model Data Verification
+
+#CLAUDE-WRITTEN
+tibble(
+  working_age_people = nrow(analytical),
+
+  labour_force = labour_force_rows,
+
+  dropped_for_missing_digital_access = labour_force_rows - nrow(model_data),
+
+  rows_in_model_data = nrow(model_data),
+
+  columns_in_model_data = ncol(model_data),
+
+  missing_values_excluding_matric_plus = sum(is.na(select(model_data, -matric_plus))),
+
+  missing_matric_plus = sum(is.na(model_data$matric_plus)),
+
+  employed = sum(model_data$employed == "Employed"),
+
+  unemployed = sum(model_data$employed == "Unemployed"),
+
+  percent_employed = round(mean(model_data$employed == "Employed") * 100, 1)
+)
+
+excluded_columns <- tibble(column = setdiff(names(analytical), names(model_data))) |>
+  mutate(
+    reason = case_when(
+      column %in% c("reason_not_attending", "reason_not_attending_code", "lab_salary_raw", "salary", "salary_status", "log_salary") ~ "Leakage: reveals the employment outcome (log_salary is used in income_data)",
+
+      column == "employment_status" ~ "Target: kept as employed",
+
+      column %in% c("person_number", "psu") ~ "Identifier or survey design column",
+
+      str_ends(column, "_code") | column %in% c("employment_status2code", "metro_indicator") ~ "Code column: its label or an engineered feature is used instead",
+
+      column == "education_level" ~ "Replaced by education_band (31 sparse levels)",
+
+      column == "sex" ~ "Replaced by female (0/1)",
+
+      column %in% c("geo_type", "metro") ~ "Replaced by settlement_type",
+
+      column == "age" ~ "Replaced by age_centred and age_centred_squared",
+
+      column == "youth" ~ "Reporting group for Power BI; duplicates age in a model",
+
+      column %in% c("fixed_internet", "mobile_internet", "computer_asset") ~ "Replaced by its 0/1 version",
+
+      column %in% c("household_smartphones", "smartphones_per_member") ~ "Replaced by smartphone_access",
+
+      column %in% c("n_elderly_65plus", "n_working_age") ~ "Used to build elderly_in_household and dependency_ratio",
+
+      column %in% c("education_attendance", "institution_type") ~ "Current study status: mostly outside the labour force, kept for description",
+
+      TRUE ~ "NOT CLASSIFIED" #Should never appear; shows up if an excluded column has no reason
+    )
+  )
+
+excluded_columns |>
+  group_by(reason) |>
+  summarise(columns = paste(column, collapse = ", "), .groups = "drop")
+```
+
+**Effect:** the modelling dataset has `r format(nrow(model_data), big.mark = ",")` people from a labour force of `r format(labour_force_rows, big.mark = ",")`, so `r labour_force_rows - nrow(model_data)` people were dropped for missing digital access. `r round(mean(model_data$employed == "Employed") * 100, 1)`% are employed, a moderate imbalance that Task 4 should keep in mind when choosing the split and evaluation metrics. The leakage tables show that "Working" as a reason for not studying and a reported salary occur almost only among the employed, so these columns are excluded. The only missing values left are in `matric_plus`, for people with "Other/unknown" education; `education_band` and `edu_digital_group` keep these people as their own level. `r sum(excluded_columns$reason == "NOT CLASSIFIED")` excluded columns lack a documented reason.
+
+### T7 No scaling
+
+**Problem:** scaling puts numeric predictors on a common range. It is required for distance-based or penalised methods such as k-nearest neighbours, k-means or lasso, but not for the methods chosen in Milestone 1.
+
+**Treatment:** no scaling is applied. Logistic regression coefficients are simply expressed per unit of each predictor, and tree-based methods split on the order of values, which scaling does not change. `person_weight` is a survey weight and must never be scaled.
+
+```{r}
+#| label: No Scaling Verification
+
+#CLAUDE-WRITTEN
+tibble(
+  person_weight_unchanged_since_integration = identical(analytical$person_weight, integrated$person_weight),
+
+  age_centred_range = paste(range(model_data$age_centred), collapse = " to "),
+
+  household_size_range = paste(range(model_data$household_size), collapse = " to ")
+)
+```
+
+**Effect:** numeric predictors keep their natural units (years, people, ratios), which keeps the odds ratios in Milestone 3 directly interpretable.
+
+## 10.5 Encoding for modelling
+
+**Problem:** R's model functions encode categories automatically, but they need to be told what to compare against. By default the first factor level is the reference, and the first level of `employment_status` is "Employed". A logistic regression would therefore predict the chance of being *unemployed*. Ordered factors would make R use polynomial contrasts, which do not give readable odds ratios.
+
+**Treatment:**
+
+- **E1:** `employed` is a factor with "Unemployed" first, so models predict the probability of being employed.
+- **E2:** the yes/no columns are already 0/1 integers (10.2).
+- **E3:** each nominal factor gets a meaningful reference level, so every odds ratio reads "compared with this group":
+  - `education_band`: "Some secondary", the largest group below matric.
+  - `province`: Gauteng, the largest province and economic hub.
+  - `population_group`: Black African, the largest group.
+  - `settlement_type`: Metro urban.
+  - `edu_digital_group`: "Below matric, no internet", the group with neither resource.
+  - `smartphone_access`: "None".
+  - `other_member_matric`: "No".
+- **E4:** all factors stay unordered, so R uses treatment contrasts (each level vs the reference).
+- **E5:** no manual one-hot encoding. `glm()` and `rpart()`/`randomForest()` accept factors directly and create the dummy columns internally; the `model.matrix()` output below shows this.
+- **E6:** `education_level` is replaced by `education_band` (10.3.1).
+
+```{r}
+#| label: Encode Model Data
+
+#CLAUDE-WRITTEN: fct_relevel() moves the named level to the front, which makes it the reference level
+model_data <- model_data |>
+  mutate(
+    employed = factor(employed, levels = c("Unemployed", "Employed")),
+
+    education_band = fct_relevel(education_band, "Some secondary"),
+
+    province = fct_relevel(province, "Gauteng"),
+
+    population_group = fct_relevel(population_group, "Black African"),
+
+    settlement_type = fct_relevel(settlement_type, "Metro urban"),
+
+    edu_digital_group = fct_relevel(edu_digital_group, "Below matric, no internet"),
+
+    smartphone_access = fct_relevel(smartphone_access, "None"),
+
+    other_member_matric = fct_relevel(other_member_matric, "No")
+  )
+```
+
+**Verification:** the reference level, the number of levels, whether the factor is ordered and the size of the smallest level, for every factor in the modelling dataset. The smallest level also checks T5: no level should be too small to estimate.
+
+```{r}
+#| label: Encoding Verification
+
+#CLAUDE-WRITTEN
+model_factors <- select(model_data, where(is.factor))
+
+tibble(
+  column = names(model_factors),
+
+  reference_level = map_chr(model_factors, ~ levels(.x)[1]),
+
+  number_of_levels = map_int(model_factors, nlevels),
+
+  ordered = map_lgl(model_factors, is.ordered),
+
+  smallest_level_people = map_int(model_factors, ~ min(table(.x)))
+)
+
+model_data |> count(employed)
+
+#E5: R creates one 0/1 column per non-reference level; the reference level (Some secondary) has no column
+colnames(model.matrix(~ education_band, data = model_data))
+
+#Column types in the final modelling dataset
+enframe(map_chr(model_data, ~ class(.x)[1]), name = "column", value = "type")
+```
+
+**Effect:** `employed` has "Unemployed" as its reference, so a logistic regression models the probability of being employed. Every factor has its chosen reference level first, no factor is ordered, and the `model.matrix()` output shows that R creates the dummy columns itself, leaving out the reference level.
+
+## 10.6 Save the analytical datasets
+
+**Problem:** Milestone 3 needs the engineered datasets without rerunning this pipeline.
+
+**Treatment:** save three CSV files in `Datasets/Analytical/`:
+
+- `analytical_dataset.csv`: all `r format(nrow(analytical), big.mark = ",")` working-age people with every cleaned and engineered column, for Power BI and description.
+- `model_data.csv`: the labour-force modelling dataset from 10.4–10.5.
+- `income_data.csv`: employed people with a usable salary, for the internet and income question.
+
+As in 8.2, missing values are written as empty cells. A CSV does not store factor levels, so Milestone 3 must read `household_id` as text and re-apply the level order from 10.5 after reading `model_data.csv`.
+
+```{r}
+#| label: Save Analytical Datasets
+
+#CLAUDE-WRITTEN
+analytical_directory <- "../Datasets/Analytical/"
+dir.create(analytical_directory, showWarnings = FALSE)
+
+income_data <- analytical |>
+  filter(!is.na(log_salary)) |>
+  transmute(household_id, person_weight, log_salary, any_home_internet, digital_access_score, education_band, matric_plus,
+            age_centred, age_centred_squared, female, population_group, province, settlement_type)
+
+write_csv(analytical, file.path(analytical_directory, "analytical_dataset.csv"), na = "")
+
+write_csv(model_data, file.path(analytical_directory, "model_data.csv"), na = "")
+
+write_csv(income_data, file.path(analytical_directory, "income_data.csv"), na = "")
+```
+
+**Verification:** read the saved files back with `household_id` as text and compare them with the datasets in memory.
+
+```{r}
+#| label: Saved Analytical Datasets Verification
+
+#CLAUDE-WRITTEN
+analytical_saved <- read_csv(file.path(analytical_directory, "analytical_dataset.csv"), show_col_types = FALSE,
+                             col_types = cols(household_id = col_character(), person_number = col_character()))
+
+model_data_saved <- read_csv(file.path(analytical_directory, "model_data.csv"), show_col_types = FALSE,
+                             col_types = cols(household_id = col_character()))
+
+income_data_saved <- read_csv(file.path(analytical_directory, "income_data.csv"), show_col_types = FALSE,
+                              col_types = cols(household_id = col_character()))
+
+tibble(
+  dataset = c("analytical_dataset", "model_data", "income_data"),
+
+  rows_in_memory = c(nrow(analytical), nrow(model_data), nrow(income_data)),
+
+  rows_in_saved_file = c(nrow(analytical_saved), nrow(model_data_saved), nrow(income_data_saved)),
+
+  same_columns = c(identical(names(analytical_saved), names(analytical)), identical(names(model_data_saved), names(model_data)),
+                   identical(names(income_data_saved), names(income_data))),
+
+  ids_identical = c(identical(analytical_saved$household_id, analytical$household_id), identical(model_data_saved$household_id, model_data$household_id),
+                    identical(income_data_saved$household_id, income_data$household_id)),
+
+  missing_values_identical = c(sum(is.na(analytical_saved)) == sum(is.na(analytical)), sum(is.na(model_data_saved)) == sum(is.na(model_data)),
+                               sum(is.na(income_data_saved)) == sum(is.na(income_data)))
+)
+```
+
+**Effect:** three new files are written to `Datasets/Analytical/`. Read back with the IDs as text, each has the same rows, columns, IDs and missing values as the dataset in memory. The cleaned datasets in `Datasets/Cleaned/` and the original files in `Datasets/` are not changed by this section.
+
+<!-- CLAUDE-WRITTEN END (part 2 of 2): end of section 10 -->
