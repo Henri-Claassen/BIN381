@@ -1001,7 +1001,9 @@ tibble(
 **Treatment:** filter D01 on `between(age, 15, 64)`, then keep only matching people in D02 and D03 with `semi_join()`. All D08 households are kept; Task 3 reports the households with no working-age member. The number of people in each household is counted before the filter, because the smartphone check in section 7 needs the full household size, not just the working-age members.
 
 <!-- ======================================================================= -->
+
 <!-- CLAUDE-WRITTEN START (part 1 of 2): household composition for section 10 -->
+
 <!-- ======================================================================= -->
 
 **Household composition (used in section 10):** the household features in section 10.3.5 need the number of children (under 15) and older people (65+) in each household. The age filter below removes these people, so every member of each household is counted first.
@@ -1875,9 +1877,13 @@ tibble(
 **Effect:** the integrated dataset has `r format(nrow(integrated), big.mark = ",")` rows, one per working-age person, and `r ncol(integrated)` columns from D01, D02, D03 and D08. It covers `r format(n_distinct(integrated$household_id), big.mark = ",")` households, and every category count matches its source, so no value was duplicated or lost. Every join matched on complete, 18-digit keys, so each value belongs to the person or household it came from. Household-level values are repeated for each working-age member of the household, which is correct at the person grain. `person_weight` is the matching survey weight at this grain; `household_weight` was dropped in section 3.
 
 <!-- ======================================================================= -->
+
 <!-- CLAUDE-WRITTEN START (part 2 of 2): everything from here to the end of  -->
+
 <!-- the file is new: section 10, feature engineering, transformation and    -->
+
 <!-- encoding                                                                -->
+
 <!-- ======================================================================= -->
 
 # 10. Feature Engineering, Transformation and Encoding
