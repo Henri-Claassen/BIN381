@@ -33,9 +33,14 @@ Code labels come from the *BIN381 Project Data Dictionary* (Milestone 1). Counts
 | `analytical_dataset.csv` | working-age person (15–64) | `household_id` + `person_number` | 45,413 | 59 | The four cleaned datasets joined (section 9), plus 24 engineered columns (section 10) |
 | `model_data.csv` | person in the labour force (employed or unemployed) | none (`person_number` is not included) | 28,742 | 24 | Filtered and encoded from `analytical_dataset.csv` (sections 10.4–10.5) |
 | `income_data.csv` | employed person with a usable salary | none (`person_number` is not included) | 18,017 | 13 | Filtered from `analytical_dataset.csv` (section 10.6) |
+| `model_train.csv` | person in the labour force | none | 23,041 | 24 | 80% of the households in `model_data.csv` (`Train-Test Split.qmd`) |
+| `model_test.csv` | person in the labour force | none | 5,701 | 24 | The remaining 20% of those households |
+| `income_train.csv` | employed person with a usable salary | none | 14,371 | 13 | 80% of the households in `income_data.csv` |
+| `income_test.csv` | employed person with a usable salary | none | 3,646 | 13 | The remaining 20% of those households |
 
 - `analytical_dataset.csv` contains every column of the four cleaned files (35 columns, with the keys counted once) plus the 24 engineered columns in 10. Each person also carries their own household's D08 values, so household values are repeated for every working-age member of the household.
 - `model_data.csv` and `income_data.csv` are subsets for the two analysis questions: employment (main question, see 11) and income (secondary question, see 12). `household_id` is kept in both for the household-grouped train/test split.
+- The four training and test files are the same two datasets split by household (see 14). They hold the same columns as the file they come from.
 
 ---
 
@@ -610,3 +615,32 @@ Every column of `analytical_dataset.csv` that is not in `model_data.csv` has a d
 | `household_smartphones`, `smartphones_per_member` | Replaced by `smartphone_access` |
 | `n_elderly_65plus`, `n_working_age` | Used to build `elderly_in_household` and `dependency_ratio` |
 | `education_attendance`, `institution_type` | Current study status: mostly outside the labour force, kept for description |
+
+---
+
+## 14. Training and test files
+
+`Scripts/Train-Test Split.qmd` splits `model_data.csv` and `income_data.csv` into training and test sets and writes four files to `Datasets/Analytical/`. The source files are not changed.
+
+| File | Split from | Rows | Households | Columns |
+|---|---|---|---|---|
+| `model_train.csv` | `model_data.csv` | 23,041 | 13,406 | 24 (see 11.1) |
+| `model_test.csv` | `model_data.csv` | 5,701 | 3,352 | 24 (see 11.1) |
+| `income_train.csv` | `income_data.csv` | 14,371 | 10,460 | 13 (see 12) |
+| `income_test.csv` | `income_data.csv` | 3,646 | 2,615 | 13 (see 12) |
+
+**How the split is made**
+
+- **80% of the distinct households** go to training, and every person follows their household's assignment. The split is by household, not by person, because members of one household share all the household-level columns (`any_home_internet`, `digital_access_score`, `smartphone_access`, `household_size`, and so on). A person-level split would place near-identical rows on both sides, and the test result would overstate how well the model works on new households.
+- `set.seed(67)` makes the split reproducible: rerunning the script produces exactly the same files.
+- **No column is added or removed**, so each file has the same columns, meaning and missing values as the file it was split from.
+
+**Verification (in the script)**
+
+- No household appears in both the training and the test file.
+- Training rows + test rows = the rows of the source file.
+- The target's class balance stays close to the full dataset: 64.9% employed overall, 64.9% in `model_train.csv` and 64.7% in `model_test.csv`. `income_train.csv` and `income_test.csv` have a continuous outcome (`log_salary`), so there is no class balance to check.
+
+**Reading them back**
+
+Read `household_id` as text and re-apply the reference levels (section 2, item 5) exactly as for `model_data.csv`. Fit or estimate anything that learns from the data (imputation, scaling) on the **training** file only, then apply it unchanged to the test file.
