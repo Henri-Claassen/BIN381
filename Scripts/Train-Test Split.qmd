@@ -16,14 +16,13 @@ execute:
   message: false
 ---
 
+## About this file
 
-## Purpose
+This file covers the Milestone 2 rubric item "Modelling preparation & leakage control": defining the modelling target, designing a train/test split and preventing leakage. The target, the predictors and the columns excluded for leakage were already decided in `Data Preprocessing.qmd` (sections 10.4–10.6) and documented in `Cleaned Datasets Data Dictionary.md` (sections 11–13), so all that is left to do here is split `model_data.csv` and `income_data.csv` into training and test sets.
 
-This covers the Milestone 2 rubric item "Modelling preparation & leakage control": defining the modelling target, designing a train/test split, and preventing leakage. The target, predictors and leakage exclusions are already decided and documented in `Data Preprocessing.qmd` (sections 10.4–10.6) and `Cleaned Datasets Data Dictionary.md` (sections 11–13). This file only adds the train/test split for `model_data.csv` and `income_data.csv`.
+`analytical_dataset.csv` is not split. It is the Power BI and reporting file, which the data dictionary describes as holding every working-age person for description rather than modelling.
 
-`analytical_dataset.csv` is not split here: it is the Power BI/reporting file, described in the data dictionary as containing every working-age person for description rather than modelling.
-
-## Loading the packages we need:
+## Loading the packages we need
 
 ```{r}
 #| label: Package Setup
@@ -32,7 +31,7 @@ library(readr)
 library(tidyverse)
 ```
 
-## File paths:
+## File paths
 
 ```{r}
 #| label: File-Path Declarations
@@ -40,21 +39,27 @@ library(tidyverse)
 analytical_directory <- "../Datasets/Analytical/"
 ```
 
-# 1. Read the analytical datasets
+# 1. Reading the analytical datasets
 
-**Problem:** the split must start from the saved files, not from objects left in memory from `Data Preprocessing.qmd`, so this file can be run on its own.
+The split starts from the saved files rather than from objects left in memory by `Data Preprocessing.qmd`, so this file can be run on its own.
 
 ```{r}
 #| label: Read Analytical Datasets
 
-model_data <- read_csv(file.path(analytical_directory, "model_data.csv"), show_col_types = FALSE,
-                       col_types = cols(household_id = col_character()))
+model_data <- read_csv(
+  file.path(analytical_directory, "model_data.csv"), 
+  show_col_types = FALSE,
+  col_types = cols(household_id = col_character())
+  )
 
-income_data <- read_csv(file.path(analytical_directory, "income_data.csv"), show_col_types = FALSE,
-                        col_types = cols(household_id = col_character()))
+income_data <- read_csv(
+  file.path(analytical_directory, "income_data.csv"), 
+  show_col_types = FALSE,
+  col_types = cols(household_id = col_character())
+  )
 ```
 
-**Re-apply the reference levels** lost when the factors were written to CSV (per `Cleaned Datasets Data Dictionary.md`, section 2.5):
+A CSV does not store factor levels, so the reference levels set in `Data Preprocessing.qmd` were lost when the files were saved. They are re-applied here, as described in `Cleaned Datasets Data Dictionary.md`, section 2.5. The categorical columns in `income_data` are converted back to factors.
 
 ```{r}
 #| label: Re-apply Reference Levels
@@ -82,9 +87,7 @@ income_data <- income_data |>
 
 # 2. Target and class balance
 
-**Problem:** the rubric asks for the modelling target to be defined and class imbalance assessed before splitting.
-
-`model_data.csv`'s target is `employed` (Employed vs Unemployed); `income_data.csv`'s outcome is `log_salary` (continuous, no class balance to check).
+Before splitting, the modelling target needs to be defined and checked for class imbalance. In `model_data.csv` the target is `employed` (Employed vs Unemployed). In `income_data.csv` the outcome is `log_salary`, which is continuous, so there is no class balance to check.
 
 ```{r}
 #| label: Target Definition and Class Balance
@@ -92,13 +95,13 @@ income_data <- income_data |>
 model_data |> count(employed) |> mutate(share = n / sum(n))
 ```
 
-**Effect:** `r sum(model_data$employed == "Employed")` employed (`r round(mean(model_data$employed == "Employed") * 100, 1)`%) vs `r sum(model_data$employed == "Unemployed")` unemployed. This is a mild imbalance (roughly 2:1), not severe enough to need resampling (e.g. SMOTE or down-sampling); `glm()`, `rpart()` and `randomForest()` can all fit this directly. Milestone 3 can still compare a class-weighted model against an unweighted one if the minority (Unemployed) class needs better recall.
+There are `r sum(model_data$employed == "Employed")` employed people (`r round(mean(model_data$employed == "Employed") * 100, 1)`%) and `r sum(model_data$employed == "Unemployed")` unemployed people. This is a mild imbalance of roughly 2:1. It is not severe enough to need resampling such as SMOTE or down-sampling, and `glm()`, `rpart()` and `randomForest()` can all handle it directly. If a model struggles to pick up the smaller Unemployed class, Milestone 3 can still compare a class-weighted model with an unweighted one.
 
 # 3. Household-grouped train/test split
 
-**Problem:** rows in both files are people, and people in the same household share household-level predictors (`any_home_internet`, `digital_access_score`, `has_fixed_internet`, and so on, per section 10 of `Data Preprocessing.qmd`). A row-level random split can put two members of the same household in both the training and the test set. The model would then see that household's digital-access profile during training and be tested on a near-duplicate of it, which overstates test performance. Splitting by `household_id` instead keeps every member of a household on the same side of the split.
+Every row in both files is a person, and people in the same household share household-level predictors such as `any_home_internet`, `digital_access_score` and `has_fixed_internet` (section 10 of `Data Preprocessing.qmd`). A normal random split by row could put two members of the same household on opposite sides, one in training and one in testing. The model would then learn that household's digital-access profile during training and be tested on a near-copy of it, which makes the test results look better than they really are.
 
-**Treatment:** sample 80% of the *distinct households* in each file for training; every person in a household follows their household's assignment.
+To prevent this, the split is done by household instead of by person. 80% of the *distinct households* in each file are randomly chosen for training, and every person goes into the same set as the rest of their household.
 
 ```{r}
 #| label: Household-Grouped Split
@@ -123,7 +126,7 @@ income_train <- income_split$train
 income_test <- income_split$test
 ```
 
-**Verification:** every household is on exactly one side, the two sides don't overlap, and the target's class balance is close to the full dataset in both the training and test rows (a household-grouped split can shift the balance slightly, since it doesn't sample people directly).
+The checks below confirm that every household is on only one side of the split, that the training and test sets do not share any households, and that the share of employed people stays close to the full dataset in both sets. Because the split samples households rather than people, the balance can shift slightly:
 
 ```{r}
 #| label: Split Verification
@@ -131,83 +134,165 @@ income_test <- income_split$test
 tibble(
   dataset = c("model_data", "income_data"),
 
-  households_total = c(n_distinct(model_data$household_id), n_distinct(income_data$household_id)),
+  households_total = c(
+    n_distinct(model_data$household_id), 
+    n_distinct(income_data$household_id)
+    ),
 
-  households_train = c(n_distinct(model_train$household_id), n_distinct(income_train$household_id)),
+  households_train = c(
+    n_distinct(model_train$household_id), 
+    n_distinct(income_train$household_id)
+    ),
 
-  households_test = c(n_distinct(model_test$household_id), n_distinct(income_test$household_id)),
+  households_test = c(
+    n_distinct(model_test$household_id), 
+    n_distinct(income_test$household_id)
+    ),
 
-  household_overlap = c(length(intersect(model_train$household_id, model_test$household_id)),
-                        length(intersect(income_train$household_id, income_test$household_id))),
+  household_overlap = c(
+    length(intersect(model_train$household_id, model_test$household_id)),
+    length(intersect(income_train$household_id, income_test$household_id))
+    ),
 
-  rows_train = c(nrow(model_train), nrow(income_train)),
+  rows_train = c(
+    nrow(model_train),
+    nrow(income_train)
+    ),
 
-  rows_test = c(nrow(model_test), nrow(income_test)),
+  rows_test = c(
+    nrow(model_test), 
+    nrow(income_test)
+    ),
 
-  rows_total_matches = c(nrow(model_train) + nrow(model_test) == nrow(model_data),
-                         nrow(income_train) + nrow(income_test) == nrow(income_data))
+  rows_total_matches = c(
+    nrow(model_train) + nrow(model_test) == nrow(model_data),
+    nrow(income_train) + nrow(income_test) == nrow(income_data)
+    )
 )
 
-model_train |> count(employed) |> mutate(share = round(n / sum(n), 3))
-model_test |> count(employed) |> mutate(share = round(n / sum(n), 3))
+model_train |> 
+  count(employed) |> 
+  mutate(share = round(n / sum(n), 3))
+
+model_test |> 
+  count(employed) |> 
+  mutate(share = round(n / sum(n), 3))
 ```
 
-**Effect:** `r n_distinct(model_train$household_id)` households (`r nrow(model_train)` people) in the `model_data` training set and `r n_distinct(model_test$household_id)` households (`r nrow(model_test)` people) in the test set, with zero household overlap. The employed/unemployed split stays close to the full dataset's `r round(mean(model_data$employed == "Employed") * 100, 1)`% in both the training and test rows.
+The `model_data` training set has `r n_distinct(model_train$household_id)` households (`r nrow(model_train)` people) and the test set has `r n_distinct(model_test$household_id)` households (`r nrow(model_test)` people), with no households in common. The share of employed people stays close to the full dataset's `r round(mean(model_data$employed == "Employed") * 100, 1)`% in both sets.
 
-# 4. Leakage check on the split itself
+# 4. Checking the split for leakage
 
-**Problem:** the rubric specifically asks for leakage prevention to be demonstrated, not just stated. The column-level leakage exclusions (salary, salary-derived and reason-not-attending columns) are already handled in `Data Preprocessing.qmd` section 10.4; this section checks that the *split* introduces no further leakage.
+It is not enough to say that leakage was prevented; it needs to be shown. The columns that leak the outcome (salary, salary-based and reason-not-attending columns) were already removed in section 10.4 of `Data Preprocessing.qmd`, so this section checks that the split itself does not introduce any new leakage:
 
 ```{r}
 #| label: Leakage Check
 
 tibble(
-  check = c("No household appears in both model train and test", "No household appears in both income train and test",
-           "model_data columns unchanged by the split", "income_data columns unchanged by the split"),
+  check = c(
+    "No household appears in both model train and test", 
+    "No household appears in both income train and test",
+    "model_data columns unchanged by the split",
+    "income_data columns unchanged by the split"
+    ),
 
-  result = c(length(intersect(model_train$household_id, model_test$household_id)) == 0,
-            length(intersect(income_train$household_id, income_test$household_id)) == 0,
-            identical(names(model_train), names(model_data)) && identical(names(model_test), names(model_data)),
-            identical(names(income_train), names(income_data)) && identical(names(income_test), names(income_data)))
+  result = c(
+    length(intersect(model_train$household_id, model_test$household_id)) == 0,
+    length(intersect(income_train$household_id, income_test$household_id)) == 0,
+    identical(names(model_train), names(model_data)) && 
+    identical(names(model_test), names(model_data)),
+    identical(names(income_train), names(income_data)) && 
+    identical(names(income_test), names(income_data))
+    )
 )
 ```
 
-**Effect:** no household appears on both sides of either split, and splitting adds no new columns and removes none — `person_weight` and `household_id` stay in place as design columns (not predictors, per section 11.1/12 of the data dictionary), so Milestone 3 can still fit the survey weights and identify each row's household without either being used as a predictor.
+No household appears on both sides of either split, and the split neither adds nor removes any columns. `person_weight` and `household_id` stay in place as design columns rather than predictors (sections 11.1 and 12 of the data dictionary), so Milestone 3 can still apply the survey weights and identify each row's household without using either one as a predictor.
 
-No further transformation is applied here: scaling, encoding and the fixed centring of age were already done in `Data Preprocessing.qmd` before this split using only fixed rules or constants (section 10.4), not statistics estimated from the data, so applying them before or after this split makes no difference. Any future step that does estimate something from the data (for example, imputing `matric_plus`'s 497 missing values, or scaling a numeric predictor by its mean and standard deviation) belongs in Milestone 3, fitted on `model_train`/`income_train` only and then applied unchanged to the corresponding test set.
+No further transformation is needed here. Encoding and the fixed centring of age were already done in `Data Preprocessing.qmd` before the split, and section 10.4 there explains why no scaling is needed. Those steps only use fixed rules or constants rather than values calculated from the data, so it makes no difference whether they happen before or after the split. Any future step that does calculate something from the data, such as filling in the 497 missing values in `matric_plus` or scaling a numeric predictor by its mean and standard deviation, belongs in Milestone 3. It should be fitted on `model_train` or `income_train` only, and then applied unchanged to the matching test set.
 
-# 5. Save the split datasets
+# 5. Saving the split datasets
+
+The four split datasets are saved alongside the other analytical datasets in `Datasets/Analytical/`:
 
 ```{r}
 #| label: Save Split Datasets
 
-write_csv(model_train, file.path(analytical_directory, "model_train.csv"), na = "")
-write_csv(model_test, file.path(analytical_directory, "model_test.csv"), na = "")
+write_csv(
+  model_train, 
+  file.path(analytical_directory, "model_train.csv"),
+  na = ""
+  )
+write_csv(
+  model_test,
+  file.path(analytical_directory, "model_test.csv"), 
+  na = ""
+  )
 
-write_csv(income_train, file.path(analytical_directory, "income_train.csv"), na = "")
-write_csv(income_test, file.path(analytical_directory, "income_test.csv"), na = "")
+write_csv(
+  income_train, 
+  file.path(analytical_directory, "income_train.csv"), 
+  na = ""
+  )
+
+write_csv(
+  income_test, 
+  file.path(analytical_directory, "income_test.csv"), 
+  na = ""
+  )
 ```
 
-**Verification:**
+The files are then read back to confirm that each one has the same number of rows as the dataset in memory:
 
 ```{r}
 #| label: Saved Split Verification
 
-model_train_saved <- read_csv(file.path(analytical_directory, "model_train.csv"), show_col_types = FALSE,
-                              col_types = cols(household_id = col_character()))
-model_test_saved <- read_csv(file.path(analytical_directory, "model_test.csv"), show_col_types = FALSE,
-                             col_types = cols(household_id = col_character()))
-income_train_saved <- read_csv(file.path(analytical_directory, "income_train.csv"), show_col_types = FALSE,
-                               col_types = cols(household_id = col_character()))
-income_test_saved <- read_csv(file.path(analytical_directory, "income_test.csv"), show_col_types = FALSE,
-                              col_types = cols(household_id = col_character()))
+model_train_saved <- read_csv(
+  file.path(analytical_directory, "model_train.csv"),
+  show_col_types = FALSE,
+  col_types = cols(household_id = col_character())
+  )
+
+model_test_saved <- read_csv(
+  file.path(analytical_directory, "model_test.csv"), 
+  show_col_types = FALSE,
+  col_types = cols(household_id = col_character())
+  )
+
+income_train_saved <- read_csv(
+  file.path(analytical_directory, "income_train.csv"), 
+  show_col_types = FALSE,
+  col_types = cols(household_id = col_character())
+  )
+
+income_test_saved <- read_csv(
+  file.path(analytical_directory, "income_test.csv"), 
+  show_col_types = FALSE,
+  col_types = cols(household_id = col_character())
+  )
 
 tibble(
-  file = c("model_train", "model_test", "income_train", "income_test"),
-  rows_in_memory = c(nrow(model_train), nrow(model_test), nrow(income_train), nrow(income_test)),
-  rows_in_saved_file = c(nrow(model_train_saved), nrow(model_test_saved), nrow(income_train_saved), nrow(income_test_saved))
+  file = c(
+    "model_train", 
+    "model_test",
+    "income_train",
+    "income_test"
+    ),
+  
+  rows_in_memory = c(
+    nrow(model_train), 
+    nrow(model_test),
+    nrow(income_train), 
+    nrow(income_test)
+    ),
+  
+  rows_in_saved_file = c(
+    nrow(model_train_saved), 
+    nrow(model_test_saved),
+    nrow(income_train_saved),
+    nrow(income_test_saved)
+    )
 )
 ```
 
-**Effect:** four new files in `Datasets/Analytical/`: `model_train.csv`, `model_test.csv`, `income_train.csv`, `income_test.csv`. `model_data.csv`, `income_data.csv` and `analytical_dataset.csv` are unchanged. As with the other saved files, re-apply the reference levels in section 1 after reading these back in Milestone 3.
-
+Four new files are saved in `Datasets/Analytical/`: `model_train.csv`, `model_test.csv`, `income_train.csv` and `income_test.csv`. `model_data.csv`, `income_data.csv` and `analytical_dataset.csv` stay unchanged. As with the other saved files, the reference levels from section 1 need to be re-applied after reading these files in Milestone 3.
