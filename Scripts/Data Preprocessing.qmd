@@ -1000,18 +1000,12 @@ tibble(
 
 **Treatment:** filter D01 on `between(age, 15, 64)`, then keep only matching people in D02 and D03 with `semi_join()`. All D08 households are kept; Task 3 reports the households with no working-age member. The number of people in each household is counted before the filter, because the smartphone check in section 7 needs the full household size, not just the working-age members.
 
-<!-- ======================================================================= -->
-
-<!-- CLAUDE-WRITTEN START (part 1 of 2): household composition for section 10 -->
-
-<!-- ======================================================================= -->
-
 **Household composition (used in section 10):** the household features in section 10.3.5 need the number of children (under 15) and older people (65+) in each household. The age filter below removes these people, so every member of each household is counted first.
 
 ```{r}
 #| label: Household Composition Before Record Selection
 
-#CLAUDE-WRITTEN: counts all members of each household before the 15-64 filter removes children and people aged 65+
+#Counts all members of each household before the 15-64 filter removes children and people aged 65+
 household_composition <- D01 |>
   group_by(household_id) |>
   summarise(
@@ -1033,8 +1027,6 @@ tibble(
   aged_65_plus_counted = sum(household_composition$n_elderly_65plus)
 )
 ```
-
-<!-- CLAUDE-WRITTEN END (part 1 of 2) -->
 
 ```{r}
 #| label: Record Selection
@@ -1876,16 +1868,6 @@ tibble(
 
 **Effect:** the integrated dataset has `r format(nrow(integrated), big.mark = ",")` rows, one per working-age person, and `r ncol(integrated)` columns from D01, D02, D03 and D08. It covers `r format(n_distinct(integrated$household_id), big.mark = ",")` households, and every category count matches its source, so no value was duplicated or lost. Every join matched on complete, 18-digit keys, so each value belongs to the person or household it came from. Household-level values are repeated for each working-age member of the household, which is correct at the person grain. `person_weight` is the matching survey weight at this grain; `household_weight` was dropped in section 3.
 
-<!-- ======================================================================= -->
-
-<!-- CLAUDE-WRITTEN START (part 2 of 2): everything from here to the end of  -->
-
-<!-- the file is new: section 10, feature engineering, transformation and    -->
-
-<!-- encoding                                                                -->
-
-<!-- ======================================================================= -->
-
 # 10. Feature Engineering, Transformation and Encoding
 
 The Milestone 1 analytics goal is to model employment status from education level, digital access and the interaction between the two, controlling for demographic and geographic factors, with a logistic regression and a tree-based method. This section turns the integrated dataset from section 9 into features for that goal:
@@ -1908,7 +1890,6 @@ Every rule in this section is fixed in advance: a code mapping, a constant or a 
 ```{r}
 #| label: Remove Flag Columns
 
-#CLAUDE-WRITTEN
 flag_columns <- str_subset(names(integrated), "_flag$")
 
 analytical <- integrated |> select(-ends_with("_flag"))
@@ -1939,7 +1920,7 @@ tibble(
 ```{r}
 #| label: Recode Yes No Columns
 
-#CLAUDE-WRITTEN: case_when() returns NA for any code not listed, so non-response codes stay missing
+#case_when() returns NA for any code not listed, so non-response codes stay missing
 analytical <- analytical |>
   mutate(
     female = case_when(sex_code == 2 ~ 1L, sex_code == 1 ~ 0L),
@@ -1957,7 +1938,6 @@ analytical <- analytical |>
 ```{r}
 #| label: Recode Yes No Verification
 
-#CLAUDE-WRITTEN
 analytical |> count(sex_code, sex, female)
 analytical |> count(fixed_internet_code, fixed_internet, has_fixed_internet)
 analytical |> count(mobile_internet_code, mobile_internet, has_mobile_internet)
@@ -1976,7 +1956,7 @@ Each feature below is justified with the employment pattern it captures. The hel
 ```{r}
 #| label: Employment Share Helper
 
-#CLAUDE-WRITTEN: weighted employment percentages for each level of a feature (used only to justify features)
+#Weighted employment percentages for each level of a feature (used only to justify features)
 employment_share <- function(data, feature) {
   data |>
     group_by({{ feature }}) |>
@@ -2004,7 +1984,7 @@ employment_share <- function(data, feature) {
 ```{r}
 #| label: Education Features
 
-#CLAUDE-WRITTEN: codes that are not listed would become NA, and the verification below confirms there are none
+#Codes that are not listed would become NA, and the verification below confirms there are none
 analytical <- analytical |>
   mutate(
     education_band = case_when(
@@ -2032,7 +2012,6 @@ analytical <- analytical |>
 ```{r}
 #| label: Education Features Verification
 
-#CLAUDE-WRITTEN
 analytical |>
   group_by(education_band, matric_plus) |>
   summarise(education_level_codes = paste(sort(unique(education_level_code)), collapse = ", "), people = n(), .groups = "drop")
@@ -2056,7 +2035,6 @@ employment_share(analytical, education_band)
 ```{r}
 #| label: Digital Access Features
 
-#CLAUDE-WRITTEN
 analytical <- analytical |>
   mutate(
     any_home_internet = case_when(
@@ -2073,7 +2051,6 @@ analytical <- analytical |>
 ```{r}
 #| label: Digital Access Features Verification
 
-#CLAUDE-WRITTEN
 analytical |> count(has_fixed_internet, has_mobile_internet, any_home_internet)
 
 analytical |> count(digital_access_score)
@@ -2094,7 +2071,6 @@ employment_share(analytical, digital_access_score)
 ```{r}
 #| label: Education Digital Interaction Feature
 
-#CLAUDE-WRITTEN
 analytical <- analytical |>
   mutate(
     edu_digital_group = case_when(
@@ -2116,7 +2092,6 @@ analytical <- analytical |>
 ```{r}
 #| label: Education Digital Interaction Verification
 
-#CLAUDE-WRITTEN
 analytical |> count(matric_plus, any_home_internet, edu_digital_group)
 
 edu_digital_rates <- employment_share(analytical, edu_digital_group)
@@ -2147,7 +2122,6 @@ internet_gap
 ```{r}
 #| label: Location And Youth Features
 
-#CLAUDE-WRITTEN
 analytical <- analytical |>
   mutate(
     settlement_type = case_when(
@@ -2168,7 +2142,6 @@ analytical <- analytical |>
 ```{r}
 #| label: Location And Youth Verification
 
-#CLAUDE-WRITTEN
 analytical |> count(geo_type, metro, settlement_type)
 
 analytical |> group_by(youth) |> summarise(min_age = min(age), max_age = max(age), people = n())
@@ -2195,7 +2168,6 @@ employment_share(analytical, settlement_type)
 ```{r}
 #| label: Household Features
 
-#CLAUDE-WRITTEN
 analytical_rows_before_household_join <- nrow(analytical)
 
 analytical <- analytical |>
@@ -2238,7 +2210,6 @@ analytical <- analytical |>
 ```{r}
 #| label: Household Features Verification
 
-#CLAUDE-WRITTEN
 tibble(
   rows_before_join = analytical_rows_before_household_join,
 
@@ -2294,7 +2265,6 @@ employment_share(analytical, other_member_matric)
 ```{r}
 #| label: Centre Age
 
-#CLAUDE-WRITTEN
 analytical <- analytical |>
   mutate(
     age_centred = age - 40,
@@ -2308,7 +2278,6 @@ analytical <- analytical |>
 ```{r}
 #| label: Centre Age Verification
 
-#CLAUDE-WRITTEN
 tibble(
   correlation_age_with_age_squared = round(cor(analytical$age, analytical$age^2), 3),
 
@@ -2335,7 +2304,6 @@ analytical |>
 ```{r}
 #| label: Log Salary
 
-#CLAUDE-WRITTEN
 analytical <- analytical |>
   mutate(log_salary = if_else(employment_status == "Employed" & salary_status == "Reported" & salary >= 100, log(salary), NA_real_))
 ```
@@ -2345,7 +2313,6 @@ analytical <- analytical |>
 ```{r}
 #| label: Log Salary Verification
 
-#CLAUDE-WRITTEN
 analytical |>
   filter(!is.na(log_salary)) |>
   summarise(
@@ -2383,7 +2350,6 @@ The evidence is below.
 ```{r}
 #| label: Leakage Evidence
 
-#CLAUDE-WRITTEN
 analytical |>
   filter(employment_status != "Not economically active") |>
   mutate(reason_not_attending_is_working = reason_not_attending == "Working (at home, business or job)") |>
@@ -2407,7 +2373,6 @@ analytical |>
 ```{r}
 #| label: Build Model Data
 
-#CLAUDE-WRITTEN
 labour_force_rows <- sum(analytical$employment_status != "Not economically active")
 
 model_data <- analytical |>
@@ -2442,7 +2407,6 @@ model_data <- analytical |>
 ```{r}
 #| label: Model Data Verification
 
-#CLAUDE-WRITTEN
 tibble(
   working_age_people = nrow(analytical),
 
@@ -2514,7 +2478,6 @@ excluded_columns |>
 ```{r}
 #| label: No Scaling Verification
 
-#CLAUDE-WRITTEN
 tibble(
   person_weight_unchanged_since_integration = identical(analytical$person_weight, integrated$person_weight),
 
@@ -2549,7 +2512,7 @@ tibble(
 ```{r}
 #| label: Encode Model Data
 
-#CLAUDE-WRITTEN: fct_relevel() moves the named level to the front, which makes it the reference level
+#fct_relevel() moves the named level to the front, which makes it the reference level
 model_data <- model_data |>
   mutate(
     employed = factor(employed, levels = c("Unemployed", "Employed")),
@@ -2575,7 +2538,6 @@ model_data <- model_data |>
 ```{r}
 #| label: Encoding Verification
 
-#CLAUDE-WRITTEN
 model_factors <- select(model_data, where(is.factor))
 
 tibble(
@@ -2616,7 +2578,6 @@ As in 8.2, missing values are written as empty cells. A CSV does not store facto
 ```{r}
 #| label: Save Analytical Datasets
 
-#CLAUDE-WRITTEN
 analytical_directory <- "../Datasets/Analytical/"
 dir.create(analytical_directory, showWarnings = FALSE)
 
@@ -2637,7 +2598,6 @@ write_csv(income_data, file.path(analytical_directory, "income_data.csv"), na = 
 ```{r}
 #| label: Saved Analytical Datasets Verification
 
-#CLAUDE-WRITTEN
 analytical_saved <- read_csv(file.path(analytical_directory, "analytical_dataset.csv"), show_col_types = FALSE,
                              col_types = cols(household_id = col_character(), person_number = col_character()))
 
@@ -2666,5 +2626,3 @@ tibble(
 ```
 
 **Effect:** three new files are written to `Datasets/Analytical/`. Read back with the IDs as text, each has the same rows, columns, IDs and missing values as the dataset in memory. The cleaned datasets in `Datasets/Cleaned/` and the original files in `Datasets/` are not changed by this section.
-
-<!-- CLAUDE-WRITTEN END (part 2 of 2): end of section 10 -->
