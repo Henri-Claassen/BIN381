@@ -531,13 +531,13 @@ rm(
   ) #Only needed for the checks above
 ```
 
-The tables above back up this decision. All six household datasets share almost all of D01's households, so leaving them out is a choice about the topic. D09's computer column never differs from D08's, and D11 shares 0 households and 0 PSUs with D01. From here on, the pipeline only cleans and integrates D01, D02, D03 and D08 (section 9). This does mean the employment outcome comes from a single source (D03), which is noted as a limitation.
+The tables above back up this decision. All six household datasets share almost all of D01's households, so leaving them out is a choice about the topic. D09's computer column never differs from D08's, and D11 shares 0 households and 0 PSUs with D01. From here on, the pipeline only cleans and integrates D01, D02, D03 and D08. This does mean the employment outcome comes from a single source (D03), which is noted as a limitation.
 
 # 2. Data Cleaning
 
 This section fixes the problems found in the uncleaned data: missing IDs, duplicate records, text placeholders in code columns, and missing or invalid values that can be filled in from another dataset.
 
-No value is changed without leaving a note. Whenever a step changes a value, it adds a column ending in `_flag` that sits next to the data, such as `age_flag` for `age`. On every row that was changed, the flag column holds a short note saying what happened (for example "missing - filled from D03"), and on every other row it is empty. This shows exactly which values were changed and why, and lets the checks count them. Section 7 uses the same idea to mark impossible smartphone counts and implausibly low salaries. The flag columns only keep track of the cleaning and are not part of the data itself, so they are left out of the saved files (8.2) and removed before modelling (10.1).
+No value is changed without leaving a note. Whenever a step changes a value, it adds a column ending in `_flag` that sits next to the data, such as `age_flag` for `age`. On every row that was changed, the flag column holds a short note saying what happened (for example "missing - filled from D03"), and on every other row it is empty. This shows exactly which values were changed and why, and lets the checks count them. The same idea is used later to mark impossible smartphone counts and implausibly low salaries. The flag columns only keep track of the cleaning and are not part of the data itself, so they are left out of the saved files and removed before modelling.
 
 ## 2.1 Recovering the missing household IDs in D01
 
@@ -783,13 +783,13 @@ bind_rows(
     column %in% c(
       "household_id",
       "person_number") ~ "Key, read as text on purpose in 1.1",
-    column == "province" ~ "Province name (rebuilt from province_code, dropped in section 3)",
+    column == "province" ~ "Province name (rebuilt from province_code, dropped as redundant)",
     TRUE ~ "Code column containing text placeholders"
   )
   )
 ```
 
-Apart from the IDs and the province name, only two columns are text: `education_attendance_code` (D02, kept) and `minutes_to_work` (D03). `minutes_to_work` is dropped as leakage in section 3, so it does not need fixing. `education_attendance_code` mixes numeric codes with three text placeholders, the same problem Milestone 1 found in D11's `hours_worked_raw`:
+Apart from the IDs and the province name, only two columns are text: `education_attendance_code` (D02, kept) and `minutes_to_work` (D03). `minutes_to_work` is dropped as leakage, so it does not need fixing. `education_attendance_code` mixes numeric codes with three text placeholders, the same problem Milestone 1 found in D11's `hours_worked_raw`:
 
 ```{r}
 #| label: Initial Student Attendance
@@ -845,7 +845,7 @@ D02 |> count(education_attendance_code, education_attendance_flag)
 class(D02$education_attendance_code)
 ```
 
-`education_attendance_code` is now an integer column that only holds dictionary codes (1, 2, 3, 8) or missing values. The `r sum(!is.na(D02$education_attendance_flag))` former placeholders are still listed in `education_attendance_flag`, so the original text is not lost. Code 3 ("do not know") is handled with the other special codes in section 4.
+`education_attendance_code` is now an integer column that only holds dictionary codes (1, 2, 3, 8) or missing values. The `r sum(!is.na(D02$education_attendance_flag))` former placeholders are still listed in `education_attendance_flag`, so the original text is not lost. Code 3 ("do not know") is a non-response value, not a gap, and is handled later alongside the other special codes.
 
 ## 2.4 Filling gaps using the other datasets
 
@@ -989,7 +989,7 @@ tibble(
 )
 ```
 
-D02's education level is now complete. Code 99 appears in both D02 and D03 but is not in the dictionary. It is a recorded value rather than a gap, so it cannot be filled from D03 and is handled with the other special codes in section 4.
+D02's education level is now complete. Code 99 appears in both D02 and D03 but is not in the dictionary. It is a recorded value rather than a gap, so it cannot be filled from D03, and its meaning stays unknown like the other special codes.
 
 # 3. Column Selection
 
@@ -1191,7 +1191,7 @@ youth |>
 
 ## Keeping the selected columns
 
-Only the columns selected in the Task 1 write-up are kept, together with the join keys and the `_flag` columns created during cleaning (section 2), which are still needed for the checks in section 8. The column names and types are stored first, so that the dropped columns can be listed below and the final types compared in section 8.
+Only the columns selected in the Task 1 write-up are kept, together with the join keys and the `_flag` columns created during cleaning, which are still needed for the checks later on. The column names and types are stored first, so that the dropped columns can be listed below and the final types compared later.
 
 ```{r}
 #| label: Selecting which columns to keep
@@ -1247,7 +1247,7 @@ D08 <- D08 |>
     household_smartphones
     )
 
-#Column types after selection, compared with the final types in section 8
+#Column types after selection, compared with the final types later
 D01_types_before <- sapply(D01, class)
 D02_types_before <- sapply(D02, class)
 D03_types_before <- sapply(D03, class)
@@ -1430,13 +1430,13 @@ D08 |> count(mobile_internet_code)
 D08 |> count(computer_asset_code)
 ```
 
-Each special code is classified as a valid category, a "Not applicable" level or `NA`, as summarised in the table below. Nothing is changed yet. The classification is applied in section 6 when the label columns are created, because any code left out of `factor()`'s levels becomes `NA`.
+Each special code is classified as a valid category, a "Not applicable" level or `NA`, as summarised in the table below. Nothing is changed yet; the classification below is only applied later, when the label columns are created, because any code left out of `factor()`'s levels becomes `NA`.
 
 - Codes 98 (No schooling) and 28 (Other) in `education_level_code` are real education levels, so they stay as valid categories.
 - Codes 29 and 3 mean "do not know", and code 9 in `computer_asset_code` means "Unspecified". These are non-responses rather than categories, so they become `NA`.
 - Code 99 in `education_level_code` and code 9 in `fixed_internet_code` and `mobile_internet_code` are not in the data dictionary. Their meaning is unknown, so they become `NA`.
 - Code 88 in `institution_type_code` and `reason_not_attending_code` means the question did not apply to that person (for example, only people who are not attending are asked why). It becomes a "Not applicable" level rather than a missing value.
-- Attendance code 8 only occurs under age 15, so it disappears after record selection (section 5).
+- Attendance code 8 only occurs under age 15, so it disappears once the working-age filter is applied.
 
 ```{r}
 #| label: Special Code Classification
@@ -1508,7 +1508,7 @@ Two groups of values were already `NA` before this section. They stay `NA`, beca
 - The `r sum(is.na(D02$education_attendance_code))` missing values in `education_attendance_code` were not gaps in the original data, because the uncleaned column had no missing values. They are the text placeholders ("N/A", "Unknown", "not recorded") that were set to missing in 2.3, with the original text kept in `education_attendance_flag`.
 - The `r sum(is.na(D08$mobile_internet_code))` missing values in `mobile_internet_code` were already missing in the uncleaned data.
 
-No values are changed in this section, and every `_code` column keeps its original codes. The classification only takes effect in section 6, where the table counting codes without a label confirms it: after record selection, the rows left without a label are exactly the rows holding the codes classified as `NA` here.
+No values are changed in this section, and every `_code` column keeps its original codes. The classification only takes effect when the label columns are created, where the table counting codes without a label confirms it: after record selection, the rows left without a label are exactly the rows holding the codes classified as `NA` here.
 
 ## 4.2 Placeholder values in salary
 
@@ -1578,9 +1578,9 @@ tibble(
 
 # 5. Record Selection (ages 15–64)
 
-The analysis focuses on the working-age population, people aged 15–64. D01 is filtered on `between(age, 15, 64)`, and D02 and D03 then keep only the matching people using `semi_join()`. All D08 households are kept; section 9.1 reports the households with no working-age member.
+The analysis focuses on the working-age population, people aged 15–64. D01 is filtered on `between(age, 15, 64)`, and D02 and D03 then keep only the matching people using `semi_join()`. All D08 households are kept; the households with no working-age member are reported once the datasets are joined.
 
-Removing children and people aged 65+ also removes information that later steps still need. The household features in section 10.3.5 use the number of children (under 15) and older people (65+) in each household, and the smartphone check in section 7.2 needs the full household size, not just the working-age members. So before the filter runs, every member of each household is counted:
+Removing children and people aged 65+ also removes information that later steps still need: household-level features built from the full household composition, and a smartphone-per-person check that needs the full household size, not just the working-age members. So before the filter runs, every member of each household is counted:
 
 ```{r}
 #| label: Household Composition Before Record Selection
@@ -1609,7 +1609,7 @@ tibble(
 )
 ```
 
-The age filter is then applied, and the full household size is kept aside for section 7.2:
+The age filter is then applied, and the full household size is kept aside for the outlier check later:
 
 ```{r}
 #| label: Record Selection
@@ -1917,7 +1917,7 @@ tibble(
 
 13 label columns are added (5 in D01, 4 in D02, 1 in D03 and 3 in D08), and no `_code` column is changed. The two count columns in the table above match, so the only codes without a label are the non-response and undocumented codes from section 4: `r sum(D02$education_level_code %in% c(29, 99))` education levels, `r sum(D02$education_attendance_code %in% 3)` attendance values, `r sum(D08$fixed_internet_code %in% 9)` fixed internet, `r sum(D08$mobile_internet_code %in% 9)` mobile internet and `r sum(D08$computer_asset_code %in% 9)` computer asset values. `institution_type` and `reason_not_attending` now use the data dictionary's descriptions, and code 88 is kept as "Not applicable" rather than missing.
 
-The levels of `education_level` follow the dictionary order, which is not a ranking: "No schooling" comes first and "Other" comes last. The education bands built in section 10.3.1 therefore group explicit codes rather than relying on the level order.
+The levels of `education_level` follow the dictionary order, which is not a ranking: "No schooling" comes first and "Other" comes last. Any education band built later groups explicit codes rather than relying on this level order.
 
 # 7. Outlier Review
 
@@ -2160,7 +2160,7 @@ D03 |>
 
 `r sum(!is.na(D03$salary_flag))` of `r format(sum(!is.na(D03$salary)), big.mark = ",")` reported salaries have a note in `salary_flag`, and every salary value stays the same. Because the threshold is fixed, later analyses can include or exclude these rows with `salary < 100`, even without `salary_flag`.
 
-`person_weight` is not touched, because survey weights should never be trimmed or scaled. No scaling or transformation is applied at this stage either, and the log scale above is only used for plotting. Transformations follow in section 10, and anything that has to learn from the data waits until after the train/test split.
+`person_weight` is not touched, because survey weights should never be trimmed or scaled. No scaling or transformation is applied at this stage either, and the log scale above is only used for plotting. Transformations follow later, and anything that has to learn from the data waits until after the train/test split.
 
 # 8. Validating and Saving the Cleaned Datasets
 
@@ -2387,7 +2387,7 @@ A few details matter for anyone using these files:
 
 - Missing values are written as empty cells rather than the text "NA". Power BI then reads them as blanks, instead of turning numeric columns such as `salary` into text.
 - A CSV does not store column types or the order of factor levels. Anyone reading the files, including Power BI, must read `household_id` and `person_number` as text, and re-apply the level order listed above where the order matters.
-- The `_flag` columns are left out of the saved files, because they only keep track of the cleaning. They stay in the datasets while this pipeline runs, so the notes are still available for the checks in this report, and they are removed in section 10.1 before modelling. The saved files only contain the analytical columns: the original codes, the cleaned values and the labels.
+- The `_flag` columns are left out of the saved files, because they only keep track of the cleaning. They stay in the datasets while this pipeline runs, so the notes are still available for the checks in this report, and they are removed later, before modelling. The saved files only contain the analytical columns: the original codes, the cleaned values and the labels.
 
 Saving at this point, before the train/test split in Task 4, does not leak information between the future training and test rows. Every change so far either applies a fixed rule to each row (dictionary codes, the 15–64 age range, the R100 salary threshold, negative counts) or copies a value from the same person's record in another dataset. Nothing is calculated from the data as a whole: no means, quantiles, imputation models or scaling are used to change any value. Steps that learn from the data belong after the split, where they are fitted on the training rows only.
 
