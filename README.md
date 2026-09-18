@@ -1,7 +1,7 @@
 # BIN381: Digital Access, Education and Employment in South Africa
 
-Business Intelligence 381 group project (Belgium Campus iTversity, 2026), **Group 5**:
-Jandre Neethling (601304) · Henri Claassen (601720) · Declin Vorkel (601756)
+Business Intelligence 381 group project, **Group 5**:
+Jandre Neethlin · Henri Claassen · Declin Vorkel
 
 The project follows the **CRISP-DM** methodology to analyse 2024 Statistics South Africa survey data within the brief *Socioeconomic Development & Household Well-being in South Africa (SDHSA)*.
 
