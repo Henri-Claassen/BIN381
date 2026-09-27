@@ -63,10 +63,10 @@ All results are associations, not causes: the data are one 2024 cross-section.
 
 The data are read through `prepare_employment_data()` in `R/model_preparation.R`. The evaluation notebook and the Shiny app use the same function, so every file is prepared in exactly the same way. The function:
 
-1. reads `household_id` as text (it is 18 digits long and would otherwise be rounded),
-2. applies fixed category levels, with the reference levels from the Milestone 2 data dictionary,
-3. leaves out the people with Other/unknown education, who have no `matric_plus` value, and
-4. keeps the design columns, the target and the 15 chosen predictors.
+1.  reads `household_id` as text (it is 18 digits long and would otherwise be rounded),
+2.  applies fixed category levels, with the reference levels from the Milestone 2 data dictionary,
+3.  leaves out the people with Other/unknown education, who have no `matric_plus` value, and
+4.  keeps the design columns, the target and the 15 chosen predictors.
 
 ```{r}
 #| label: Read Training Data
@@ -118,13 +118,13 @@ Removing the people with unknown education does not change the class balance not
 `model_data.csv` has 21 candidate predictors, several of which measure the same thing in different ways. Using overlapping columns together would split one effect across several coefficients and make the interaction harder to read, so one version of each idea is kept:
 
 | Kept | Left out | Reason |
-|---|---|---|
+|----|----|----|
 | `matric_plus` (0/1) | `education_band` | The business question is framed as "with or without matric". A 0/1 variable gives the interaction **one** odds ratio instead of six (one per education band), which answers the question directly. `education_band` can be used in a sensitivity check during evaluation. |
 | `any_home_internet` (0/1) | `has_fixed_internet`, `has_mobile_internet`, `digital_access_score` | Internet access is the policy lever (connectivity subsidies). The fixed and mobile columns are its parts, and `digital_access_score` adds them to computer and smartphone access, so any of them next to `any_home_internet` would count the same access twice. |
-| `has_computer`, `smartphone_access` | | Kept as separate controls for other kinds of digital access, so that the internet effect is not simply picking up device ownership (which also reflects household wealth). |
+| `has_computer`, `smartphone_access` |  | Kept as separate controls for other kinds of digital access, so that the internet effect is not simply picking up device ownership (which also reflects household wealth). |
 | `matric_plus × any_home_internet` (in the regression formula) | `edu_digital_group` | `edu_digital_group` is the same combination stored as one categorical column. Using both would duplicate the interaction. |
 | `household_size`, `n_children_under15`, `elderly_in_household`, `female_x_children`, `other_member_matric` | `dependency_ratio` | `dependency_ratio` is calculated from the number of children, elderly and working-age members, which the other household columns already describe. |
-| `age_centred`, `age_centred_squared`, `female`, `population_group`, `province`, `settlement_type` | | Standard labour-market controls. Without them, the internet effect would partly be an age, location or population-group effect. `population_group` is a sensitive attribute: it is included **as a control** so that the education and internet effects are estimated within groups, and it is used for fairness checks during evaluation. |
+| `age_centred`, `age_centred_squared`, `female`, `population_group`, `province`, `settlement_type` |  | Standard labour-market controls. Without them, the internet effect would partly be an age, location or population-group effect. `population_group` is a sensitive attribute: it is included **as a control** so that the education and internet effects are estimated within groups, and it is used for fairness checks during evaluation. |
 
 `household_id` and `person_weight` are design columns and never predictors: `household_id` defines the clusters and `person_weight` is the survey weight.
 
@@ -160,7 +160,7 @@ The smallest group, people with matric but no home internet, still has more than
 Three models are fitted. They are chosen to answer the question in different ways, not only to compete on accuracy:
 
 | Model | Package | Role | Why it suits this problem |
-|---|---|---|---|
+|----|----|----|----|
 | **1. Survey-weighted logistic regression** | `survey::svyglm()` | Main explanatory model | The only candidate that estimates the education × internet interaction directly as an odds ratio with a significance test, as the Milestone 1 success criteria require. It uses the survey weights and accounts for people in the same household being related. |
 | **2. Decision tree** | `rpart::rpart()` | Interpretable tree-based check | Finds interactions itself, without being told about them. If it splits on internet access differently for people with and without matric, that supports the regression's interaction. Its rules are easy to explain to non-technical stakeholders. |
 | **3. Random forest** | `ranger::ranger()` | Predictive benchmark | Captures non-linear effects and interactions that the regression's form rules out. Shows how much predictive power the simpler models give up, and whether education and internet remain important once everything else is allowed to interact freely. |
@@ -182,7 +182,7 @@ All three models are fitted to the same training rows with the same predictors, 
 Logistic regression models the log-odds of being employed as a linear combination of the predictors. Its assumptions and how each one is handled:
 
 | Assumption | How it is handled |
-|---|---|
+|----|----|
 | Binary outcome | `employed` has two levels, with Unemployed as the reference, so the model predicts the probability of being **Employed**. |
 | Independent observations | People in the same household are not independent: they share every household-level predictor. The survey design treats **households as clusters**, so the standard errors (and the p-value of the interaction) allow for this. The Stats SA primary sampling unit is not in `model_data.csv`, so the household is the finest cluster available. |
 | Log-odds linear in the numeric predictors | Age has a curved relationship with employment (low for the young, highest in mid-career), so `age_centred_squared` is included next to `age_centred` (Milestone 2, section 10.4). |
@@ -268,7 +268,7 @@ A classification tree repeatedly splits the data on the predictor and cut-off th
 Starting parameters (to be tuned in the evaluation notebook):
 
 | Parameter | Value | Reason |
-|---|---|---|
+|----|----|----|
 | `method` | `"class"` | Classification tree for the two-level target. |
 | `maxdepth` | 5 | At most five questions from the top of the tree to a prediction. A tree deeper than that is no longer readable, and being readable is why a tree was chosen. |
 | `minbucket` | 100 | Every leaf describes at least 100 people (about 0.4% of the training data). This keeps the leaves stable, and it avoids rules that describe very small, possibly identifiable groups. |
@@ -342,7 +342,7 @@ A random forest grows many decision trees, each on a bootstrap sample of the tra
 Starting parameters (to be tuned in the evaluation notebook):
 
 | Parameter | Value | Reason |
-|---|---|---|
+|----|----|----|
 | `num.trees` | 500 | Enough trees for the predictions and the importance scores to stabilise. More trees only cost time. |
 | `mtry` | 3 | Predictors considered at each split: the standard √15 ≈ 3 for classification. The main tuning parameter. |
 | `min.node.size` | 10 | The standard minimum leaf size for probability forests. |
@@ -438,14 +438,14 @@ tibble(
 
 **Preparing the test set.** Use the same function, so the test set gets the same rows, columns and factor levels:
 
-```r
+``` r
 source("../R/model_preparation.R")
 model_test <- prepare_employment_data("../Datasets/Analytical/model_test.csv")
 ```
 
 **Getting predicted probabilities of being Employed** from each saved model:
 
-```r
+``` r
 employment_logistic <- readRDS("../Models/employment_logistic.rds")
 employment_tree     <- readRDS("../Models/employment_tree.rds")
 employment_forest   <- readRDS("../Models/employment_forest.rds")
@@ -458,7 +458,7 @@ p_forest   <- predict(employment_forest, model_test)$predictions[, "Employed"]
 **What is left to tune.** The values above are starting points, not tuned values:
 
 | Model | Parameters to tune |
-|---|---|
+|----|----|
 | Logistic regression | None (only the classification threshold) |
 | Decision tree | `cp` (pruning), `maxdepth`, `minbucket` |
 | Random forest | `mtry`, `min.node.size` (`num.trees` only needs to be large enough) |

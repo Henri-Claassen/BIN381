@@ -1,0 +1,1342 @@
+---
+title: "Model Tuning and Evaluation"
+author: "Group 5"
+date: today
+format:
+  html:
+    toc: true
+    code-fold: show
+    df-print: kable
+    embed-resources: true
+  pdf:
+    toc: true
+    df-print: kable
+execute:
+  warning: false
+  message: false
+---
+
+## About this file
+
+This file covers the Milestone 3 rubric items "Model implementation and reproducibility" (tuning and resampling) and "Technical model evaluation and comparison". It continues from `Employment Model.qmd` and `Income Model.qmd`, which chose the candidate models, fitted them once with starting parameters and saved them to `Models/`.
+
+The file works in a fixed order, so that the test sets cannot influence any choice:
+
+| Section | Data used | What happens |
+|----|----|----|
+| 2–3 | Training files only | Household-grouped cross-validation folds are built. |
+| 4–5 | Training files only | The tree and forest parameters are tuned, the baseline models are cross-validated and each employment model's classification threshold is chosen, all from out-of-fold predictions. |
+| 6 | Training files only | The tuned models are refitted on the full training files and saved. |
+| 7 | Test files, **used once** | Every model is scored on the test sets with the parameters and thresholds fixed in sections 4–6. |
+| 8 | Training files and fitted models | The education × internet interaction is tested and checked across the models (Milestone 1 success criteria). |
+| 9 | Results of sections 4–8 | The comparison matrix and the final model selection. |
+
+## Loading the packages we need
+
+```{r}
+#| label: Package Setup
+
+library(tidyverse)  # data handling
+library(survey)     # svyglm(): survey-weighted regressions, regTermTest(): likelihood-ratio test
+library(rpart)      # decision tree
+library(rpart.plot) # plot of the tuned tree
+library(ranger)     # random forest
+library(pROC)       # ROC curves, AUC with confidence intervals, DeLong test
+# caret is used for one function only, caret::groupKFold(), so it is not loaded
+```
+
+## File paths
+
+```{r}
+#| label: File-Path Declarations
+
+analytical_directory <- "../Datasets/Analytical/"
+model_directory <- "../Models/"
+```
+
+# 1. Evaluation design
+
+## 1.1 What is being compared
+
+| Question | Models | Task |
+|----|----|----|
+| Employment (research areas B and C) | Survey-weighted logistic regression, decision tree, random forest, and a demographics-only baseline | Binary classification of `employed` |
+| Income (research area D) | Survey-weighted linear regression, random forest, and a demographics-only baseline | Regression of `log_salary` |
+
+The **baseline models** are new in this file. The Milestone 2 success criteria require the models to be compared with a demographics-only baseline: a model that knows a person's age, sex, population group, province and settlement type, but nothing about their education, digital access or household. If the full models do not predict clearly better than the baseline, education and digital access add little predictive information beyond who and where a person is. Each baseline is a survey-weighted regression with the same design as the main regression, so the only difference between the two is the predictors.
+
+## 1.2 Metrics and why they were chosen
+
+No single metric is enough, so each task gets several that measure different things.
+
+**Employment (classification).** The models predict the probability of being **Employed**, so Employed is the positive class. About 35% of the labour force is unemployed, so a model that always predicts Employed would already be 65% accurate; accuracy on its own is therefore misleading.
+
+| Metric | What it measures | Why it is used |
+|----|----|----|
+| ROC-AUC | How well the predicted probabilities rank employed people above unemployed people, over every possible threshold | Main tuning and comparison metric: it does not depend on the threshold or on the class balance. Milestone 2 set AUC ≥ 0.70 as the minimum acceptable performance. |
+| Balanced accuracy | The average of sensitivity and specificity | Treats both classes as equally important, unlike accuracy. |
+| Sensitivity (recall) | Share of employed people predicted Employed |  |
+| Specificity | Share of unemployed people predicted Unemployed | The smaller class, and the one policy is most concerned with. |
+| Precision, F1 | Share of Employed predictions that are correct; the balance of precision and sensitivity | Required by the brief's list of classification metrics. |
+| Accuracy | Share of all predictions that are correct | Reported for completeness, next to the 65% of the "always Employed" rule. |
+| Brier score | Mean squared difference between predicted probability and the actual outcome (0 = perfect) | The Shiny app will show probabilities, so they must be accurate, not only well ranked. |
+
+**Income (regression).** Errors are measured on the log scale, where the model was fitted:
+
+| Metric | What it measures                                          |
+|--------|-----------------------------------------------------------|
+| RMSE   | Typical size of an error, with large errors counting more |
+| MAE    | Average size of an error                                  |
+| R²     | Share of the variation in `log_salary` the model explains |
+
+The residuals of the linear regression are also plotted, because its standard errors rely on them being roughly symmetric with constant spread.
+
+Every metric is reported **unweighted** (how well the model predicts for the people in the sample) and, on the test set, also **weighted by `person_weight`** (how well it would predict for the South African population the sample represents).
+
+## 1.3 Helper functions
+
+These small functions calculate the metrics above. They are written once here so that the cross-validation, the test set and the subgroup checks all use exactly the same calculation.
+
+```{r}
+#| label: Helper Functions
+
+# Runs one model through the cross-validation folds. For each fold, the model is
+# fitted on the other folds and predicts the held-out fold, so every training row
+# gets one prediction from a model that never saw it ("out-of-fold" predictions).
+cross_validate <- function(data, fold_id, fit_and_predict) {
+  predictions <- rep(NA_real_, nrow(data))
+  for (k in sort(unique(fold_id))) {
+    held_out <- fold_id == k
+    predictions[held_out] <- fit_and_predict(data[!held_out, ], data[held_out, ])
+  }
+  predictions
+}
+
+# ROC curve and AUC with Employed as the positive class
+roc_curve <- function(truth, probability) {
+  roc(truth, probability, levels = c("Unemployed", "Employed"), direction = "<", quiet = TRUE)
+}
+
+auc_value <- function(truth, probability) {
+  as.numeric(auc(roc_curve(truth, probability)))
+}
+
+# AUC in each cross-validation fold, so the spread across folds can be reported
+fold_auc <- function(truth, probability, fold_id) {
+  sapply(sort(unique(fold_id)), function(k) auc_value(truth[fold_id == k], probability[fold_id == k]))
+}
+
+# Population-weighted AUC: the weighted share of (employed, unemployed) pairs in
+# which the employed person gets the higher probability (ties count as half)
+weighted_auc <- function(truth, probability, weight) {
+  employed <- truth == "Employed"
+  wins <- outer(probability[employed], probability[!employed], ">") +
+    0.5 * outer(probability[employed], probability[!employed], "==")
+  sum(weight[employed] * (wins %*% weight[!employed])) /
+    (sum(weight[employed]) * sum(weight[!employed]))
+}
+
+# Threshold-based classification metrics. With weight = 1 for everyone these are
+# the ordinary (unweighted) metrics; with person_weight they are population estimates.
+classification_metrics <- function(truth, probability, threshold, weight = rep(1, length(truth))) {
+  predicted_employed <- probability >= threshold
+  actual_employed <- truth == "Employed"
+  tp <- sum(weight[predicted_employed & actual_employed])
+  tn <- sum(weight[!predicted_employed & !actual_employed])
+  fp <- sum(weight[predicted_employed & !actual_employed])
+  fn <- sum(weight[!predicted_employed & actual_employed])
+  sensitivity <- tp / (tp + fn)
+  specificity <- tn / (tn + fp)
+  precision <- tp / (tp + fp)
+  tibble(
+    accuracy = (tp + tn) / (tp + tn + fp + fn),
+    balanced_accuracy = (sensitivity + specificity) / 2,
+    sensitivity = sensitivity,
+    specificity = specificity,
+    precision = precision,
+    f1 = 2 * precision * sensitivity / (precision + sensitivity),
+    brier = sum(weight * (probability - actual_employed)^2) / sum(weight)
+  )
+}
+
+# Regression metrics on the log-salary scale
+regression_metrics <- function(actual, predicted, weight = rep(1, length(actual))) {
+  error <- actual - predicted
+  tibble(
+    rmse = sqrt(sum(weight * error^2) / sum(weight)),
+    mae = sum(weight * abs(error)) / sum(weight),
+    r_squared = 1 - sum(weight * error^2) /
+      sum(weight * (actual - weighted.mean(actual, weight))^2)
+  )
+}
+```
+
+# 2. Training data
+
+The training files are read through the same preparation functions as in the modelling notebooks (`R/model_preparation.R`), so the rows, columns and factor levels are identical to those the saved models were fitted on. The test files are **not** read until section 7.
+
+```{r}
+#| label: Read Training Data
+
+source("../R/model_preparation.R")
+
+model_train <- prepare_employment_data(file.path(analytical_directory, "model_train.csv"))
+income_train <- prepare_income_data(file.path(analytical_directory, "income_train.csv"))
+
+tibble(
+  dataset = c("model_train", "income_train"),
+  rows = c(nrow(model_train), nrow(income_train)),
+  households = c(n_distinct(model_train$household_id), n_distinct(income_train$household_id))
+)
+```
+
+The row counts match the modelling notebooks (22,671 and 14,055 rows).
+
+# 3. Household-grouped cross-validation folds
+
+## 3.1 Why the folds are grouped by household
+
+Tuning needs data the model was not fitted on, but the test set must stay untouched until the end. **Cross-validation** solves this with the training data alone: the training rows are divided into five folds, each model is fitted five times on four folds and evaluated on the fifth, and the five results are averaged.
+
+The folds are grouped **by household** for the same reason the Milestone 2 train/test split was: members of one household share every household-level predictor (internet access, computer, smartphones, household size), so if they were in different folds the model would be evaluated on near-copies of people it was trained on, and the cross-validated performance would look better than it really is. `caret::groupKFold()` puts every member of a household in the same fold.
+
+Five folds is a common balance: each model is fitted on 80% of the training data (close to the full size) and there are enough folds to measure how much performance varies.
+
+```{r}
+#| label: Create Folds
+
+set.seed(67) # Same seed as the train/test split, for reproducibility
+
+# groupKFold() returns, for each fold, the rows used for fitting. The rows it
+# leaves out are that fold's held-out rows, stored as a fold number per row.
+employment_folds <- caret::groupKFold(model_train$household_id, k = 5)
+employment_fold_id <- rep(NA_integer_, nrow(model_train))
+for (k in seq_along(employment_folds)) {
+  employment_fold_id[-employment_folds[[k]]] <- k
+}
+
+income_folds <- caret::groupKFold(income_train$household_id, k = 5)
+income_fold_id <- rep(NA_integer_, nrow(income_train))
+for (k in seq_along(income_folds)) {
+  income_fold_id[-income_folds[[k]]] <- k
+}
+```
+
+## 3.2 Checking the folds
+
+```{r}
+#| label: Fold Verification
+
+tibble(
+  check = c(
+    "Employment: rows without a fold",
+    "Employment: households split across folds",
+    "Income: rows without a fold",
+    "Income: households split across folds"
+  ),
+  value = c(
+    sum(is.na(employment_fold_id)),
+    tibble(household_id = model_train$household_id, fold = employment_fold_id) |>
+      group_by(household_id) |> summarise(folds = n_distinct(fold)) |> filter(folds > 1) |> nrow(),
+    sum(is.na(income_fold_id)),
+    tibble(household_id = income_train$household_id, fold = income_fold_id) |>
+      group_by(household_id) |> summarise(folds = n_distinct(fold)) |> filter(folds > 1) |> nrow()
+  )
+)
+
+model_train |>
+  mutate(fold = employment_fold_id) |>
+  group_by(fold) |>
+  summarise(people = n(), households = n_distinct(household_id),
+            share_employed = round(mean(employed == "Employed"), 3))
+```
+
+Every row is in exactly one fold, no household is split across folds, and the share of employed people is similar in every fold, so each fold is a fair small-scale copy of the training data.
+
+# 4. Employment models: cross-validation and tuning
+
+## 4.1 Logistic regression and the baseline
+
+The logistic regression has no hyperparameters, but it is still cross-validated: its out-of-fold predictions give a cross-validated AUC to compare with the other models, and they are used to choose its threshold in section 4.4. The demographics-only baseline is cross-validated in the same way. In each fold, the survey design is rebuilt from that fold's training rows only.
+
+```{r}
+#| label: Baseline Formula
+
+# Demographics-only baseline: age, sex, population group and location, with no
+# education, digital-access or household predictors
+employment_baseline_formula <- employed ~ age_centred + age_centred_squared + female +
+  population_group + province + settlement_type
+```
+
+```{r}
+#| label: Cross-Validate Logistic and Baseline
+
+logistic_oof <- cross_validate(model_train, employment_fold_id, function(training, held_out) {
+  design <- svydesign(ids = ~household_id, weights = ~person_weight, data = training)
+  model <- svyglm(employment_regression_formula, design = design, family = quasibinomial())
+  as.numeric(predict(model, held_out, type = "response"))
+})
+
+baseline_oof <- cross_validate(model_train, employment_fold_id, function(training, held_out) {
+  design <- svydesign(ids = ~household_id, weights = ~person_weight, data = training)
+  model <- svyglm(employment_baseline_formula, design = design, family = quasibinomial())
+  as.numeric(predict(model, held_out, type = "response"))
+})
+
+tibble(
+  model = c("Baseline (demographics only)", "Logistic regression"),
+  mean_cv_auc = c(mean(fold_auc(model_train$employed, baseline_oof, employment_fold_id)),
+                  mean(fold_auc(model_train$employed, logistic_oof, employment_fold_id))),
+  sd_cv_auc = c(sd(fold_auc(model_train$employed, baseline_oof, employment_fold_id)),
+                sd(fold_auc(model_train$employed, logistic_oof, employment_fold_id)))
+) |>
+  mutate(across(where(is.numeric), \(x) round(x, 3)))
+```
+
+## 4.2 Decision tree tuning
+
+`Employment Model.qmd` fitted the tree with `maxdepth = 5`, `minbucket = 100` and `cp = 0.001` as starting values. Three parameters control the tree's size, and they are tuned together over a grid:
+
+| Parameter | Values tried | Effect |
+|----|----|----|
+| `maxdepth` | 3, 4, 5 | Maximum number of questions from the top of the tree to a prediction. Not above 5, because the tree was chosen for readability (`Employment Model.qmd`, section 5.1). |
+| `minbucket` | 50, 100, 200 | Minimum number of people in a leaf. Not below 50, so no rule describes a very small, possibly identifiable group. |
+| `cp` | 0.0005, 0.001, 0.002, 0.005 | Minimum improvement a split must give to be kept (pruning). |
+
+That is 36 combinations, each fitted five times (once per fold). rpart's own cross-validation stays switched off (`xval = 0`), because it splits by person.
+
+```{r}
+#| label: Tune Decision Tree
+
+tree_grid <- expand_grid(
+  maxdepth = c(3, 4, 5),
+  minbucket = c(50, 100, 200),
+  cp = c(0.0005, 0.001, 0.002, 0.005)
+)
+
+tree_results <- tree_grid |> mutate(mean_cv_auc = NA_real_, sd_cv_auc = NA_real_, leaves = NA_integer_)
+tree_oof <- list()
+
+for (i in seq_len(nrow(tree_grid))) {
+  settings <- tree_grid[i, ]
+  tree_control <- rpart.control(maxdepth = settings$maxdepth, minbucket = settings$minbucket,
+                                cp = settings$cp, xval = 0)
+
+  predictions <- cross_validate(model_train, employment_fold_id, function(training, held_out) {
+    tree <- rpart(employment_tree_formula, data = training, method = "class", control = tree_control)
+    predict(tree, held_out, type = "prob")[, "Employed"]
+  })
+
+  aucs <- fold_auc(model_train$employed, predictions, employment_fold_id)
+  tree_results$mean_cv_auc[i] <- mean(aucs)
+  tree_results$sd_cv_auc[i] <- sd(aucs)
+  # size of the tree these settings give on the full training data, for the selection rule below
+  full_tree <- rpart(employment_tree_formula, data = model_train, method = "class", control = tree_control)
+  tree_results$leaves[i] <- sum(full_tree$frame$var == "<leaf>")
+  tree_oof[[i]] <- predictions
+}
+
+tree_results |>
+  arrange(desc(mean_cv_auc)) |>
+  mutate(across(c(mean_cv_auc, sd_cv_auc), \(x) round(x, 4))) |>
+  head(10)
+```
+
+**Selection rule: the one-standard-error rule.** Many settings give almost the same AUC, and the differences between them are smaller than the variation between folds. Instead of taking the single highest AUC, the tree with the **fewest leaves** is chosen among all settings whose mean AUC is within one standard error of the best. This is the standard rule for pruning trees (Breiman et al., 1984): it picks the simplest tree that performs as well as the best one within the precision the cross-validation can measure, which suits a model chosen for being readable.
+
+```{r}
+#| label: Select Tree Settings
+
+best_tree_row <- which.max(tree_results$mean_cv_auc)
+one_se_limit <- tree_results$mean_cv_auc[best_tree_row] -
+  tree_results$sd_cv_auc[best_tree_row] / sqrt(5)
+
+tree_selected <- tree_results |>
+  mutate(row = row_number()) |>
+  filter(mean_cv_auc >= one_se_limit) |>
+  arrange(leaves, desc(mean_cv_auc)) |>
+  slice(1)
+
+tibble(
+  measure = c("Best mean CV AUC", "One-standard-error limit", "Selected maxdepth",
+              "Selected minbucket", "Selected cp", "Selected mean CV AUC", "Leaves in selected tree"),
+  value = as.character(c(round(tree_results$mean_cv_auc[best_tree_row], 4), round(one_se_limit, 4),
+                         tree_selected$maxdepth, tree_selected$minbucket, tree_selected$cp,
+                         round(tree_selected$mean_cv_auc, 4), tree_selected$leaves))
+)
+
+tree_selected_oof <- tree_oof[[tree_selected$row]]
+```
+
+Every tree's AUC lies in a narrow band, and the best trees all use the maximum depth of 5, so the depth limit set for readability does cost some accuracy. Even the best tree, at a cross-validated AUC of `r round(tree_results$mean_cv_auc[best_tree_row], 3)`, is below the demographics-only baseline (`r round(mean(fold_auc(model_train$employed, baseline_oof, employment_fold_id)), 3)`): a readable tree of at most five questions captures less than a regression that uses all the demographic predictors at once.
+
+## 4.3 Random forest tuning
+
+The forest's main parameters are `mtry` (how many predictors each split may choose from) and `min.node.size` (the smallest leaf in each tree). `num.trees` is not tuned: more trees only make the predictions more stable. During tuning 300 trees are grown to save time, and the final forest in section 6 has 500, as in `Employment Model.qmd`.
+
+| Parameter | Values tried | Effect |
+|----|----|----|
+| `mtry` | 2, 3, 4, 6 | Small values make the trees more different from each other; large values let each split use the strongest predictors. 3 (√15) was the starting value. |
+| `min.node.size` | 10, 30, 100, 200, 400 | Larger leaves give smoother, often better-calibrated probabilities; smaller leaves fit more detail. 10 was the starting value. The range goes well above it because a first run of this grid, which stopped at 100, chose 100: the best value was at the edge of the grid, so larger values had to be tried. |
+
+The forest is chosen by the highest mean cross-validated AUC. The one-standard-error rule is not used here, because the forest is not meant to be readable.
+
+```{r}
+#| label: Tune Random Forest
+
+forest_grid <- expand_grid(
+  mtry = c(2, 3, 4, 6),
+  min.node.size = c(10, 30, 100, 200, 400)
+)
+
+forest_results <- forest_grid |> mutate(mean_cv_auc = NA_real_, sd_cv_auc = NA_real_)
+forest_oof <- list()
+
+for (i in seq_len(nrow(forest_grid))) {
+  settings <- forest_grid[i, ]
+
+  predictions <- cross_validate(model_train, employment_fold_id, function(training, held_out) {
+    forest <- ranger(
+      employment_tree_formula, data = training,
+      num.trees = 300, mtry = settings$mtry, min.node.size = settings$min.node.size,
+      probability = TRUE, respect.unordered.factors = "order", seed = 67
+    )
+    predict(forest, held_out)$predictions[, "Employed"]
+  })
+
+  aucs <- fold_auc(model_train$employed, predictions, employment_fold_id)
+  forest_results$mean_cv_auc[i] <- mean(aucs)
+  forest_results$sd_cv_auc[i] <- sd(aucs)
+  forest_oof[[i]] <- predictions
+}
+
+forest_results |>
+  arrange(desc(mean_cv_auc)) |>
+  mutate(across(c(mean_cv_auc, sd_cv_auc), \(x) round(x, 4)))
+
+forest_selected <- forest_results |>
+  mutate(row = row_number()) |>
+  slice_max(mean_cv_auc, n = 1, with_ties = FALSE)
+
+forest_selected_oof <- forest_oof[[forest_selected$row]]
+```
+
+The selected forest uses `mtry` = `r forest_selected$mtry` and `min.node.size` = `r forest_selected$min.node.size`, with a cross-validated AUC of `r round(forest_selected$mean_cv_auc, 3)`. The starting values (`mtry = 3`, `min.node.size = 10`) gave `r round(forest_results$mean_cv_auc[forest_results$mtry == 3 & forest_results$min.node.size == 10], 3)`: small leaves let each tree fit individual people too closely, and larger leaves give smoother probabilities that rank people better.
+
+## 4.4 Choosing the classification thresholds
+
+A model's probabilities become Employed/Unemployed predictions through a threshold. The default of 0.5 is only right when both kinds of error are equally costly *and* the classes are balanced. Here 65% of people are employed, so a 0.5 threshold labels most people Employed and misses many of the unemployed.
+
+The threshold for each model is chosen from its **out-of-fold** predictions (never the test set), as the threshold that maximises **balanced accuracy** (equivalently, Youden's J = sensitivity + specificity − 1). This gives the Employed and Unemployed classes equal importance, which suits a policy question where failing to identify unemployed people matters as much as misclassifying employed people.
+
+```{r}
+#| label: Choose Thresholds
+
+youden_threshold <- function(truth, probability) {
+  coords(roc_curve(truth, probability), "best", best.method = "youden",
+         ret = "threshold", transpose = FALSE)$threshold[1]
+}
+
+employment_thresholds <- tibble(
+  model = c("Baseline", "Logistic regression", "Decision tree", "Random forest"),
+  threshold = c(
+    youden_threshold(model_train$employed, baseline_oof),
+    youden_threshold(model_train$employed, logistic_oof),
+    youden_threshold(model_train$employed, tree_selected_oof),
+    youden_threshold(model_train$employed, forest_selected_oof)
+  )
+)
+
+employment_thresholds |> mutate(threshold = round(threshold, 3))
+```
+
+The effect of the tuned threshold compared with 0.5, on the out-of-fold predictions:
+
+```{r}
+#| label: Threshold Comparison
+
+oof_predictions <- list(
+  "Baseline" = baseline_oof,
+  "Logistic regression" = logistic_oof,
+  "Decision tree" = tree_selected_oof,
+  "Random forest" = forest_selected_oof
+)
+
+bind_rows(
+  lapply(names(oof_predictions), function(m) {
+    bind_rows(
+      classification_metrics(model_train$employed, oof_predictions[[m]], 0.5) |>
+        mutate(model = m, threshold = "0.5", .before = 1),
+      classification_metrics(model_train$employed, oof_predictions[[m]],
+                             employment_thresholds$threshold[employment_thresholds$model == m]) |>
+        mutate(model = m, threshold = "Tuned", .before = 1)
+    )
+  })
+) |>
+  select(model, threshold, balanced_accuracy, sensitivity, specificity, accuracy) |>
+  mutate(across(where(is.numeric), \(x) round(x, 3)))
+```
+
+At 0.5, every model identifies fewer than half of the unemployed people (specificity below 0.5) while labelling most employed people correctly. The tuned thresholds, all between 0.6 and 0.7, trade some of that sensitivity for much higher specificity, which raises balanced accuracy for every model. Accuracy falls slightly because the larger class (Employed) is now predicted less often; this is expected and is why accuracy is not used to choose the threshold.
+
+# 5. Income models: cross-validation and tuning
+
+## 5.1 Linear regression and the baselines
+
+The linear regression has no hyperparameters. It is cross-validated with the demographics-only baseline (same predictors as the employment baseline) and with the simplest possible baseline, predicting every person's salary as the training average.
+
+```{r}
+#| label: Cross-Validate Income Regressions
+
+income_baseline_formula <- log_salary ~ age_centred + age_centred_squared + female +
+  population_group + province + settlement_type
+
+linear_oof <- cross_validate(income_train, income_fold_id, function(training, held_out) {
+  design <- svydesign(ids = ~household_id, weights = ~person_weight, data = training)
+  model <- svyglm(income_regression_formula, design = design, family = gaussian())
+  as.numeric(predict(model, held_out))
+})
+
+income_baseline_oof <- cross_validate(income_train, income_fold_id, function(training, held_out) {
+  design <- svydesign(ids = ~household_id, weights = ~person_weight, data = training)
+  model <- svyglm(income_baseline_formula, design = design, family = gaussian())
+  as.numeric(predict(model, held_out))
+})
+
+mean_oof <- cross_validate(income_train, income_fold_id, function(training, held_out) {
+  rep(weighted.mean(training$log_salary, training$person_weight), nrow(held_out))
+})
+
+bind_rows(
+  regression_metrics(income_train$log_salary, mean_oof) |> mutate(model = "Training average", .before = 1),
+  regression_metrics(income_train$log_salary, income_baseline_oof) |> mutate(model = "Baseline (demographics only)", .before = 1),
+  regression_metrics(income_train$log_salary, linear_oof) |> mutate(model = "Linear regression", .before = 1)
+) |>
+  mutate(across(where(is.numeric), \(x) round(x, 3)))
+```
+
+## 5.2 Random forest tuning
+
+| Parameter | Values tried | Effect |
+|----|----|----|
+| `mtry` | 1, 2, 3, 4, 6, 8 | The full range for 8 predictors; 2 (one third) was the starting value. `mtry = 8` lets every split use every predictor (bagging). |
+| `min.node.size` | 5, 20, 50, 100, 200 | 5 was the starting value; larger leaves average more people and smooth the predictions. As for the employment forest, a first run that stopped at 50 chose 50, so larger values were added. |
+
+The setting with the lowest mean cross-validated RMSE is chosen.
+
+```{r}
+#| label: Tune Income Forest
+
+income_forest_grid <- expand_grid(
+  mtry = c(1, 2, 3, 4, 6, 8),
+  min.node.size = c(5, 20, 50, 100, 200)
+)
+
+income_forest_results <- income_forest_grid |> mutate(mean_cv_rmse = NA_real_, sd_cv_rmse = NA_real_)
+income_forest_oof <- list()
+
+for (i in seq_len(nrow(income_forest_grid))) {
+  settings <- income_forest_grid[i, ]
+
+  predictions <- cross_validate(income_train, income_fold_id, function(training, held_out) {
+    forest <- ranger(
+      income_tree_formula, data = training,
+      num.trees = 300, mtry = settings$mtry, min.node.size = settings$min.node.size,
+      respect.unordered.factors = "order", seed = 67
+    )
+    predict(forest, held_out)$predictions
+  })
+
+  fold_rmse <- sapply(1:5, function(k) {
+    regression_metrics(income_train$log_salary[income_fold_id == k], predictions[income_fold_id == k])$rmse
+  })
+  income_forest_results$mean_cv_rmse[i] <- mean(fold_rmse)
+  income_forest_results$sd_cv_rmse[i] <- sd(fold_rmse)
+  income_forest_oof[[i]] <- predictions
+}
+
+income_forest_results |>
+  arrange(mean_cv_rmse) |>
+  mutate(across(c(mean_cv_rmse, sd_cv_rmse), \(x) round(x, 4))) |>
+  head(10)
+
+income_forest_selected <- income_forest_results |>
+  mutate(row = row_number()) |>
+  slice_min(mean_cv_rmse, n = 1, with_ties = FALSE)
+
+income_forest_selected_oof <- income_forest_oof[[income_forest_selected$row]]
+```
+
+The selected forest uses `mtry` = `r income_forest_selected$mtry` and `min.node.size` = `r income_forest_selected$min.node.size`. This is again at the edge of the grid, but the grid is not extended further: the ten best settings differ in mean RMSE by only `r round(sort(income_forest_results$mean_cv_rmse)[10] - min(income_forest_results$mean_cv_rmse), 4)`, well below the fold-to-fold standard deviation of about `r round(income_forest_selected$sd_cv_rmse, 3)`. The RMSE is flat across these settings, so larger leaves could not give a meaningful improvement.
+
+# 6. Refitting and saving the tuned models
+
+The chosen settings are now used to refit each tuned model on the **full** training file. The logistic and linear regressions have nothing to tune, so the models saved by the modelling notebooks are used unchanged. Henri's untuned models also stay in `Models/` as the documented starting point; the tuned models are saved next to them with `_tuned` in the name.
+
+```{r}
+#| label: Refit Tuned Models
+
+employment_tree_tuned <- rpart(
+  employment_tree_formula, data = model_train, method = "class",
+  control = rpart.control(maxdepth = tree_selected$maxdepth, minbucket = tree_selected$minbucket,
+                          cp = tree_selected$cp, xval = 0)
+)
+
+employment_forest_tuned <- ranger(
+  employment_tree_formula, data = model_train,
+  num.trees = 500, mtry = forest_selected$mtry, min.node.size = forest_selected$min.node.size,
+  probability = TRUE, respect.unordered.factors = "order", importance = "permutation", seed = 67
+)
+
+income_forest_tuned <- ranger(
+  income_tree_formula, data = income_train,
+  num.trees = 500, mtry = income_forest_selected$mtry, min.node.size = income_forest_selected$min.node.size,
+  respect.unordered.factors = "order", importance = "permutation", seed = 67
+)
+
+employment_baseline <- svyglm(
+  employment_baseline_formula,
+  design = svydesign(ids = ~household_id, weights = ~person_weight, data = model_train),
+  family = quasibinomial()
+)
+
+income_baseline <- svyglm(
+  income_baseline_formula,
+  design = svydesign(ids = ~household_id, weights = ~person_weight, data = income_train),
+  family = gaussian()
+)
+
+# Models that were not tuned, from the modelling notebooks
+employment_logistic <- readRDS(file.path(model_directory, "employment_logistic.rds"))
+income_linear <- readRDS(file.path(model_directory, "income_linear.rds"))
+```
+
+```{r}
+#| label: Save Tuned Models
+
+saveRDS(employment_tree_tuned, file.path(model_directory, "employment_tree_tuned.rds"))
+saveRDS(employment_forest_tuned, file.path(model_directory, "employment_forest_tuned.rds"))
+saveRDS(employment_baseline, file.path(model_directory, "employment_baseline.rds"))
+saveRDS(income_forest_tuned, file.path(model_directory, "income_forest_tuned.rds"))
+saveRDS(income_baseline, file.path(model_directory, "income_baseline.rds"))
+
+# The thresholds are part of each classification model and are needed by the Shiny app
+write_csv(employment_thresholds, file.path(model_directory, "employment_thresholds.csv"))
+
+tibble(
+  setting = c("Tree maxdepth", "Tree minbucket", "Tree cp",
+              "Employment forest mtry", "Employment forest min.node.size",
+              "Income forest mtry", "Income forest min.node.size"),
+  starting_value = as.character(c(5, 100, 0.001, 3, 10, 2, 5)),
+  tuned_value = as.character(c(tree_selected$maxdepth, tree_selected$minbucket, tree_selected$cp,
+                               forest_selected$mtry, forest_selected$min.node.size,
+                               income_forest_selected$mtry, income_forest_selected$min.node.size))
+)
+```
+
+The tuned tree:
+
+```{r}
+#| label: Plot Tuned Tree
+#| fig-width: 12
+#| fig-height: 7
+
+rpart.plot(
+  employment_tree_tuned,
+  extra = 106,
+  box.palette = "RdGn",
+  branch.lty = 3,
+  tweak = 1.1,
+  main = "Tuned decision tree: probability of being employed"
+)
+```
+
+The tuned tree splits only on age, smartphone access, computer ownership, household size and population group. It never splits on `matric_plus` or `any_home_internet`, so it cannot show an education × internet interaction (section 8.3).
+
+# 7. Test-set evaluation
+
+## 7.1 Reading the test sets
+
+From here on nothing is tuned or chosen: every parameter and threshold was fixed in sections 4–6. The test sets are read with the same preparation functions, and the checks confirm they share no households with the training data.
+
+```{r}
+#| label: Read Test Data
+
+model_test <- prepare_employment_data(file.path(analytical_directory, "model_test.csv"))
+income_test <- prepare_income_data(file.path(analytical_directory, "income_test.csv"))
+
+tibble(
+  check = c("Employment test rows", "Employment test households",
+            "Employment households also in training", "Income test rows",
+            "Income test households", "Income households also in training"),
+  value = c(nrow(model_test), n_distinct(model_test$household_id),
+            length(intersect(model_test$household_id, model_train$household_id)),
+            nrow(income_test), n_distinct(income_test$household_id),
+            length(intersect(income_test$household_id, income_train$household_id)))
+)
+
+model_test |> count(employed) |> mutate(share = round(n / sum(n), 3))
+```
+
+## 7.2 Employment: test-set predictions and metrics
+
+```{r}
+#| label: Employment Test Predictions
+
+employment_test_predictions <- model_test |>
+  select(household_id, person_weight, employed, population_group, female, settlement_type, province) |>
+  mutate(
+    "Baseline" = as.numeric(predict(employment_baseline, model_test, type = "response")),
+    "Logistic regression" = as.numeric(predict(employment_logistic, model_test, type = "response")),
+    "Decision tree" = predict(employment_tree_tuned, model_test, type = "prob")[, "Employed"],
+    "Random forest" = predict(employment_forest_tuned, model_test)$predictions[, "Employed"]
+  )
+
+employment_models <- c("Baseline", "Logistic regression", "Decision tree", "Random forest")
+```
+
+```{r}
+#| label: Employment Test Metrics
+
+employment_test_metrics <- bind_rows(lapply(employment_models, function(m) {
+  probability <- employment_test_predictions[[m]]
+  threshold <- employment_thresholds$threshold[employment_thresholds$model == m]
+  auc_ci <- ci.auc(roc_curve(employment_test_predictions$employed, probability))
+  bind_rows(
+    classification_metrics(employment_test_predictions$employed, probability, threshold) |>
+      mutate(model = m, weighting = "Unweighted", auc = auc_ci[2],
+             auc_lower = auc_ci[1], auc_upper = auc_ci[3], .before = 1),
+    classification_metrics(employment_test_predictions$employed, probability, threshold,
+                           employment_test_predictions$person_weight) |>
+      mutate(model = m, weighting = "Population-weighted",
+             auc = weighted_auc(employment_test_predictions$employed, probability,
+                                employment_test_predictions$person_weight),
+             auc_lower = NA, auc_upper = NA, .before = 1)
+  )
+}))
+
+employment_test_metrics |>
+  filter(weighting == "Unweighted") |>
+  select(-weighting) |>
+  pivot_longer(-model, names_to = "metric") |>
+  pivot_wider(names_from = model, values_from = value) |>
+  mutate(across(where(is.numeric), \(x) round(x, 3)))
+```
+
+`auc_lower` and `auc_upper` are the 95% DeLong confidence interval of the AUC.
+
+The test results are close to the cross-validated results in sections 4.1–4.3, so the cross-validation gave a realistic estimate and the models are not overfitted to the training data. Every model clears the AUC ≥ 0.70 threshold set in Milestone 2, including the demographics-only baseline, so that threshold on its own does not separate the models. The comparison with the baseline is what shows whether education, digital access and the household predictors add anything.
+
+The same metrics weighted by `person_weight`, which estimate performance for the population rather than the sample:
+
+```{r}
+#| label: Employment Weighted Test Metrics
+
+employment_test_metrics |>
+  filter(weighting == "Population-weighted") |>
+  select(-weighting, -auc_lower, -auc_upper) |>
+  pivot_longer(-model, names_to = "metric") |>
+  pivot_wider(names_from = model, values_from = value) |>
+  mutate(across(where(is.numeric), \(x) round(x, 3)))
+```
+
+## 7.3 Confusion matrices
+
+Each model's test predictions at its tuned threshold, as counts of people:
+
+```{r}
+#| label: Confusion Matrices
+
+bind_rows(lapply(employment_models, function(m) {
+  threshold <- employment_thresholds$threshold[employment_thresholds$model == m]
+  tibble(
+    model = m,
+    actual = employment_test_predictions$employed,
+    predicted = if_else(employment_test_predictions[[m]] >= threshold, "Employed", "Unemployed")
+  )
+})) |>
+  count(model, actual, predicted) |>
+  pivot_wider(names_from = predicted, values_from = n, names_prefix = "predicted_") |>
+  arrange(factor(model, levels = employment_models), actual)
+```
+
+## 7.4 ROC curves and statistical comparison
+
+```{r}
+#| label: ROC Curves
+#| fig-width: 7
+#| fig-height: 6
+
+employment_rocs <- lapply(employment_models, function(m) {
+  roc_curve(employment_test_predictions$employed, employment_test_predictions[[m]])
+})
+names(employment_rocs) <- employment_models
+
+ggroc(employment_rocs, legacy.axes = TRUE) +
+  geom_abline(linetype = "dashed", colour = "grey60") +
+  labs(title = "ROC curves on the test set", x = "1 − specificity", y = "Sensitivity", colour = "Model") +
+  coord_equal() +
+  theme_minimal()
+```
+
+The DeLong test checks whether the difference in AUC between two models on the same test people is larger than chance. Each model is compared with the logistic regression, the main explanatory model:
+
+```{r}
+#| label: DeLong Tests
+
+delong_results <- bind_rows(lapply(setdiff(employment_models, "Logistic regression"), function(m) {
+  test <- roc.test(employment_rocs[["Logistic regression"]], employment_rocs[[m]],
+                   method = "delong", paired = TRUE)
+  tibble(
+    comparison = paste("Logistic regression vs", m),
+    auc_logistic = as.numeric(auc(employment_rocs[["Logistic regression"]])),
+    auc_other = as.numeric(auc(employment_rocs[[m]])),
+    difference = auc_logistic - auc_other,
+    p_value = test$p.value
+  )
+}))
+
+delong_results |>
+  mutate(across(auc_logistic:difference, \(x) round(x, 3)),
+         p_value = format.pval(p_value, digits = 3, eps = 0.0001))
+```
+
+The DeLong test treats people as independent. Household members are not fully independent, so these p-values are somewhat too small; a difference that is only just significant should be read with caution.
+
+## 7.5 Calibration
+
+The Shiny app will show predicted probabilities, so they should match reality: of the people given a 70% probability, about 70% should be employed. The test people are grouped into ten equal-sized bins by predicted probability, and each bin's average prediction is compared with its actual share employed:
+
+```{r}
+#| label: Calibration Plot
+#| fig-width: 8
+#| fig-height: 6
+
+employment_test_predictions |>
+  pivot_longer(all_of(employment_models), names_to = "model", values_to = "probability") |>
+  group_by(model) |>
+  mutate(bin = ntile(probability, 10)) |>
+  group_by(model, bin) |>
+  summarise(mean_predicted = mean(probability), share_employed = mean(employed == "Employed"),
+            .groups = "drop") |>
+  ggplot(aes(x = mean_predicted, y = share_employed, colour = model)) +
+  geom_abline(linetype = "dashed", colour = "grey60") +
+  geom_line() +
+  geom_point() +
+  coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+  labs(title = "Calibration on the test set", x = "Average predicted probability of employment",
+       y = "Actual share employed", colour = "Model") +
+  theme_minimal()
+```
+
+All four models lie close to the diagonal across the whole range, so their probabilities can be read at face value: none of them is systematically too confident or too cautious. This matters for deployment, where the probability itself is shown to the user.
+
+## 7.6 Performance for different groups
+
+A model can perform well overall but worse for particular groups. AUC and the threshold metrics are calculated separately by population group, sex and settlement type for the logistic regression and the random forest. These figures are an input to the fairness evaluation (Task 3); groups with fewer than about 200 test people give imprecise estimates.
+
+```{r}
+#| label: Subgroup Performance
+
+subgroup_metrics <- function(group_column) {
+  bind_rows(lapply(c("Logistic regression", "Random forest"), function(m) {
+    threshold <- employment_thresholds$threshold[employment_thresholds$model == m]
+    employment_test_predictions |>
+      mutate(group = as.character(.data[[group_column]]), probability = .data[[m]]) |>
+      group_by(group) |>
+      summarise(
+        people = n(),
+        share_employed = mean(employed == "Employed"),
+        auc = auc_value(employed, probability),
+        classification_metrics(employed, probability, threshold),
+        .groups = "drop"
+      ) |>
+      mutate(model = m, grouping = group_column, .before = 1)
+  }))
+}
+
+bind_rows(
+  subgroup_metrics("population_group"),
+  subgroup_metrics("female"),
+  subgroup_metrics("settlement_type")
+) |>
+  select(grouping, group, model, people, share_employed, auc, balanced_accuracy, sensitivity, specificity) |>
+  mutate(across(share_employed:specificity, \(x) round(x, 3)))
+```
+
+For `female`, 1 means female and 0 means male.
+
+The AUC is similar across most groups, so both models rank people about equally well within each group. The threshold-based metrics differ much more, because one threshold is applied to groups with very different employment rates:
+
+- For the **Indian/Asian and White** groups, where more than 85% of the labour force is employed, both models almost never predict Unemployed: specificity is 0.2 or lower. Unemployed people in these groups are nearly always misclassified as employed. These groups are also small in the test set (about 100 and 300 people), so the estimates are uncertain.
+- In **traditional areas**, where only about half the labour force is employed, the logistic regression misses more than half of the employed people (sensitivity about 0.45).
+
+This is not a bug in the models but a consequence of a single threshold meeting different base rates. It means the classifications should not be used to make decisions about individuals, and it is carried into the fairness evaluation (Task 3).
+
+## 7.7 Income: test-set metrics
+
+```{r}
+#| label: Income Test Metrics
+
+income_test_predictions <- income_test |>
+  select(household_id, person_weight, log_salary) |>
+  mutate(
+    "Training average" = weighted.mean(income_train$log_salary, income_train$person_weight),
+    "Baseline" = as.numeric(predict(income_baseline, income_test)),
+    "Linear regression" = as.numeric(predict(income_linear, income_test)),
+    "Random forest" = predict(income_forest_tuned, income_test)$predictions
+  )
+
+income_models <- c("Training average", "Baseline", "Linear regression", "Random forest")
+
+income_test_metrics <- bind_rows(lapply(income_models, function(m) {
+  bind_rows(
+    regression_metrics(income_test_predictions$log_salary, income_test_predictions[[m]]) |>
+      mutate(model = m, weighting = "Unweighted", .before = 1),
+    regression_metrics(income_test_predictions$log_salary, income_test_predictions[[m]],
+                       income_test_predictions$person_weight) |>
+      mutate(model = m, weighting = "Population-weighted", .before = 1)
+  )
+}))
+
+income_test_metrics |>
+  mutate(across(where(is.numeric), \(x) round(x, 3)))
+```
+
+An RMSE on the log scale can be read as a typical multiplicative error: an RMSE of 0.9, for example, means predictions are typically off by a factor of about exp(0.9) ≈ 2.5 in rand terms.
+
+Both the linear regression and the forest clearly beat the two baselines, and the test results match the cross-validated ones. Even so, both explain only about 30% of the variation in log salary: education, internet access, age, sex, population group and location leave most of the differences in salary unexplained (occupation, industry and hours worked are not in the data). The income models are useful for estimating *average* differences between groups, not for predicting an individual's salary.
+
+## 7.8 Residuals of the linear regression
+
+```{r}
+#| label: Residual Plots
+#| fig-width: 10
+#| fig-height: 4.5
+
+residual_data <- income_test_predictions |>
+  transmute(fitted = `Linear regression`, residual = log_salary - `Linear regression`)
+
+residual_plot <- ggplot(residual_data, aes(x = fitted, y = residual)) +
+  geom_point(alpha = 0.15) +
+  geom_hline(yintercept = 0, colour = "red") +
+  geom_smooth(se = FALSE, colour = "steelblue") +
+  labs(title = "Residuals vs fitted (test set)", x = "Fitted log salary", y = "Residual") +
+  theme_minimal()
+
+qq_plot <- ggplot(residual_data, aes(sample = residual)) +
+  stat_qq(alpha = 0.3) +
+  stat_qq_line(colour = "red") +
+  labs(title = "Normal Q-Q plot of residuals", x = "Theoretical quantiles", y = "Residual quantiles") +
+  theme_minimal()
+
+residual_plot
+qq_plot
+```
+
+The residuals are centred on zero across the whole range of fitted values (the smoothed blue line stays on the red line), with roughly constant spread, so the linear form and the constant-variance assumption hold reasonably well. The diagonal bands come from salaries reported as round amounts (for example R5,000 or R10,000). The Q-Q plot shows heavier tails than a normal distribution: a small number of people earn far more or far less than the model predicts. With more than 14,000 people, this does not affect the coefficients or their confidence intervals much, but it confirms that individual predictions can be far off.
+
+## 7.9 How closely the models agree
+
+The metrics above show how well each model predicts, but not whether the models make the *same* predictions. Two models with similar AUCs could still disagree about many individual people. Correlating the models' test-set predictions with each other shows how much the more flexible models add beyond the simpler ones: if a flexible model's predictions are almost the same as the regression's, it has found little the regression missed.
+
+The heatmaps show the Pearson correlation between each pair of models' predictions (predicted probability of employment, and predicted log salary). For income, the actual log salary is included as a reference. The training-average model is left out because it predicts the same value for everyone, so it has no correlation.
+
+```{r}
+#| label: Prediction Correlations
+
+employment_prediction_correlations <- employment_test_predictions |>
+  select(all_of(employment_models)) |>
+  cor()
+
+income_prediction_correlations <- income_test_predictions |>
+  select(Baseline, `Linear regression`, `Random forest`, `Actual log salary` = log_salary) |>
+  cor()
+
+# Heatmap of a correlation matrix: one blue hue, light for weaker and dark for stronger correlations
+correlation_heatmap <- function(correlations, title) {
+  as_tibble(correlations, rownames = "model_1") |>
+    pivot_longer(-model_1, names_to = "model_2", values_to = "correlation") |>
+    mutate(
+      model_1 = factor(model_1, levels = rownames(correlations)),
+      model_2 = factor(model_2, levels = rev(colnames(correlations))),
+      text_colour = if_else(correlation >= 0.75, "white", "black")
+    ) |>
+    ggplot(aes(x = model_1, y = model_2, fill = correlation)) +
+    geom_tile(colour = "white", linewidth = 1) +
+    geom_text(aes(label = sprintf("%.2f", correlation), colour = text_colour), size = 4.5) +
+    scale_colour_identity() +
+    scale_fill_gradientn(colours = c("#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"),
+                         limits = c(0.4, 1)) +
+    coord_equal() +
+    labs(title = title, x = NULL, y = NULL, fill = "Correlation") +
+    theme_minimal() +
+    theme(panel.grid = element_blank(), axis.text.x = element_text(angle = 30, hjust = 1))
+}
+```
+
+```{r}
+#| label: Employment Correlation Heatmap
+#| fig-width: 7
+#| fig-height: 5.5
+
+correlation_heatmap(employment_prediction_correlations,
+                    "Employment: correlation of predicted probabilities (test set)")
+```
+
+```{r}
+#| label: Income Correlation Heatmap
+#| fig-width: 7
+#| fig-height: 5.5
+
+correlation_heatmap(income_prediction_correlations,
+                    "Income: correlation of predicted log salary (test set)")
+```
+
+The same comparison as a table, for every pair of employment models. It adds the Spearman (rank) correlation, which matches what AUC measures (how the models *rank* people), and two measures of agreement on the final Employed/Unemployed classification at each model's tuned threshold: the share of test people given the same class, and **Cohen's kappa**, which is that agreement corrected for the agreement expected by chance (0 = no better than chance, 1 = identical; 0.6–0.8 is usually read as substantial agreement).
+
+```{r}
+#| label: Model Agreement Table
+
+employment_classes <- sapply(employment_models, function(m) {
+  employment_test_predictions[[m]] >= employment_thresholds$threshold[employment_thresholds$model == m]
+})
+
+bind_rows(lapply(combn(employment_models, 2, simplify = FALSE), function(pair) {
+  class_1 <- employment_classes[, pair[1]]
+  class_2 <- employment_classes[, pair[2]]
+  observed_agreement <- mean(class_1 == class_2)
+  chance_agreement <- mean(class_1) * mean(class_2) + (1 - mean(class_1)) * (1 - mean(class_2))
+  tibble(
+    model_1 = pair[1],
+    model_2 = pair[2],
+    pearson = cor(employment_test_predictions[[pair[1]]], employment_test_predictions[[pair[2]]]),
+    spearman = cor(employment_test_predictions[[pair[1]]], employment_test_predictions[[pair[2]]],
+                   method = "spearman"),
+    same_class = observed_agreement,
+    kappa = (observed_agreement - chance_agreement) / (1 - chance_agreement)
+  )
+})) |>
+  arrange(desc(pearson)) |>
+  mutate(across(where(is.numeric), \(x) round(x, 3)))
+```
+
+- **The selected regressions and the forests mostly make the same predictions.** For employment, the logistic regression and the random forest correlate at `r round(employment_prediction_correlations["Logistic regression", "Random forest"], 2)` and give the same class to `r round(100 * mean(employment_classes[, "Logistic regression"] == employment_classes[, "Random forest"]))`% of test people; for income, the linear regression and the forest correlate at `r round(income_prediction_correlations["Linear regression", "Random forest"], 2)`. The forests' extra flexibility finds very little that the regressions miss, which supports choosing the simpler, interpretable models (section 9.3).
+- **The decision tree agrees least with the other models**, and least of all with the baseline (`r round(employment_prediction_correlations["Decision tree", "Baseline"], 2)`). It sorts everyone into only `r sum(employment_tree_tuned$frame$var == "<leaf>")` groups, so it loses the finer differences between people that the other models use, which matches its lower AUC.
+- **The baseline differs clearly from the full models** (correlations of `r round(employment_prediction_correlations["Baseline", "Logistic regression"], 2)` with the logistic regression and `r round(employment_prediction_correlations["Baseline", "Random forest"], 2)` with the forest). That difference is the information that education, digital access and the household predictors add beyond who and where a person is.
+- **The income models agree with each other much more than with the actual salaries**, which they correlate with at only about `r round(income_prediction_correlations["Linear regression", "Actual log salary"], 2)`. All of them capture the same average differences between groups and miss the same individual variation: the "about 30% explained" result from section 7.7 seen from another angle.
+
+# 8. The education × internet interaction
+
+The Milestone 1 and 2 technical success criteria require the interaction to be tested with a likelihood-ratio test at α = 0.05, reported as an odds ratio **and** as predicted probabilities for each education × internet group, and checked with at least two modelling approaches.
+
+## 8.1 Likelihood-ratio tests
+
+`regTermTest()` compares each regression with and without the interaction term. With `method = "LRT"` it gives the Rao-Scott likelihood-ratio test, which adjusts the ordinary likelihood-ratio test for the survey weights and household clustering.
+
+```{r}
+#| label: Interaction LRT
+
+employment_lrt <- regTermTest(employment_logistic, ~ matric_plus:any_home_internet, method = "LRT")
+income_lrt <- regTermTest(income_linear, ~ matric_plus:any_home_internet, method = "LRT")
+
+tibble(
+  model = c("Employment (logistic regression)", "Income (linear regression)"),
+  interaction_effect = c(
+    paste0("Odds ratio ", round(exp(coef(employment_logistic)["matric_plus:any_home_internet"]), 3)),
+    paste0(round(100 * (exp(coef(income_linear)["matric_plus:any_home_internet"]) - 1), 1), "% salary difference")
+  ),
+  lrt_p_value = c(employment_lrt$p, income_lrt$p),
+  significant_at_0.05 = lrt_p_value < 0.05
+) |>
+  mutate(lrt_p_value = format.pval(lrt_p_value, digits = 3, eps = 0.0001))
+```
+
+## 8.2 Predicted probabilities for each group, from every model
+
+An odds ratio is hard to explain to a non-technical reader, so each model's predictions are also turned into the average probability of employment for the four education × internet groups. For each group, every training person is given that group's `matric_plus` and `any_home_internet` values while all their other characteristics stay the same, and the predictions are averaged using `person_weight`. The groups then differ only in education and internet access.
+
+The **interaction on the probability scale** is the extra gain from having both: (both − internet only) − (matric only − neither). A positive value means the two reinforce each other (complements).
+
+```{r}
+#| label: Group Probabilities
+
+group_average <- function(predict_function, data) {
+  expand_grid(matric_plus = 0:1, any_home_internet = 0:1) |>
+    rowwise() |>
+    mutate(probability = {
+      scenario <- data
+      scenario$matric_plus <- matric_plus
+      scenario$any_home_internet <- any_home_internet
+      weighted.mean(predict_function(scenario), data$person_weight)
+    }) |>
+    ungroup()
+}
+
+group_probabilities <- bind_rows(
+  group_average(\(d) as.numeric(predict(employment_logistic, d, type = "response")), model_train) |>
+    mutate(model = "Logistic regression"),
+  group_average(\(d) predict(employment_tree_tuned, d, type = "prob")[, "Employed"], model_train) |>
+    mutate(model = "Decision tree"),
+  group_average(\(d) predict(employment_forest_tuned, d)$predictions[, "Employed"], model_train) |>
+    mutate(model = "Random forest")
+) |>
+  mutate(group = case_when(
+    matric_plus == 0 & any_home_internet == 0 ~ "Neither",
+    matric_plus == 1 & any_home_internet == 0 ~ "Matric only",
+    matric_plus == 0 & any_home_internet == 1 ~ "Internet only",
+    TRUE ~ "Both"
+  ))
+
+group_probability_table <- group_probabilities |>
+  select(model, group, probability) |>
+  pivot_wider(names_from = group, values_from = probability) |>
+  mutate(interaction_on_probability_scale = (Both - `Internet only`) - (`Matric only` - Neither))
+
+group_probability_table |>
+  mutate(across(where(is.numeric), \(x) round(x, 3)))
+```
+
+```{r}
+#| label: Group Probability Plot
+#| fig-width: 8
+#| fig-height: 4.5
+
+group_probabilities |>
+  mutate(
+    Matric = if_else(matric_plus == 1, "Matric or higher", "Below matric"),
+    Internet = if_else(any_home_internet == 1, "Home internet", "No home internet")
+  ) |>
+  ggplot(aes(x = Internet, y = probability, colour = Matric, group = Matric)) +
+  geom_point(size = 3) +
+  geom_line() +
+  facet_wrap(~model) +
+  labs(title = "Average predicted probability of employment by education and internet access",
+       x = NULL, y = "Predicted probability of employment", colour = NULL) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+Non-parallel lines mean the internet gap differs by education level, which is the interaction.
+
+The logistic regression and the random forest agree on the **direction**: in both, people with matric gain more from home internet than people without matric, so the two go together as complements. The forest's interaction is smaller (`r round(group_probability_table$interaction_on_probability_scale[group_probability_table$model == "Random forest"], 3)` against `r round(group_probability_table$interaction_on_probability_scale[group_probability_table$model == "Logistic regression"], 3)` on the probability scale). The forest was not told about the interaction and found the same pattern on its own, but its estimate is also shrunk by averaging many trees that often do not split on these two predictors. The decision tree gives the same probability to all four groups because it never splits on education or internet access.
+
+## 8.3 Do the tree-based models use education and internet access?
+
+```{r}
+#| label: Tree and Forest Use of Key Predictors
+
+tree_variables <- unique(as.character(employment_tree_tuned$frame$var[employment_tree_tuned$frame$var != "<leaf>"]))
+
+forest_importance <- tibble(
+  predictor = names(importance(employment_forest_tuned)),
+  permutation_importance = importance(employment_forest_tuned)
+) |>
+  arrange(desc(permutation_importance)) |>
+  mutate(rank = row_number())
+
+tibble(
+  check = c("Tuned tree splits on matric_plus", "Tuned tree splits on any_home_internet",
+            "Forest importance rank of matric_plus (of 15)", "Forest importance rank of any_home_internet (of 15)"),
+  value = c(
+    as.character("matric_plus" %in% tree_variables),
+    as.character("any_home_internet" %in% tree_variables),
+    as.character(forest_importance$rank[forest_importance$predictor == "matric_plus"]),
+    as.character(forest_importance$rank[forest_importance$predictor == "any_home_internet"])
+  )
+)
+
+forest_importance |> mutate(permutation_importance = signif(permutation_importance, 3))
+```
+
+Age, household size and the device predictors drive the tree-based models' predictions far more than education or home internet. Two reasons, which are about the data rather than a fault in the models:
+
+- **Little variation in internet access.** About 85% of the labour force lives in a household with internet access, so splitting on it separates only a small group.
+- **Overlap with the devices.** Almost everyone with home internet also has a smartphone in the household (section 8.4), so once a tree has split on `smartphone_access`, `any_home_internet` adds little.
+
+Low importance does not mean internet access is unrelated to employment. It means that, for *predicting* employment, other predictors carry the same information. Whether internet access is *associated* with employment, holding the other predictors fixed, is what the regression's coefficients and the likelihood-ratio test answer.
+
+## 8.4 Sensitivity check: without the device predictors
+
+`has_computer` and `smartphone_access` are strongly linked to home internet: almost everyone with home internet also has a smartphone in the household. They are in the main model as controls for other kinds of digital access and for household wealth, but they may also absorb part of the internet effect, and employment can pay for devices (reverse direction). The logistic regression is therefore refitted without them to see whether the conclusions depend on this choice.
+
+```{r}
+#| label: Sensitivity Without Devices
+
+employment_logistic_no_devices <- svyglm(
+  update(employment_regression_formula, . ~ . - has_computer - smartphone_access),
+  design = svydesign(ids = ~household_id, weights = ~person_weight, data = model_train),
+  family = quasibinomial()
+)
+
+key_terms <- c("matric_plus", "any_home_internet", "matric_plus:any_home_internet")
+
+odds_ratio_table <- function(model, label) {
+  estimates <- coef(model)[key_terms]
+  limits <- confint(model)[key_terms, ]
+  tibble(specification = label, term = key_terms, odds_ratio = exp(estimates),
+         ci_lower = exp(limits[, 1]), ci_upper = exp(limits[, 2]))
+}
+
+bind_rows(
+  odds_ratio_table(employment_logistic, "Main model (with devices)"),
+  odds_ratio_table(employment_logistic_no_devices, "Without has_computer and smartphone_access")
+) |>
+  mutate(across(odds_ratio:ci_upper, \(x) round(x, 3)))
+
+tibble(
+  specification = c("Main model (with devices)", "Without has_computer and smartphone_access"),
+  interaction_lrt_p_value = c(
+    employment_lrt$p,
+    regTermTest(employment_logistic_no_devices, ~ matric_plus:any_home_internet, method = "LRT")$p
+  )
+) |>
+  mutate(interaction_lrt_p_value = format.pval(interaction_lrt_p_value, digits = 3, eps = 0.0001))
+```
+
+The **interaction** hardly changes (odds ratio about 1.29 with the devices and 1.28 without), and it is significant at α = 0.05 in both, so the complements finding does not depend on whether the devices are controlled for. The **main effects** do change: without the devices, both matric and home internet are clearly associated with higher odds of employment on their own. With the devices, the internet main effect is small and not significant, because `smartphone_access` carries most of the same information. Which version is reported as "the" internet effect is a modelling-strategy question for the report; the interaction conclusion is the same either way.
+
+# 9. Model comparison and selection
+
+## 9.1 Employment comparison matrix
+
+```{r}
+#| label: Employment Comparison Matrix
+
+employment_cv_auc <- tibble(
+  model = employment_models,
+  cv_auc = c(
+    mean(fold_auc(model_train$employed, baseline_oof, employment_fold_id)),
+    mean(fold_auc(model_train$employed, logistic_oof, employment_fold_id)),
+    tree_selected$mean_cv_auc,
+    forest_selected$mean_cv_auc
+  )
+)
+
+employment_comparison <- employment_test_metrics |>
+  filter(weighting == "Unweighted") |>
+  select(model, auc, auc_lower, auc_upper, balanced_accuracy, sensitivity, specificity, f1, brier) |>
+  left_join(employment_cv_auc, by = "model") |>
+  mutate(
+    auc_gain_over_baseline = auc - auc[model == "Baseline"],
+    meets_auc_0.70 = if_else(auc >= 0.70, "Yes", "No"),
+    test_auc_95_ci = paste0(round(auc_lower, 3), "–", round(auc_upper, 3))
+  ) |>
+  left_join(
+    tibble(
+      model = employment_models,
+      interpretability = c("High (odds ratios)", "High (odds ratios)", "High (if-then rules)", "Low (black box)"),
+      tests_interaction = c(
+        "No (no education or internet predictors)",
+        "Yes (odds ratio and LRT)",
+        if_else("matric_plus" %in% tree_variables & "any_home_internet" %in% tree_variables,
+                "Only through its splits", "No (does not split on both)"),
+        "Indirectly (group averages)"
+      ),
+      uses_population_group_to_predict = if_else(
+        c(TRUE, TRUE, "population_group" %in% tree_variables, TRUE), "Yes", "No"
+      )
+    ),
+    by = "model"
+  )
+
+employment_comparison |>
+  select(model, cv_auc, test_auc = auc, test_auc_95_ci, auc_gain_over_baseline, meets_auc_0.70,
+         balanced_accuracy, sensitivity, specificity, f1, brier,
+         interpretability, tests_interaction, uses_population_group_to_predict) |>
+  mutate(across(where(is.numeric), \(x) round(x, 3)))
+```
+
+## 9.2 Income comparison matrix
+
+```{r}
+#| label: Income Comparison Matrix
+
+income_cv_rmse <- tibble(
+  model = income_models,
+  cv_rmse = c(
+    regression_metrics(income_train$log_salary, mean_oof)$rmse,
+    regression_metrics(income_train$log_salary, income_baseline_oof)$rmse,
+    regression_metrics(income_train$log_salary, linear_oof)$rmse,
+    income_forest_selected$mean_cv_rmse
+  )
+)
+
+income_test_metrics |>
+  filter(weighting == "Unweighted") |>
+  select(model, test_rmse = rmse, test_mae = mae, test_r_squared = r_squared) |>
+  left_join(income_cv_rmse, by = "model") |>
+  left_join(
+    tibble(
+      model = income_models,
+      interpretability = c("Trivial", "High (% differences)", "High (% differences)", "Low (black box)"),
+      tests_interaction = c("No", "No", "Yes (coefficient, LRT)", "Indirectly")
+    ),
+    by = "model"
+  ) |>
+  select(model, cv_rmse, test_rmse, test_mae, test_r_squared, interpretability, tests_interaction) |>
+  mutate(across(where(is.numeric), \(x) round(x, 3)))
+```
+
+## 9.3 Model selection
+
+```{r}
+#| label: Selection Figures
+#| echo: false
+
+# Short names for the figures quoted in the text below
+test_auc <- function(m) round(employment_comparison$auc[employment_comparison$model == m], 3)
+test_ba <- function(m) round(employment_comparison$balanced_accuracy[employment_comparison$model == m], 3)
+test_brier <- function(m) sprintf("%.3f", employment_comparison$brier[employment_comparison$model == m])
+delong_p <- function(m) format.pval(delong_results$p_value[delong_results$comparison == paste("Logistic regression vs", m)],
+                                    digits = 2, eps = 0.0001)
+income_rmse <- function(m) round(income_test_metrics$rmse[income_test_metrics$model == m & income_test_metrics$weighting == "Unweighted"], 3)
+income_r2 <- function(m) round(income_test_metrics$r_squared[income_test_metrics$model == m & income_test_metrics$weighting == "Unweighted"], 3)
+```
+
+The brief's key principle is that the highest-scoring model is not automatically the best one. The selection below therefore weighs the evidence in sections 7–8 against what each model has to deliver: an answer to Treasury's complements-or-substitutes question (Milestone 1 success criteria 1, 2 and 4), acceptable performance on the held-out test set (criterion 3), and probabilities that can be shown in a deployed app.
+
+**Employment: the survey-weighted logistic regression is selected.**
+
+- **It meets the performance criterion.** Its test AUC is `r test_auc("Logistic regression")`, above the 0.70 threshold set in Milestone 2 and clearly above the demographics-only baseline (`r test_auc("Baseline")`, DeLong p `r delong_p("Baseline")`). Education, digital access and the household predictors therefore add real predictive information beyond who and where a person is.
+- **It gives up little against the best-scoring model.** The random forest has the highest test AUC (`r test_auc("Random forest")`). The difference of `r round(test_auc("Random forest") - test_auc("Logistic regression"), 3)` is statistically detectable (DeLong p `r delong_p("Random forest")`, which is somewhat too small because household members are not independent), but it is small in practice: balanced accuracy is `r test_ba("Logistic regression")` against `r test_ba("Random forest")`, and the Brier scores are `r test_brier("Logistic regression")` and `r test_brier("Random forest")`. Both are well calibrated (section 7.5).
+- **It is the only model that answers the business question directly.** It estimates the education × internet interaction as an odds ratio (`r round(exp(coef(employment_logistic)["matric_plus:any_home_internet"]), 2)`) with a likelihood-ratio test (p = `r format.pval(employment_lrt$p, digits = 2)`), as the success criteria require, and the survey weights make that estimate describe the South African labour force. The forest can only show the interaction indirectly, through group averages.
+- **Its result is robust.** The random forest, which was not told about the interaction, finds the same complements pattern (section 8.2), and the interaction barely changes when the device predictors are removed (section 8.4). This is the check across a second modelling approach that success criterion 4 requires.
+- **It is easier to deploy and explain.** Every prediction can be traced to odds ratios that a policy stakeholder can read, and a regression is small and fast to score in a Shiny app.
+
+The **random forest** is kept as the predictive benchmark: it shows that a flexible model gains only about `r round(test_auc("Random forest") - test_auc("Logistic regression"), 2)` AUC over the logistic regression, and its predictions correlate with the logistic regression's at `r round(employment_prediction_correlations["Logistic regression", "Random forest"], 2)` (section 7.9), which supports using the simpler model.
+
+The **decision tree** is not selected. Its test AUC (`r test_auc("Decision tree")`) is below the demographics-only baseline, and it never splits on education or internet access, so it cannot serve as the readable check of the interaction it was chosen for. That role is filled by the random forest instead.
+
+**Income: the survey-weighted linear regression is selected.** The random forest predicts slightly better (test RMSE `r income_rmse("Random forest")` against `r income_rmse("Linear regression")`, R² `r income_r2("Random forest")` against `r income_r2("Linear regression")`), a difference of about 1% in RMSE. That is too small to outweigh the linear regression's advantages: it reports the salary differences as percentages with confidence intervals, it uses the survey weights, and its residuals behave acceptably (section 7.8). Its answer to the research question is that the interaction is **not** significant (likelihood-ratio p = `r format.pval(income_lrt$p, digits = 2)`): among people who report a salary, there is no evidence that home internet changes the salary premium for matric. Both models explain only about 30% of the variation in log salary, so the income results remain exploratory, as planned in Milestone 1.
+
+**Limits that carry into the business and ethical evaluation (Tasks 3 and 4).**
+
+- The classifications are much less reliable for some groups (section 7.6): with one threshold, unemployed people in the Indian/Asian and White groups are nearly always predicted Employed, and many employed people in traditional areas are predicted Unemployed. The selected model is suited to estimating **group-level** patterns and "what-if" scenarios, not to making decisions about individuals.
+- All results are associations from one 2024 cross-section. The odds ratios describe how employment differs between groups, not what would happen if a person gained matric or internet access.
+- The DeLong tests and the ROC confidence intervals treat people as independent, so they slightly understate the uncertainty.
+
+# 10. Reproducibility
+
+Every random step uses seed 67: the cross-validation folds (`set.seed(67)` before `caret::groupKFold()`) and every forest (`seed = 67` in `ranger()`). Rerunning this file therefore gives the same folds, the same tuned settings and the same test results. With the seed set, `ranger` gives identical forests whatever number of processor threads it uses, so the results do not depend on the computer's number of cores. The decision tree and the regressions have no random steps.
+
+The files this notebook produces:
+
+| File | Contents |
+|----|----|
+| `Models/employment_tree_tuned.rds` | Tuned decision tree |
+| `Models/employment_forest_tuned.rds` | Tuned employment random forest |
+| `Models/employment_baseline.rds` | Demographics-only employment baseline |
+| `Models/income_forest_tuned.rds` | Tuned income random forest |
+| `Models/income_baseline.rds` | Demographics-only income baseline |
+| `Models/employment_thresholds.csv` | The classification threshold of each employment model |
+
+The selected models, `employment_logistic.rds` and `income_linear.rds`, were saved by the modelling notebooks and are not changed here.
+
+The package versions used:
+
+```{r}
+#| label: Session Info
+
+sessionInfo()
+```
