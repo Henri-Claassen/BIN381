@@ -1,0 +1,5 @@
+model,threshold
+Baseline,0.6736606521019555
+Logistic regression,0.6391893086321168
+Decision tree,0.6155607310622508
+Random forest,0.6540354527721071
