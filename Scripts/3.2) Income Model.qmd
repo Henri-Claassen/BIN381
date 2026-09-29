@@ -18,9 +18,31 @@ execute:
 
 ## About this file
 
-This file covers model selection and implementation for the **income question** (research area D). It follows the same structure as `Employment Model.qmd`: it restates the question, chooses the candidate models, explains why each one was chosen and fits them to the training data.
+This file covers model selection and implementation for the **income question** (research area D). It follows the same structure as `3.1) Employment Model.qmd`: it restates the question, chooses the candidate models, explains why each one was chosen and fits them to the training data.
 
 As with the employment models, **the test set is not used here** and no parameters are tuned. Each model is fitted once with documented starting parameters and saved to `Models/`, for tuning and evaluation in the evaluation notebook. The reasoning is also written up in `Model Choices.docx`.
+
+## How this notebook works
+
+The steps are the same as in `3.1) Employment Model.qmd`:
+
+1. **Load the shared setup** with `source("../R/model_preparation.R")`, which gives the notebook the predictor lists, the formulas and `prepare_income_data()`.
+2. **Prepare the training data** with `prepare_income_data()`, which reads `income_train.csv` the same way in every notebook (section 2.1).
+3. **Fit two models** on the same rows (sections 4–5). Parameters that work as in the employment models are only briefly commented here; the differences are explained in full.
+4. **Save** both models to `Models/` and check that they reload with identical predictions (section 6).
+5. `3.3) Model Evaluation.qmd` then tunes and tests them.
+
+| Model | Function | What fitting does | What comes out |
+|----|----|----|----|
+| Linear regression | `survey::svyglm()` | Finds the coefficients that make the predicted `log_salary` as close as possible to the actual values (least squares), using the survey weights | One coefficient per predictor, readable as a percentage difference in salary |
+| Random forest | `ranger::ranger()` | Grows 500 regression trees on random resamples and averages their predicted `log_salary` | Predicted `log_salary`, and a ranking of how much each predictor is used |
+
+**Formulas.** The `+` and `*` work exactly as explained with the four-group tables in `3.1) Employment Model.qmd` (and in `R/model_preparation.R`), but the outcome is salary instead of employment:
+
+- **With `+`**, the salary difference that goes with home internet is forced to be the same for people with and without matric.
+- **With `*`**, the regression adds a fourth number for people with **both** matric and home internet. Above zero means the salary premium for matric is larger in connected households (complements); below zero means it is smaller (substitutes).
+
+The linear regression uses `matric_plus * any_home_internet` and `+` for the six controls. The random forest uses `+` only, because its trees find interactions themselves.
 
 ## Loading the packages we need
 
@@ -169,22 +191,20 @@ Parameter choices: `family = gaussian()` (ordinary linear regression), with the 
 ```{r}
 #| label: Fit Linear Regression
 
-# Survey design: people are clustered in households and each person has a survey weight
+# Survey design, as in the employment model: households as clusters, person_weight as the survey weight
 income_design <- svydesign(
   ids = ~household_id,
   weights = ~person_weight,
   data = income_train
 )
 
-# The formula comes from R/model_preparation.R:
-# log_salary ~ matric_plus * any_home_internet + the 6 control predictors
 income_linear <- svyglm(
-  income_regression_formula,
+  income_regression_formula, # log_salary ~ matric_plus * any_home_internet + the 6 controls (R/model_preparation.R)
   design = income_design,
-  family = gaussian()
+  family = gaussian()        # ordinary linear regression: the outcome is a number, not yes/no
 )
 
-income_regression_formula
+income_regression_formula # prints the formula in full
 ```
 
 ## 4.3 Fitted coefficients
@@ -249,18 +269,18 @@ Survey weights are not used, for the reason given in the employment model: `rang
 ```{r}
 #| label: Fit Random Forest
 
-# Same 8 predictors as the linear regression, without an interaction term: the
-# forest finds interactions itself. household_id and person_weight are not used.
+# Works like the employment forest; only the settings that differ are explained in full
 income_forest <- ranger(
-  income_tree_formula,
+  income_tree_formula,                 # log_salary ~ the same 8 predictors joined with +
   data = income_train,
-  num.trees = 500,
-  mtry = 2,
-  min.node.size = 5,
-  respect.unordered.factors = "order",
-  importance = "permutation",
-  seed = 67
+  num.trees = 500,                     # as in the employment forest
+  mtry = 2,                            # predictors each split may choose from: one third of 8, the standard for regression
+  min.node.size = 5,                   # smallest group a tree may end in: the standard for regression forests
+  respect.unordered.factors = "order", # categories sorted by average salary (not share employed) before splitting
+  importance = "permutation",          # as in the employment forest
+  seed = 67                            # as in the employment forest
 )
+# No probability = TRUE: with a numeric outcome the forest averages the trees' predicted log_salary
 ```
 
 ## 5.3 Variable importance
