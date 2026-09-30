@@ -51,9 +51,25 @@ BIN381/
 ├── README.md
 │
 ├── Scripts/                          Quarto notebooks (run in this order)
-│   ├── EDA.qmd                       Milestone 1: data inspection, EDA and data-quality checks
-│   ├── Data Preprocessing.qmd        Milestone 2: cleaning, integration, feature engineering
-│   └── Train-Test Split.qmd          Milestone 2: target, class balance, household-grouped split
+│   ├── 1) EDA.qmd                    Milestone 1: data inspection, EDA and data-quality checks
+│   ├── 2.1) Data Preprocessing.qmd   Milestone 2: cleaning, integration, feature engineering
+│   ├── 2.2) Train-Test Split.qmd     Milestone 2: target, class balance, household-grouped split
+│   ├── 3.1) Employment Model.qmd     Milestone 3: logistic regression, decision tree, random forest
+│   ├── 3.2) Income Model.qmd         Milestone 3: linear regression, random forest
+│   ├── 3.3) Model Evaluation.qmd     Milestone 3: tuning, test-set evaluation, model selection
+│   └── 4) Deployment Preparation.qmd Milestone 3: deployment strategy, builds App/app_data.rds
+│
+├── R/                                Shared R code, sourced by the notebooks and the app
+│   ├── model_preparation.R           Reads and prepares data the same way everywhere; model formulas
+│   ├── deployment_model.R            The slim model the app predicts with
+│   ├── validate_input.R              Checks uploaded data; defines the app's data format
+│   └── monitoring.R                  Accuracy measures, drift checks and monitoring thresholds
+│
+├── Models/                           Fitted models (.rds) and classification thresholds
+│
+├── App/                              Shiny app (deployment)
+│   ├── app.R                         The app
+│   └── app_data.rds                  What the app loads: slim model and aggregated tables only
 │
 ├── Datasets/
 │   ├── D01_…csv – D11_…csv           Original Stats SA files (read only, never modified)
@@ -81,9 +97,11 @@ BIN381/
 │
 ├── Rendered Documentation/           Rendered notebook output (code, results, verification)
 │   ├── EDA.html / EDA.pdf
-│   └── Milestone 2/
-│       ├── Data-Preprocessing.pdf
-│       └── Train-Test-Split.pdf
+│   ├── Milestone 2/
+│   │   ├── Data-Preprocessing.pdf
+│   │   └── Train-Test-Split.pdf
+│   └── Milestone 3/                  Employment Model, Income Model, Model Evaluation and
+│                                     Deployment Preparation (.html)
 │
 └── Power Bi/
     ├── Initial Power Bi.pbix         Milestone 1 exploratory dashboard
@@ -97,14 +115,28 @@ BIN381/
 1. **Open `BIN381.Rproj`** in RStudio, so relative paths such as `../Datasets/` resolve correctly.
 2. **Install the packages** (once):
    ```r
-   install.packages(c("tidyverse", "janitor", "skimr", "visdat"))
+   install.packages(c("tidyverse", "janitor", "skimr", "visdat", "survey", "rpart", "rpart.plot",
+                      "ranger", "pROC", "caret", "shiny", "bslib"))
    ```
    `dplyr` 1.1.0 or newer is required: the joins use its `relationship` and `unmatched` checks.
 3. **Run the notebooks in order:**
-   1. `Scripts/Data Preprocessing.qmd`: reads the original files and writes `Datasets/Cleaned/` and `Datasets/Analytical/` (`analytical_dataset.csv`, `model_data.csv`, `income_data.csv`).
-   2. `Scripts/Train-Test Split.qmd`: reads `model_data.csv` and `income_data.csv` and writes the four training and test files.
+   1. `Scripts/2.1) Data Preprocessing.qmd`: reads the original files and writes `Datasets/Cleaned/` and `Datasets/Analytical/` (`analytical_dataset.csv`, `model_data.csv`, `income_data.csv`).
+   2. `Scripts/2.2) Train-Test Split.qmd`: reads `model_data.csv` and `income_data.csv` and writes the four training and test files.
+   3. `Scripts/3.1) Employment Model.qmd` and `Scripts/3.2) Income Model.qmd`: fit the candidate models on the training files and save them to `Models/`.
+   4. `Scripts/3.3) Model Evaluation.qmd`: tunes the models, evaluates them on the test files and selects the final models.
+   5. `Scripts/4) Deployment Preparation.qmd`: builds `App/app_data.rds` for the Shiny app.
 
-   Each notebook reads from disk, so either can be rerun on its own once its inputs exist. The split uses `set.seed(67)`, so reruns produce identical files. Rendering to PDF additionally needs a LaTeX installation (e.g. `quarto install tinytex`).
+   Each notebook reads from disk, so it can be rerun on its own once its inputs exist. Every random step uses seed 67, so reruns produce identical files and models. Rendering to PDF additionally needs a LaTeX installation (e.g. `quarto install tinytex`).
+
+### Running the Shiny app
+
+With `BIN381.Rproj` open, run:
+
+```r
+shiny::runApp("App")
+```
+
+The app has five pages: an overview of the findings, the predicted employment rates of the four matric × internet groups, province scenarios, a page to validate, score and monitor new data (upload `Datasets/Analytical/model_test.csv` for a working example), and a model card. It loads only `App/app_data.rds`, which holds the slim model and aggregated tables, never survey microdata. It shows results for groups of people only, never for individuals.
 
 ### Reading the output files
 
@@ -124,7 +156,7 @@ BIN381/
 |---|---|---|
 | 1. Business and Data Understanding | Business understanding, data understanding | ✅ Complete |
 | 2. Data Preprocessing | Data preparation | ✅ Complete |
-| 3. Modelling, Evaluation and Deployment | Modelling, evaluation, deployment (Shiny) | ⏳ Upcoming |
+| 3. Modelling, Evaluation and Deployment | Modelling, evaluation, deployment (Shiny) | 🔄 In progress |
 | 4. Final Report and Presentation | Synthesis across all phases | ⏳ Upcoming |
 
 ---
