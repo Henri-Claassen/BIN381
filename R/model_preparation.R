@@ -160,13 +160,23 @@ prepare_employment_data <- function(path) {
     col_types = cols(household_id = col_character()), # 18 digits: read as text
     show_col_types = FALSE
   ) |>
+    prepare_employment_frame()
+}
+
+# The preparation steps themselves, for data that has already been read in. The
+# Shiny app uses this directly: it reads and checks an uploaded file first
+# (R/validate_input.R) and then prepares it with exactly the same steps.
+prepare_employment_frame <- function(data) {
+  data |>
     apply_category_levels() |>
     # People with Other/unknown education have no matric_plus value. They are
     # left out (1.7% of model_data) so that every model is fitted and compared on
     # exactly the same people, without imputing an education level.
     filter(!is.na(matric_plus)) |>
-    # household_id and person_weight are design columns, not predictors
-    select(household_id, person_weight, employed, all_of(employment_predictors))
+    # household_id and person_weight are design columns, not predictors. any_of()
+    # keeps them and the outcome (employed) when they are present, so new data
+    # without an outcome column can still be prepared for prediction.
+    select(any_of(c("household_id", "person_weight", "employed")), all_of(employment_predictors))
 }
 
 # Reads income_train.csv, income_test.csv (or any file with the same columns)
