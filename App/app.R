@@ -57,20 +57,57 @@ app_data <- readRDS("app_data.rds")
 slim_model <- app_data$slim_model
 key <- app_data$key_results
 
+
 options(shiny.maxRequestSize = 50 * 1024^2) # allow uploads up to 50 MB
 
 # Formatting helpers ----------------------------------------------------------------
+# Every number on screen goes through one of these, so the wording stays consistent
 pct <- function(x, digits = 1) paste0(format(round(100 * x, digits), nsmall = digits), "%")
-change_points <- function(x, digits = 1) paste0(if_else(x >= 0, "+", "−"), format(round(abs(100 * x), digits), nsmall = digits), " points")
 num <- function(x) format(round(x), big.mark = ",", trim = TRUE)
+# A difference between two rates, as "+6.3": 6.3 more people in every 100 (percentage points)
+signed <- function(x, digits = 1) paste0(if_else(x >= 0, "+", "−"), format(round(abs(100 * x), digits), nsmall = digits, trim = TRUE))
+change_points <- function(x, digits = 1) paste0(signed(x, digits), " points")
+# The same difference spelled out, naming who is compared with whom. Every
+# "+6.3 in every 100" figure is the first group's employment rate minus the
+# second group's, so a plus sign means the first group is ahead:
+# "Of every 100 people with home internet, about 6 more have a job than of every
+# 100 people without home internet (63 more in every 1,000)."
+in_words <- function(x, group = "people with home internet", other = "people without home internet") {
+  n <- abs(100 * x)
+  direction <- if (x >= 0) "more" else "fewer"
+  if (round(10 * n) == 0) {
+    paste0("Almost no difference: ", group, " and ", other, " have a job about equally often.")
+  } else if (round(n) < 1) {
+    paste0("Of every 1,000 ", group, ", about ", round(10 * n), " ", direction, " have a job than of every 1,000 ", other, ".")
+  } else {
+    paste0("Of every 100 ", group, ", about ", round(n), " ", direction, " have a job than of every 100 ", other,
+           " (", round(10 * n), " ", direction, " in every 1,000).")
+  }
+}
 
-# Coloured label for a status, shown inside HTML tables
+# For the province scenarios the comparison is the same people at the target
+# level of home internet against today
+in_words_scenario <- function(x) {
+  n <- 100 * x
+  if (round(10 * n) == 0) return("No change: this province is already at or above the target.")
+  if (round(n) < 1) {
+    paste0("Of every 1,000 people in the labour force, about ", round(10 * n), " more would have a job at the target than have one today.")
+  } else {
+    paste0("Of every 100 people in the labour force, about ", round(n), " more would have a job at the target than have one today (",
+           round(10 * n), " more in every 1,000).")
+  }
+}
+
+# Coloured label for a status, shown inside HTML tables. The internal statuses
+# (Green / Amber / Red) are shown to users as plain words.
+status_label <- c(Green = "OK", Amber = "Investigate", Red = "Action needed", Pass = "Pass",
+                  Info = "Note", Warning = "Warning", Fail = "Problem", `Not checked` = "Not checked")
 status_badge <- function(status) {
   colour <- case_when(status %in% c("Green", "Pass") ~ "text-bg-success",
                       status %in% c("Amber", "Warning") ~ "text-bg-warning",
                       status %in% c("Red", "Fail") ~ "text-bg-danger",
                       TRUE ~ "text-bg-secondary")
-  paste0('<span class="badge ', colour, '">', status, "</span>")
+  paste0('<span class="badge ', colour, '">', status_label[status], "</span>")
 }
 
 # Tables with HTML inside them (badges); sanitize.text.function = identity stops
@@ -78,6 +115,62 @@ status_badge <- function(status) {
 html_table <- function(expr, ...) {
   renderTable(expr, sanitize.text.function = identity, striped = TRUE, spacing = "s", width = "100%", ...)
 }
+
+# A highlighted box that states the answer of a page in one or two sentences
+answer_box <- function(title, ..., colour = "primary") {
+  div(class = paste0("alert alert-", colour, " mb-3"), style = "font-size: 1.08rem;",
+      div(class = "fw-bold mb-1", title), ...)
+}
+
+# The four group rates of one filter combination (a row of group_cells), the
+# internet gaps and the difference between the gaps, each with a 95% confidence
+# interval ("likely range"). Each interval comes from the stored gradient and the
+# coefficient covariance (delta method): estimate ± 1.96 standard errors.
+estimates_for_cell <- function(row) {
+  cell <- app_data$group_cells[row, ]
+  gradient <- function(s) app_data$group_gradients[[s]][row, ]
+  with_interval <- function(estimate, grad) {
+    se <- delta_method_se(slim_model, grad)
+    tibble(estimate = estimate, lower = estimate - 1.96 * se, upper = estimate + 1.96 * se)
+  }
+  list(
+    people = cell$people,
+    groups = bind_rows(
+      with_interval(cell$p00, gradient("00")) |> mutate(education = "Below matric", internet = "No home internet"),
+      with_interval(cell$p01, gradient("01")) |> mutate(education = "Below matric", internet = "Home internet"),
+      with_interval(cell$p10, gradient("10")) |> mutate(education = "Matric or higher", internet = "No home internet"),
+      with_interval(cell$p11, gradient("11")) |> mutate(education = "Matric or higher", internet = "Home internet")
+    ),
+    gap_below = with_interval(cell$p01 - cell$p00, gradient("01") - gradient("00")),
+    gap_matric = with_interval(cell$p11 - cell$p10, gradient("11") - gradient("10")),
+    interaction = with_interval((cell$p11 - cell$p10) - (cell$p01 - cell$p00),
+                                (gradient("11") - gradient("10")) - (gradient("01") - gradient("00")))
+  )
+}
+
+# The national figures (every filter on "All"), used on the Overview page
+national <- estimates_for_cell(which(
+  app_data$group_cells$province == "All provinces" & app_data$group_cells$settlement_type == "All settlement types" &
+    app_data$group_cells$age_band == "All ages" & app_data$group_cells$sex == "Both sexes"
+))
+national_rate <- function(education, internet) {
+  national$groups$estimate[national$groups$education == education & national$groups$internet == internet]
+}
+
+# "women aged 25-34 in metro urban areas in Gauteng": the chosen filters as words
+describe_group <- function(province, settlement, age_band, sex) {
+  paste0(
+    switch(sex, "Male" = "men", "Female" = "women", "people"),
+    if (age_band == "All ages") "" else paste0(" aged ", age_band),
+    if (settlement == "All settlement types") "" else if (settlement == "Farms") " on farms" else paste0(" in ", tolower(settlement), " areas"),
+    if (province == "All provinces") " in South Africa" else paste0(" in ", province)
+  )
+}
+
+# Plain names of the variables in the drift check
+drift_names <- c(province = "provinces", settlement_type = "settlement types", population_group = "population groups",
+                 age_band = "ages", matric_plus = "education (matric or not)", any_home_internet = "home internet access",
+                 smartphone_access = "smartphone access")
 
 # A small example file users can download and fill in. The values are made up.
 template_file <- tribble(
@@ -113,6 +206,11 @@ format_table <- input_columns |>
 # ================================================================================
 # User interface
 # ================================================================================
+# Every page follows the same pattern, so a reader never has to search:
+#   1. the answer in plain words at the top,
+#   2. the key numbers, each with a one-line explanation in everyday units,
+#   3. the detail (charts, tables), and
+#   4. the technical terms last, for analysts.
 
 ui <- page_navbar(
   title = "Education, Internet & Employment",
@@ -123,69 +221,112 @@ ui <- page_navbar(
   # Page 1: Overview -----------------------------------------------------------------
   nav_panel(
     "Overview",
+    answer_box(
+      "The question: should government fund internet access and education together, or can one stand in for the other?",
+      p(class = "mb-1", strong("The short answer: fund them together."),
+        "People who have", strong("both"), "matric and home internet are employed more often than you would expect from either one on its own.",
+        "Home internet goes with a clear employment advantage for people who have matric, and with little or no advantage for people who do not.")
+    ),
+    h5("The evidence in three numbers"),
     layout_columns(
       col_widths = c(4, 4, 4),
       value_box(
-        title = "Education and home internet",
-        value = "Reinforce each other",
+        title = "With matric, home internet goes with",
+        value = paste0(signed(national$gap_matric$estimate), " in every 100"),
         theme = "primary",
-        p(paste0("Odds ratio ", round(key$odds_ratio, 2), " (95% CI ", round(key$odds_ratio_lower, 2), "–",
-                 round(key$odds_ratio_upper, 2), "), p = ", round(key$employment_p, 3)))
+        p(strong(in_words(national$gap_matric$estimate, "people with matric who have home internet", "people with matric who do not"))),
+        p(class = "small", paste0("Among people with matric, ", pct(national_rate("Matric or higher", "Home internet")),
+                                  " of those with home internet have a job, against ",
+                                  pct(national_rate("Matric or higher", "No home internet")), " of those without it."))
       ),
       value_box(
-        title = "How well the model ranks people (AUC)",
-        value = round(app_data$baseline$auc, 3),
+        title = "Without matric, home internet goes with",
+        value = paste0(signed(national$gap_below$estimate), " in every 100"),
         theme = "secondary",
-        p("On the test set. 0.5 = coin toss, 1 = perfect. Above the 0.70 minimum set in Milestone 2.")
+        p(strong(in_words(national$gap_below$estimate, "people without matric who have home internet", "people without matric who do not"))),
+        p(class = "small", paste0("Among people without matric, ", pct(national_rate("Below matric", "Home internet")),
+                                  " of those with home internet have a job, against ",
+                                  pct(national_rate("Below matric", "No home internet")), " of those without it. ",
+                                  if (national$gap_below$lower < 0) "A difference this small could be chance." else ""))
       ),
       value_box(
-        title = "People behind the results",
-        value = num(sum(app_data$provinces$people)),
+        title = "How sure are we that the two differ?",
+        value = if (key$employment_p < 0.05) "Confident" else "Not sure",
         theme = "secondary",
-        p("Labour force aged 15–64 in the Stats SA 2024 survey data")
+        p(paste0("If internet really mattered equally with and without matric, a difference this large would show up by chance only about 1 time in ",
+                 round(1 / key$employment_p), "."))
       )
     ),
     layout_columns(
       col_widths = c(7, 5),
       card(
-        card_header("What this app answers"),
-        p("National Treasury has to divide limited funding between digital-access subsidies and education programmes.",
-          "The question is whether the two", strong("reinforce"), "each other (complements) or can",
-          strong("stand in"), "for each other (substitutes)."),
-        p("The answer from the survey-weighted logistic regression: among otherwise similar people, having",
-          strong("both"), "matric and home internet goes with higher odds of employment than the two separately would suggest.",
-          paste0("The interaction's odds ratio is ", round(key$odds_ratio, 2),
-                 ": above 1 means they reinforce each other, below 1 would mean substitutes.")),
-        p("In practical terms: home internet goes with a bigger employment advantage for people with matric than for people without it.",
-          "The", strong("Education × internet"), "page shows this as predicted employment rates for any province, settlement type, age band and sex.")
+        card_header("What this means for decisions"),
+        tags$ul(
+          tags$li(strong("Pair the two investments."), paste0(
+            " The employment advantage that goes with home internet is about ",
+            round(national$gap_matric$estimate / national$gap_below$estimate), " times larger for people with matric (",
+            signed(national$gap_matric$estimate), " people in every 100) than for people without (", signed(national$gap_below$estimate),
+            " in every 100). Connectivity and education spending support each other; they are not alternatives.")),
+          tags$li(strong("Internet access on its own is not enough."), " For people without matric, home internet shows almost no employment difference."),
+          tags$li(strong("Where to look first:"), " the ", em("Province scenarios"), " page shows which provinces have the most to gain from more home internet access."),
+          tags$li(strong("Keep in mind:"), " this is a pattern in one 2024 survey. It shows what goes together, not what causes what.")
+        )
       ),
       card(
-        card_header("How to use this app"),
-        tags$ol(
-          tags$li(strong("Education × internet:"), " compare the four matric × internet groups for the people you choose."),
-          tags$li(strong("Province scenarios:"), " see what the model's association implies if more households had home internet."),
-          tags$li(strong("Check and predict new data:"), " upload survey data to validate it, get group predictions, see how accurate they are and run the monitoring checks."),
-          tags$li(strong("About the model:"), " what the model is for, how well it works for different groups, and its limits.")
+        card_header("Where to find what"),
+        tags$ul(
+          tags$li(strong("Does this hold for a specific province, age group or sex?"), " → Education × internet"),
+          tags$li(strong("What could more home internet mean for each province?"), " → Province scenarios"),
+          tags$li(strong("Does the model still work on new survey data?"), " → Check and predict new data"),
+          tags$li(strong("Can I trust the model, and what are its limits?"), " → About the model")
         )
       )
     ),
-    card(
-      card_header("Income (exploratory)"),
-      p("A second model looked at salaries of employed people who reported one.",
-        paste0("People with both matric and home internet earned about ", round(key$income_percent, 1),
-               "% more than the separate effects of matric and internet would suggest, but the 95% confidence interval runs from ",
-               round(key$income_percent_lower, 1), "% to ", round(key$income_percent_upper, 1), "% (p = ",
-               round(key$income_p, 2), ")."),
-        "There is therefore", strong("no evidence"), "that home internet changes the salary premium for matric.",
-        "Salaries are missing for many employed people, so this result is exploratory and is not part of the app's predictions.")
+    layout_columns(
+      col_widths = c(6, 6),
+      card(
+        card_header("How good is the model behind these numbers?"),
+        p(strong(paste0("Acceptable: right about ", round(100 * app_data$baseline$auc), " times out of 100.")),
+          "Shown one employed and one unemployed person it has never seen, the model picks the employed one about",
+          round(100 * app_data$baseline$auc), "times out of 100. A coin toss would get 50, a perfect model 100, and 70 was set as the minimum."),
+        p(paste0("The results are based on ", num(sum(app_data$provinces$people)),
+                 " people aged 15–64 in the labour force, from Statistics South Africa's 2024 survey.")),
+        p(class = "text-muted small mb-0", "This is good enough to describe groups of people, but not to judge individuals. See About the model.")
+      ),
+      card(
+        card_header("Does the same hold for income?"),
+        p(strong("No clear evidence."), "A second model looked at the salaries of employed people.",
+          paste0("People with both matric and home internet earned about ", round(key$income_percent), "% more than expected from the two separately, ",
+                 "but the likely range runs from ", round(key$income_percent_lower), "% to +", round(key$income_percent_upper),
+                 "%, so the true difference could easily be zero.")),
+        p(class = "text-muted small mb-0", "Many employed people did not report a salary, so this part is exploratory and is not used elsewhere in the app.")
+      )
     ),
     card(
       class = "border-warning",
       card_header("Read this before using the results"),
-      tags$ul(
+      tags$ul(class = "mb-0",
         tags$li("These are", strong("associations"), "from one 2024 survey, not proof that providing internet or education", em("causes"), "employment."),
         tags$li("The app shows results for", strong("groups of people"), "only. It must not be used to make decisions about individuals."),
-        tags$li("Groups with fewer than 50 people in the survey are not shown, because their estimates would be unreliable and could identify people.")
+        tags$li("Groups with fewer than 50 people in the survey are not shown, because their results would be unreliable and could identify people.")
+      )
+    ),
+    accordion(
+      open = FALSE,
+      accordion_panel(
+        "Technical details (for analysts)",
+        tags$ul(
+          tags$li(paste0("Model: survey-weighted logistic regression. Interaction (matric × home internet) odds ratio ",
+                         round(key$odds_ratio, 2), ", 95% confidence interval ", round(key$odds_ratio_lower, 2), "–",
+                         round(key$odds_ratio_upper, 2), ", Rao-Scott likelihood-ratio test p = ", round(key$employment_p, 3),
+                         ". An odds ratio above 1 means complements, below 1 substitutes.")),
+          tags$li(paste0("The \"in every 100\" figures are percentage-point differences between average predicted employment rates, ",
+                         "with everyone given each education and internet combination in turn and all other characteristics unchanged.")),
+          tags$li(paste0("Test-set AUC ", round(app_data$baseline$auc, 3), "; balanced accuracy ", round(app_data$baseline$balanced_accuracy, 3),
+                         "; Brier score ", round(app_data$baseline$brier, 3), ".")),
+          tags$li(paste0("Income model: interaction ", round(key$income_percent, 1), "% (95% CI ", round(key$income_percent_lower, 1),
+                         "% to ", round(key$income_percent_upper, 1), "%), p = ", round(key$income_p, 2), "."))
+        )
       )
     )
   ),
@@ -205,29 +346,37 @@ ui <- page_navbar(
         helpText("Population group is deliberately not a filter. Results average over the real mix of people in the chosen group,",
                  "so the app cannot be used to compare the employment chances of racial groups.")
       ),
+      uiOutput("group_answer"),
       card(
         card_header(textOutput("group_title")),
-        plotOutput("group_plot", height = "380px"),
+        plotOutput("group_plot", height = "360px"),
         uiOutput("group_people")
       ),
+      h5("The differences between the bars, in numbers"),
       uiOutput("group_boxes"),
       card(
         card_header("How to read this page"),
-        tags$ul(
-          tags$li(strong("Each bar"), " is the predicted share of people employed, if everyone in the chosen group had that education and internet combination and kept all their other characteristics.",
-                  " A bar of 65% means about 65 in every 100 such people are predicted to be employed. It is a rate for a group, not one person's chance."),
-          tags$li(strong("The black lines"), " are 95% confidence intervals: the range the rate plausibly lies in, given the uncertainty of the model. When the intervals of two bars overlap a lot, the difference between them is uncertain."),
-          tags$li(strong("Internet gap"), " is how much higher the predicted employment rate is with home internet than without, in percentage points."),
-          tags$li(strong("Difference between the gaps"), " is the interaction. Positive: internet goes with a bigger advantage for people with matric, so education and internet reinforce each other. Negative: a smaller advantage, so they substitute for each other.")
+        tags$ul(class = "mb-0",
+          tags$li(strong("Each bar"), " is the share of people expected to have a job, for people like the ones you chose, if they had that education and internet combination.",
+                  " A bar of 65% means about 65 of every 100. It describes a group, not one person's chance."),
+          tags$li(strong("\"+6.3 in every 100\""), " compares two groups: the dark bar (home internet) minus the light bar (no home internet).",
+                  " If 69.7% of people with home internet have a job and 63.5% of people without, the difference is about +6.3:",
+                  " of every 100 people with home internet, about 6 more have a job than of every 100 people without.",
+                  strong(" A plus sign means the group with home internet is ahead; a minus sign means it is behind."),
+                  " It compares two groups of people; it does not say that getting internet gives someone a job."),
+          tags$li(strong("Likely range"), " (the thin black lines, and the ranges in the boxes): the model cannot be exact, so this is the range the true value very probably lies in.",
+                  " If a range includes 0, the difference may not be real."),
+          tags$li(strong("The verdict"), " compares the two internet gaps. If internet goes with a clearly bigger gap for people with matric, education and internet reinforce each other.")
         )
       ),
       accordion(
         open = FALSE,
         accordion_panel(
           "How reliable are these predictions?",
-          p(paste0("Measured on the ", num(app_data$baseline$people), " people in the test set, whom the model never saw during training. ",
-                   "For the measures that need a yes/no prediction, a person counts as predicted employed when their predicted probability is at least ",
-                   round(app_data$threshold, 3), ", the threshold chosen in the evaluation to give employed and unemployed people equal importance.")),
+          p(paste0("The model was tested on ", num(app_data$baseline$people), " people it never saw while it was being built. ",
+                   "\"In short\" gives each result in everyday terms. For the rows about employed and unemployed people found, ",
+                   "a person is counted as predicted employed when the model gives them a chance of at least ",
+                   round(100 * app_data$threshold), "% (the cut-off that treats both groups equally).")),
           tableOutput("reliability_table")
         )
       )
@@ -239,32 +388,42 @@ ui <- page_navbar(
     "Province scenarios",
     layout_sidebar(
       sidebar = sidebar(
-        title = "Scenario",
+        title = "Set the scenario",
         width = 300,
         open = list(desktop = "open", mobile = "always"), # filters stay visible on narrow screens
-        sliderInput("target", "Target share of people with home internet", min = 70, max = 100, value = 95, step = 1, post = "%"),
-        helpText("Provinces already at or above the target stay as they are.",
-                 "The newly connected people are assumed to be a typical mix of the people who are not connected today.")
+        sliderInput("target", "What if this share of people had home internet?", min = 70, max = 100, value = 95, step = 1, post = "%"),
+        helpText("Move the slider to set the target. Provinces already at or above the target stay as they are.")
+      ),
+      uiOutput("scenario_answer"),
+      uiOutput("scenario_boxes"),
+      card(
+        card_header("Each province: employment rate today and at the target"),
+        plotOutput("province_plot", height = "400px"),
+        p(class = "text-muted small mb-0",
+          "Light dot: the employment rate today. Dark dot: the rate at the target. The longer the line, the more the province stands to gain.",
+          "The label compares the target with today: +3.0 in every 100 means that of every 100 people in that province's labour force, about 3 more would have a job at the target than have one today.",
+          "Provinces at the top gain the most for their size.")
       ),
       card(
-        card_header("Predicted employment rate now and at the target"),
-        plotOutput("province_plot", height = "400px")
-      ),
-      card(
-        card_header("Province figures"),
+        card_header("The figures per province"),
         tableOutput("province_table"),
-        p(class = "text-muted small",
-          "Labour force = people aged 15–64 who are employed or unemployed (with known education), estimated with the survey weights.",
-          "Employed now is the survey's actual weighted rate; Predicted now is the model's average prediction for the same people.")
+        tags$ul(class = "text-muted small mb-0",
+          tags$li(strong("People in the labour force:"), " people aged 15–64 who have a job or are looking for one."),
+          tags$li(strong("Employed today:"), " the share of them who have a job, according to the survey."),
+          tags$li(strong("Home internet today:"), " the share living in a household with fixed or mobile internet."),
+          tags$li(strong("Employed at the target:"), " the employment rate the model expects if home internet reached the target."),
+          tags$li(strong("More employed in every 100 people:"), " employed at the target minus employed today. +3.0 means that of every 100 people, about 3 more would have a job at the target than have one today."),
+          tags$li(strong("More people employed:"), " that gain turned into a rough number of people.")
+        )
       ),
       card(
         class = "border-warning",
-        card_header("What this does and does not show"),
-        p("For each person without home internet today, the model compares their predicted employment probability with and without internet, keeping everything else the same.",
-          "The scenario adds that difference for the share of people who would need to be connected to reach the target."),
-        p(strong("This is the association in today's data applied to a scenario, not a forecast of what a subsidy would achieve."),
-          "People who get internet through a subsidy may differ from people who have it today, and the survey cannot show cause and effect.",
-          "Use the scenarios to compare provinces, not to promise a number of jobs.")
+        card_header("How far can these numbers be trusted?"),
+        p(strong("They are a \"what if\", not a forecast."),
+          "The app takes the people who have no home internet today and asks the model how often similar people who do have it are employed.",
+          "It assumes the newly connected would be a typical mix of today's unconnected people."),
+        p(class = "mb-0", "People who get internet through a subsidy may differ from people who have it today, and one survey cannot prove cause and effect.",
+          strong("Use the scenarios to compare provinces and set priorities, not to promise a number of jobs."))
       )
     )
   ),
@@ -272,11 +431,17 @@ ui <- page_navbar(
   # Page 4: Check and predict new data ----------------------------------------------------
   nav_panel(
     "Check and predict new data",
+    answer_box(
+      "What this page is for",
+      p(class = "mb-0", "Upload a file of people (for example a new survey) and the app tells you, in order:",
+        strong("is the file usable"), ",", strong("what employment rate does the model predict"), ",",
+        strong("how accurate are the predictions"), ", and", strong("can the model still be trusted"), "on this data.")
+    ),
     card(
       card_header("Step 1: Prepare your file"),
       p("Upload a CSV file with one row per person in the labour force (aged 15–64, employed or unemployed).",
-        "The columns must have the names and values below, which are the same columns the model was trained on.",
-        "The easiest way to see a working example is to upload", code("Datasets/Analytical/model_test.csv"), "from the project repository."),
+        "The columns must have the names and values listed below, which are the same columns the model was built on.",
+        "To see a working example, upload", code("Datasets/Analytical/model_test.csv"), "from the project folder."),
       accordion(
         open = FALSE,
         accordion_panel(
@@ -294,7 +459,7 @@ ui <- page_navbar(
     card(
       card_header("Step 2: Upload the file"),
       fileInput("upload", NULL, accept = ".csv", buttonLabel = "Choose CSV file", width = "100%"),
-      p(class = "text-muted small", "The file is only held in memory while the app is open. It is never saved.")
+      p(class = "text-muted small mb-0", "The file is only held in memory while the app is open. It is never saved.")
     ),
     uiOutput("results")
   ),
@@ -302,67 +467,99 @@ ui <- page_navbar(
   # Page 5: About the model ---------------------------------------------------------------
   nav_panel(
     "About the model",
+    answer_box(
+      "The model in short",
+      tags$ul(class = "mb-0",
+        tags$li(strong("What it does:"), " estimates how likely people are to be employed, from their education, home internet access and background."),
+        tags$li(strong("How good it is:"), paste0(" acceptable. It ranks an employed person above an unemployed one about ",
+                                                  round(100 * app_data$baseline$auc), " times out of 100 (50 is a coin toss).")),
+        tags$li(strong("What it is for:"), " comparing groups and provinces to guide funding priorities."),
+        tags$li(strong("What it is not for:"), " decisions about individual people, or proving that internet causes employment.")
+      )
+    ),
     layout_columns(
       col_widths = c(6, 6),
       card(
         card_header("Intended use"),
         p(strong("Users:"), "National Treasury policy analysts, and the analysts who maintain the model."),
-        p(strong("Supports:"), "decisions about dividing funding between digital-access subsidies and education, by showing whether the two reinforce each other and where more home internet access is associated with the largest employment gains."),
+        p(strong("Supports:"), "decisions about dividing funding between digital-access subsidies and education, by showing whether the two reinforce each other and where more home internet access goes with the largest employment gains."),
         p(strong("Must not be used for:")),
-        tags$ul(
+        tags$ul(class = "mb-0",
           tags$li("decisions about individual people (hiring, grants, eligibility);"),
           tags$li("claims that providing internet or education", em("causes"), "employment;"),
           tags$li("comparing the employment chances of population groups.")
         )
       ),
       card(
-        card_header("The model"),
-        p("A", strong("survey-weighted logistic regression"), "(", code("survey::svyglm"), ") fitted to",
-          num(key$training_people), "people in the Stats SA 2024 survey (the training set), with households as clusters and the survey weights applied."),
-        p("It predicts the probability of being employed from matric, home internet and their interaction, plus computer and smartphone access,",
-          "age, sex, population group, province, settlement type and household composition."),
-        p("It was chosen over a decision tree and a random forest because it is the only one that estimates the education × internet interaction directly,",
-          "it performs almost as well as the random forest (test AUC 0.765 against 0.774), and its predictions can be explained.")
+        card_header("How the model works"),
+        p("It learned from", num(key$training_people), "people in the Stats SA 2024 survey how employment goes with matric, home internet and the two together,",
+          "while taking into account computer and smartphone access, age, sex, population group, province, settlement type and household make-up."),
+        p("For any group of people it then gives the share expected to be employed."),
+        p(class = "mb-0", "It was chosen over two other models (a decision tree and a random forest) because it is the only one that measures directly whether education and internet reinforce each other,",
+          "it is almost as accurate as the best of them (a ranking score of 0.765 against 0.774), and its results can be explained.",
+          span(class = "text-muted", "Technical name: survey-weighted logistic regression."))
       )
     ),
     card(
-      card_header("Performance on the test set"),
-      p(paste0("Measured on ", num(key$test_people), " people the model never saw during training. For the yes/no measures, a person counts as predicted employed when their probability is at least ",
-               round(app_data$threshold, 3), ".")),
+      card_header("How accurate is it?"),
+      p(paste0("Tested on ", num(key$test_people), " people the model never saw while it was being built. ",
+               "Read the \"In short\" column first; the \"Value\" column is the technical score.")),
       tableOutput("about_metrics"),
-      p(strong("AUC in one sentence:"), "take one employed and one unemployed person at random; the AUC is the probability that the model gives the employed person the higher predicted probability.",
-        "It is the main measure because it does not depend on the threshold or on how many people are employed.")
+      p(class = "text-muted small mb-0",
+        paste0("For the rows about people found and predictions, a person is counted as predicted employed when the model gives them a chance of at least ",
+               round(100 * app_data$threshold), "%."))
     ),
     card(
-      card_header("Performance for different groups"),
-      p("The model ranks people about equally well in every group (similar AUC). The yes/no measures differ much more, because one threshold meets groups with very different employment rates:"),
+      card_header("Does it work equally well for everyone?"),
+      p(strong("Not for individuals, which is why the app only shows groups."),
+        "The model ranks people about equally well in every group (the \"Ranking accuracy\" column is similar everywhere). But when it has to say employed or unemployed for each person, it treats groups unevenly:"),
       tags$ul(
-        tags$li("In the Indian/Asian and White groups, where over 85% are employed, the model almost never predicts unemployment (specificity 0.20 and 0.04): unemployed people in these groups are nearly always counted as employed."),
-        tags$li("In traditional areas, where about half are employed, it misses more than half of the employed people (sensitivity 0.45).")
+        tags$li("In the Indian/Asian and White groups, where more than 85 of every 100 people are employed, it almost never spots the unemployed (it finds 20% and 4% of them)."),
+        tags$li("In traditional areas, where only about half are employed, it misses more than half of the people who do have a job (it finds 45%).")
       ),
-      p("This is why the app only reports group rates and never labels individuals."),
-      tableOutput("about_subgroups")
+      tableOutput("about_subgroups"),
+      p(class = "text-muted small mb-0",
+        "Ranking accuracy: out of 100 pairs of one employed and one unemployed person, how many the model ranks correctly.",
+        "Employed found / Unemployed found: the share of each group the model identifies. Groups with few test people give less certain figures.")
     ),
     layout_columns(
       col_widths = c(6, 6),
       card(
         card_header("Limitations"),
-        tags$ul(
-          tags$li("One cross-section (2024): associations, not causes."),
-          tags$li("Education is simplified to matric or not; people with unknown education are left out (1.7%)."),
-          tags$li("The survey's primary sampling units are not available, so households are the clusters; confidence intervals may be slightly too narrow."),
-          tags$li("Small groups (Indian/Asian, farms) have few test people, so their measures are uncertain.")
+        tags$ul(class = "mb-0",
+          tags$li("One survey year (2024): it shows what goes together, not what causes what."),
+          tags$li("Education is simplified to \"matric or not\"; people with unknown education are left out (1.7%)."),
+          tags$li("The likely ranges may be slightly too narrow, because the survey's sampling areas were not available."),
+          tags$li("Small groups (Indian/Asian people, farms) have few test people, so their figures are uncertain.")
         )
       ),
       card(
-        card_header("Monitoring, retraining and retirement"),
+        card_header("When to check, retrain or retire the model"),
+        p("Every upload on the \"Check and predict new data\" page is tested against these limits:"),
         tableOutput("about_thresholds"),
-        p(strong("Retrain"), "when Stats SA releases a new survey wave or any check is red.",
-          strong("Retire"), "the model if retraining does not bring the AUC back above 0.70, if Stats SA changes the education or internet questions,",
-          "if the complements finding disappears in successive waves, or if the app is used for decisions about individuals.")
+        p(class = "mb-0", strong("Retrain"), "when Stats SA releases a new survey or any check shows \"Action needed\".",
+          strong("Retire"), "the model if retraining does not bring the ranking accuracy back above 70 out of 100, if Stats SA changes the education or internet questions,",
+          "if education and internet stop reinforcing each other in new surveys, or if the app is used for decisions about individuals.")
       )
     ),
-    p(class = "text-muted small",
+    accordion(
+      open = FALSE,
+      accordion_panel(
+        "Glossary: the terms used in this app",
+        tags$dl(
+          tags$dt("Predicted employment rate"), tags$dd("The share of a group the model expects to be employed, for example 65% = 65 of every 100 people."),
+          tags$dt("\"+6 in every 100\" (percentage points)"), tags$dd("A comparison of two groups: the first group's employment rate minus the second group's. If 70% of people with home internet have a job and 64% of people without, that is +6 in every 100: of every 100 people with home internet, six more have a job than of every 100 without (60 more in every 1,000). A plus sign means the first group is ahead, a minus sign that it is behind. On the province page the comparison is the target against today."),
+          tags$dt("Likely range (95% confidence interval)"), tags$dd("The range the true value very probably lies in. If the range of a difference includes 0, the difference may not be real."),
+          tags$dt("Reinforce each other (complements)"), tags$dd("Having both education and internet goes with more employment than the two separate advantages added together. The opposite is substitutes: one makes up for the lack of the other."),
+          tags$dt("Odds ratio"), tags$dd("The technical measure of \"reinforce\". Above 1: reinforce. Below 1: substitute. Exactly 1: no difference."),
+          tags$dt("Ranking accuracy (AUC)"), tags$dd("Shown one employed and one unemployed person, how often the model gives the employed person the higher chance. 50 out of 100 is a coin toss; 100 is perfect."),
+          tags$dt("Cut-off (threshold)"), tags$dd(paste0("The chance above which a person is counted as predicted employed (", round(100 * app_data$threshold), "%). Only used to measure accuracy, never to label a person.")),
+          tags$dt("Drift (PSI)"), tags$dd("How much the mix of people in new data differs from the data the model learned from. 0 is identical; above 0.25 is a large change."),
+          tags$dt("Labour force"), tags$dd("People aged 15–64 who are employed or looking for work.")
+        )
+      )
+    ),
+    p(class = "text-muted small mt-2",
       paste0("Model: ", app_data$built$model, ". App data built on ", app_data$built$date,
              " by Scripts/4) Deployment Preparation.qmd. Data: Statistics South Africa, 2024 survey microdata (isiBalo portal)."))
   )
@@ -376,45 +573,81 @@ server <- function(input, output, session) {
 
   # Page 2: Education x internet ------------------------------------------------------
 
-  # The row of group_cells that matches the filters
-  selected_cell <- reactive({
-    app_data$group_cells |>
-      mutate(row = row_number()) |>
-      filter(province == input$province, settlement_type == input$settlement,
-             age_band == input$age_band, sex == input$sex)
-  })
-
-  # The four group rates and the gaps between them, each with a 95% confidence
-  # interval. Each interval comes from the stored gradient and the coefficient
-  # covariance (delta method): estimate ± 1.96 standard errors.
+  # The estimates for the filter combination the user chose
   group_estimates <- reactive({
-    cell <- selected_cell()
+    row <- which(app_data$group_cells$province == input$province &
+                   app_data$group_cells$settlement_type == input$settlement &
+                   app_data$group_cells$age_band == input$age_band & app_data$group_cells$sex == input$sex)
+    cell <- app_data$group_cells[row, ]
     validate(need(!is.na(cell$p00),
                   paste0("Only ", cell$people, " people in the survey match this group, fewer than the minimum of 50. ",
                          "Choose a broader group (for example 'All ages' or 'Both sexes').")))
-    gradient <- function(s) app_data$group_gradients[[s]][cell$row, ]
-    with_interval <- function(estimate, grad) {
-      se <- delta_method_se(slim_model, grad)
-      tibble(estimate = estimate, lower = estimate - 1.96 * se, upper = estimate + 1.96 * se)
+    estimates_for_cell(row)
+  })
+
+  group_words <- reactive(describe_group(input$province, input$settlement, input$age_band, input$sex))
+
+  # The answer for the chosen group, in plain words. The verdict depends on
+  # whether the likely range of the difference between the gaps includes 0.
+  output$group_answer <- renderUI({
+    e <- group_estimates()
+    rate <- function(education, internet) pct(e$groups$estimate[e$groups$education == education & e$groups$internet == internet])
+    clear <- e$interaction$lower > 0 || e$interaction$upper < 0
+    verdict <- if (e$interaction$lower > 0) {
+      "Education and home internet reinforce each other for this group."
+    } else if (e$interaction$upper < 0) {
+      "Education and home internet substitute for each other for this group."
+    } else {
+      "No clear difference for this group."
     }
-    list(
-      people = cell$people,
-      groups = bind_rows(
-        with_interval(cell$p00, gradient("00")) |> mutate(education = "Below matric", internet = "No home internet"),
-        with_interval(cell$p01, gradient("01")) |> mutate(education = "Below matric", internet = "Home internet"),
-        with_interval(cell$p10, gradient("10")) |> mutate(education = "Matric or higher", internet = "No home internet"),
-        with_interval(cell$p11, gradient("11")) |> mutate(education = "Matric or higher", internet = "Home internet")
-      ),
-      gap_below = with_interval(cell$p01 - cell$p00, gradient("01") - gradient("00")),
-      gap_matric = with_interval(cell$p11 - cell$p10, gradient("11") - gradient("10")),
-      interaction = with_interval((cell$p11 - cell$p10) - (cell$p01 - cell$p00),
-                                  (gradient("11") - gradient("10")) - (gradient("01") - gradient("00")))
+    answer_box(
+      paste0("For ", group_words(), ": ", verdict),
+      p(class = "mb-1", paste0(
+        "With matric, ", rate("Matric or higher", "Home internet"), " of people with home internet are expected to be employed, against ",
+        rate("Matric or higher", "No home internet"), " of those without it. So of every 100 people with home internet, about ", round(abs(100 * e$gap_matric$estimate)),
+        if (e$gap_matric$estimate >= 0) " more" else " fewer", " have a job than of every 100 without it. Without matric, it is ",
+        rate("Below matric", "Home internet"), " against ", rate("Below matric", "No home internet"), ": about ",
+        round(abs(100 * e$gap_below$estimate)), if (e$gap_below$estimate >= 0) " more" else " fewer", " in every 100.")),
+      p(class = "mb-0", if (e$interaction$lower > 0) {
+        "Home internet goes with a clearly bigger employment advantage for people who have matric."
+      } else if (e$interaction$upper < 0) {
+        "Home internet goes with a clearly smaller employment advantage for people who have matric: it seems to make up for lower education."
+      } else {
+        paste0("The two internet gaps differ, but with only ", num(e$people),
+               " people in the survey for this group the difference is too uncertain to rely on. The national result (all people) is clear: they reinforce each other.")
+      }),
+      colour = if (clear) "primary" else "secondary"
     )
   })
 
-  output$group_title <- renderText({
-    paste("Predicted employment rate:", input$province, "·", input$settlement, "·", input$age_band, "·", input$sex)
+  output$group_boxes <- renderUI({
+    e <- group_estimates()
+    rate <- function(education, internet) pct(e$groups$estimate[e$groups$education == education & e$groups$internet == internet])
+    range_text <- function(x) paste0("Likely range: ", signed(x$lower), " to ", signed(x$upper), ".",
+                                     if (x$lower < 0 && x$upper > 0) " It includes 0, so this may be no real difference." else "")
+    layout_columns(
+      col_widths = c(4, 4, 4),
+      value_box(title = "Without matric: people with home internet compared with people without",
+                value = paste0(signed(e$gap_below$estimate), " in every 100"), theme = "secondary",
+                p(strong(in_words(e$gap_below$estimate, "people without matric who have home internet", "people without matric who do not"))),
+                p(class = "small", paste0(rate("Below matric", "Home internet"), " of those with home internet have a job, against ",
+                                          rate("Below matric", "No home internet"), " of those without. ", range_text(e$gap_below)))),
+      value_box(title = "With matric: people with home internet compared with people without",
+                value = paste0(signed(e$gap_matric$estimate), " in every 100"), theme = "secondary",
+                p(strong(in_words(e$gap_matric$estimate, "people with matric who have home internet", "people with matric who do not"))),
+                p(class = "small", paste0(rate("Matric or higher", "Home internet"), " of those with home internet have a job, against ",
+                                          rate("Matric or higher", "No home internet"), " of those without. ", range_text(e$gap_matric)))),
+      value_box(title = "How much more home internet is worth with matric than without",
+                value = paste0(signed(e$interaction$estimate), " in every 100"), theme = "primary",
+                p(strong(paste0("The advantage that goes with home internet is about ", round(abs(100 * e$interaction$estimate)),
+                                if (e$interaction$estimate >= 0) " more" else " fewer",
+                                " employed people in every 100 for people with matric than for people without matric."))),
+                p(class = "small", paste0("The second box minus the first: ", signed(e$gap_matric$estimate), " minus ", signed(e$gap_below$estimate),
+                                          ". Above 0 means education and internet reinforce each other. ", range_text(e$interaction))))
+    )
   })
+
+  output$group_title <- renderText(paste0("Share expected to be employed: ", group_words()))
 
   output$group_plot <- renderPlot({
     groups <- group_estimates()$groups |>
@@ -425,43 +658,22 @@ server <- function(input, output, session) {
       geom_text(aes(y = upper + 0.03, label = pct(estimate)), position = position_dodge(width = 0.8), size = 5) +
       scale_fill_manual(values = c("No home internet" = "#9DB4D6", "Home internet" = "#1F3864")) +
       scale_y_continuous(labels = \(x) paste0(round(100 * x), "%"), limits = c(0, 1), expand = c(0, 0)) +
-      labs(x = NULL, y = "Predicted share employed", fill = NULL) +
+      labs(x = NULL, y = "Share expected to be employed", fill = NULL) +
       theme_minimal(base_size = 15) +
       theme(legend.position = "top", panel.grid.major.x = element_blank())
   })
 
   output$group_people <- renderUI({
-    p(class = "text-muted small",
+    p(class = "text-muted small mb-0",
       paste0("Based on ", num(group_estimates()$people),
-             " people in the survey, weighted to represent the population. Black lines: 95% confidence intervals."))
-  })
-
-  output$group_boxes <- renderUI({
-    estimates <- group_estimates()
-    interval <- function(x) paste0("95% CI ", change_points(x$lower), " to ", change_points(x$upper))
-    interaction_reading <- if (estimates$interaction$lower > 0) {
-      "Internet goes with a bigger advantage for people with matric: they reinforce each other."
-    } else if (estimates$interaction$upper < 0) {
-      "Internet goes with a smaller advantage for people with matric: they substitute for each other."
-    } else {
-      "The interval includes 0, so for this group the difference is uncertain."
-    }
-    layout_columns(
-      col_widths = c(4, 4, 4),
-      value_box(title = "Internet gap without matric", value = change_points(estimates$gap_below$estimate),
-                p(interval(estimates$gap_below))),
-      value_box(title = "Internet gap with matric", value = change_points(estimates$gap_matric$estimate),
-                p(interval(estimates$gap_matric))),
-      value_box(title = "Difference between the gaps (the interaction)", value = change_points(estimates$interaction$estimate),
-                theme = "primary", p(interval(estimates$interaction)), p(interaction_reading))
-    )
+             " people in the survey, weighted to represent the population. Thin black lines: the likely range of each bar."))
   })
 
   # The test-set measures with their explanations (the "How reliable" panel)
   output$reliability_table <- renderTable(
     describe_metrics(app_data$baseline, app_data$baseline) |>
-      select(Measure = measure, `Test set` = value, `What it means` = meaning),
-    striped = TRUE, spacing = "s", width = "100%", digits = 3
+      select(Measure = measure, `In short` = in_short, `What it means` = meaning),
+    striped = TRUE, spacing = "s", width = "100%"
   )
 
   # Page 3: Province scenarios ------------------------------------------------------------
@@ -476,46 +688,92 @@ server <- function(input, output, session) {
         target_share = pmax(target, internet_share),
         connected_fraction = (target_share - internet_share) / (1 - internet_share),
         predicted_target = predicted_rate + connected_fraction * uplift_unconnected,
-        change = predicted_target - predicted_rate,
-        additional_employed = labour_force * change
+        change = predicted_target - predicted_rate, # the model's gain
+        additional_employed = labour_force * change,
+        # Shown to the user: the survey's actual rate today, and that rate plus the
+        # model's gain, so that "today" matches the published employment figures
+        employed_today = actual_rate,
+        employed_target = actual_rate + change
       )
+  })
+
+  # The whole country: the provinces added up, weighted by their labour force
+  scenario_national <- reactive({
+    scenario() |>
+      summarise(
+        province = "South Africa",
+        across(c(internet_share, employed_today, employed_target), \(x) sum(x * labour_force) / sum(labour_force)),
+        change = employed_target - employed_today,
+        additional_employed = sum(additional_employed),
+        labour_force = sum(labour_force)
+      )
+  })
+
+  output$scenario_answer <- renderUI({
+    country <- scenario_national()
+    provinces <- scenario()
+    if (all(provinces$change == 0)) {
+      return(answer_box(paste0("At a target of ", input$target, "%, nothing changes"),
+                        p(class = "mb-0", "Every province already has at least this share of people with home internet. Move the slider to a higher target."),
+                        colour = "secondary"))
+    }
+    top_rate <- provinces |> slice_max(change, n = 1, with_ties = FALSE)
+    top_people <- provinces |> slice_max(additional_employed, n = 1, with_ties = FALSE)
+    answer_box(
+      paste0("If ", input$target, "% of people had home internet (today: ", pct(country$internet_share, 0), ")"),
+      p(class = "mb-1", paste0(
+        "The pattern in the data suggests the national employment rate would be about ", pct(country$employed_target),
+        " instead of ", pct(country$employed_today), ": roughly ", num(signif(country$additional_employed, 2)), " more people employed.")),
+      p(class = "mb-0", paste0(
+        top_rate$province, " gains the most for its size (of every 100 people, about ", round(100 * top_rate$change), " more would have a job than today), and ",
+        top_people$province, " gains the most people (about ", num(signif(top_people$additional_employed, 2)), ").",
+        " Provinces with the least home internet today have the most room to gain."))
+    )
+  })
+
+  output$scenario_boxes <- renderUI({
+    country <- scenario_national()
+    provinces <- scenario()
+    top_rate <- provinces |> slice_max(change, n = 1, with_ties = FALSE)
+    top_people <- provinces |> slice_max(additional_employed, n = 1, with_ties = FALSE)
+    layout_columns(
+      col_widths = c(4, 4, 4),
+      value_box(title = "South Africa: more people employed", value = paste0(signed(country$change), " in every 100"), theme = "primary",
+                p(strong(in_words_scenario(country$change))),
+                p(class = "small", paste0("Across the country that is about ", num(signif(country$additional_employed, 2)), " people."))),
+      value_box(title = "Biggest gain for its size", value = span(style = "font-size: 1.5rem;", top_rate$province), theme = "secondary",
+                p(strong(in_words_scenario(top_rate$change))),
+                p(class = "small", paste0("It has the most room to grow: only ", pct(top_rate$internet_share, 0), " have home internet today."))),
+      value_box(title = "Most people gained", value = span(style = "font-size: 1.5rem;", top_people$province), theme = "secondary",
+                p(paste0("About ", num(signif(top_people$additional_employed, 2)), " more people employed, because it has the largest labour force.")))
+    )
   })
 
   output$province_plot <- renderPlot({
     scenario() |>
       mutate(province = fct_reorder(province, change)) |>
       ggplot(aes(y = province)) +
-      geom_segment(aes(x = predicted_rate, xend = predicted_target, yend = province), colour = "#9DB4D6", linewidth = 2) +
-      geom_point(aes(x = predicted_rate, colour = "Now"), size = 4) +
-      geom_point(aes(x = predicted_target, colour = "At the target"), size = 4) +
-      geom_text(aes(x = predicted_target, label = change_points(change)), hjust = -0.3, size = 4.5) +
-      scale_colour_manual(values = c("Now" = "#9DB4D6", "At the target" = "#1F3864")) +
-      scale_x_continuous(labels = \(x) paste0(round(100 * x), "%"), expand = expansion(mult = c(0.05, 0.15))) +
-      labs(x = "Predicted employment rate", y = NULL, colour = NULL) +
+      geom_segment(aes(x = employed_today, xend = employed_target, yend = province), colour = "#9DB4D6", linewidth = 2) +
+      geom_point(aes(x = employed_today, colour = "Today"), size = 4) +
+      geom_point(aes(x = employed_target, colour = "At the target"), size = 4) +
+      geom_text(aes(x = employed_target, label = paste0(signed(change), " in every 100")), hjust = -0.15, size = 4.5) +
+      scale_colour_manual(values = c("Today" = "#9DB4D6", "At the target" = "#1F3864"), breaks = c("Today", "At the target")) +
+      scale_x_continuous(labels = \(x) paste0(round(100 * x), "%"), expand = expansion(mult = c(0.05, 0.3))) +
+      labs(x = "Share of the labour force employed", y = NULL, colour = NULL) +
       theme_minimal(base_size = 15) +
       theme(legend.position = "top")
   })
 
   output$province_table <- renderTable({
-    rows <- scenario()
-    national <- rows |>
-      summarise(
-        province = "South Africa",
-        across(c(actual_rate, internet_share, predicted_rate, predicted_target), \(x) sum(x * labour_force) / sum(labour_force)),
-        change = predicted_target - predicted_rate,
-        additional_employed = sum(additional_employed),
-        labour_force = sum(labour_force)
-      )
-    bind_rows(rows |> arrange(desc(change)), national) |>
+    bind_rows(scenario() |> arrange(desc(change)), scenario_national()) |>
       transmute(
         Province = province,
-        `Labour force` = num(labour_force),
-        `Employed now` = pct(actual_rate),
-        `Home internet now` = pct(internet_share),
-        `Predicted now` = pct(predicted_rate),
-        `Predicted at target` = pct(predicted_target),
-        Change = change_points(change),
-        `About this many more people employed` = num(additional_employed)
+        `People in the labour force` = num(labour_force),
+        `Employed today` = pct(employed_today),
+        `Home internet today` = pct(internet_share),
+        `Employed at the target` = pct(employed_target),
+        `More employed in every 100 people` = signed(change),
+        `More people employed (about)` = num(signif(additional_employed, 2))
       )
   }, striped = TRUE, spacing = "s", width = "100%")
 
@@ -560,50 +818,144 @@ server <- function(input, output, session) {
     compute_metrics(s$prepared$employed, s$probability, app_data$threshold)
   })
 
+  # With very few rows every measure is dominated by chance (a handful of people
+  # can make the mix look completely different), so the checks are not judged
+  too_few_rows <- reactive(nrow(scored()$prepared) < monitoring_thresholds$min_rows)
+
+  # All monitoring checks in one table: performance and fairness (only with an
+  # employed column) and drift (always)
+  monitoring_checks <- reactive({
+    s <- scored()
+    req(!s$fatal)
+    drift <- drift_report(s$prepared, app_data$reference_shares) |>
+      transmute(variable,
+                check = paste0("Has the mix of ", drift_names[variable], " changed? (drift, PSI)"),
+                value = round(psi, 3), expected = "0 (same mix)", status,
+                meaning = paste(meaning, "0 is identical; above 0.10 is a noticeable shift; above 0.25 a large one."))
+    if (!s$has_outcome) return(drift)
+
+    performance <- describe_metrics(upload_metrics(), app_data$baseline) |>
+      filter(status != "-") |>
+      transmute(variable = NA_character_, check = measure, value, expected = as.character(test_set), status,
+                meaning = paste0(in_short, ". ", meaning))
+
+    groups <- subgroup_auc(s$prepared$employed, s$probability, s$prepared$population_group)
+    gap <- if (nrow(groups) >= 2) max(groups$auc) - min(groups$auc) else NA_real_
+    fairness <- tibble(
+      variable = NA_character_,
+      check = "Does the model work equally well across population groups? (gap in ranking accuracy)",
+      value = round(gap, 3),
+      expected = as.character(round(app_data$baseline_subgroup_gap, 3)),
+      status = subgroup_gap_status(gap, app_data$baseline_subgroup_gap),
+      meaning = if (is.na(gap)) paste0("Not checked: fewer than two population groups have ", monitoring_thresholds$min_group_rows, " or more people.")
+                else paste0("The ranking accuracy of the best-served population group minus that of the worst-served (groups of ",
+                            monitoring_thresholds$min_group_rows, "+ people). If the gap grows, the model is becoming less fair.")
+    )
+    bind_rows(performance |> mutate(value = round(value, 3)), fairness, drift)
+  })
+
+  # The result of the upload in plain words, shown before the detailed steps
+  output$summary_card <- renderUI({
+    s <- scored()
+    line <- function(status, ...) tags$li(class = "mb-1", HTML(status_badge(status)), " ", ...)
+
+    if (s$fatal) {
+      problem <- s$checked$checks |> filter(status == "Fail") |> slice(1)
+      return(answer_box("The result in short: this file cannot be used",
+                        tags$ul(class = "list-unstyled mb-0", line("Fail", problem$detail)),
+                        p(class = "mb-0 mt-1", "Fix the file using the data format in Step 1 and upload it again."),
+                        colour = "danger"))
+    }
+
+    rows_used <- nrow(s$prepared)
+    weight <- if (s$has_weight) s$prepared$person_weight else rep(1, rows_used)
+    predicted_rate <- sum(weight * s$probability) / sum(weight)
+    checks <- monitoring_checks()
+    changed <- checks |> filter(!is.na(variable), status != "Green")
+
+    file_line <- line(if (rows_used < s$rows_read) "Warning" else "Pass", strong("Is the file usable? "),
+                      paste0("Yes. ", num(rows_used), " of ", num(s$rows_read), " rows can be used",
+                             if (rows_used < s$rows_read) paste0("; ", num(s$rows_read - rows_used), " were left out (see Step 3).") else "."))
+    prediction_line <- line("Info", strong("What does the model predict? "),
+                            paste0(pct(predicted_rate), " of these people are expected to be employed",
+                                   if (s$has_outcome) {
+                                     actual_rate <- sum(weight * (s$prepared$employed == "Employed")) / sum(weight)
+                                     paste0("; the actual figure in the file is ", pct(actual_rate), " (", format(round(100 * abs(predicted_rate - actual_rate), 1), nsmall = 1), " points apart).")
+                                   } else "."))
+
+    if (too_few_rows()) {
+      return(answer_box("The result in short",
+                        tags$ul(class = "list-unstyled mb-0", file_line, prediction_line,
+                                line("Not checked", strong("Can the model still be trusted on this data? "),
+                                     paste0("Not judged: the file has fewer than ", monitoring_thresholds$min_rows,
+                                            " usable rows, too few for reliable accuracy and monitoring checks."))),
+                        colour = "secondary"))
+    }
+
+    accuracy_line <- if (s$has_outcome) {
+      m <- upload_metrics()
+      auc_status <- traffic_light(m$auc, monitoring_thresholds$auc)
+      line(auc_status, strong("How accurate are the predictions? "),
+           paste0(switch(auc_status, Green = "As accurate as expected", Amber = "Somewhat less accurate than expected", "Clearly less accurate than expected"),
+                  ": the model ranks people correctly ", round(100 * m$auc), " times out of 100 (expected: about ",
+                  round(100 * app_data$baseline$auc), ")."))
+    } else {
+      line("Info", strong("How accurate are the predictions? "),
+           "Cannot be measured: the file has no usable ", code("employed"), " column with the actual outcomes.")
+    }
+    drift_line <- line(if (nrow(changed) == 0) "Green" else if (any(changed$status == "Red")) "Red" else "Amber",
+                       strong("Are these people like the ones the model learned from? "),
+                       if (nrow(changed) == 0) "Yes, the mix of people is about the same."
+                       else paste0("Not entirely. The mix differs in: ", paste(drift_names[changed$variable], collapse = ", "), "."))
+    worst <- if (any(checks$status == "Red")) "Red" else if (any(checks$status == "Amber")) "Amber" else "Green"
+
+    answer_box("The result in short",
+               tags$ul(class = "list-unstyled mb-2", file_line, prediction_line, accuracy_line, drift_line),
+               p(class = "mb-0", strong("What to do: "), overall_verdict(checks$status)),
+               colour = c(Green = "success", Amber = "warning", Red = "danger")[[worst]])
+  })
+
   output$results <- renderUI({
     s <- scored()
-    rows_used <- if (s$fatal) 0 else nrow(s$prepared)
     tagList(
-      layout_columns(
-        col_widths = c(4, 4, 4),
-        value_box(title = "Rows in the file", value = num(s$rows_read)),
-        value_box(title = "Rows used", value = num(rows_used), theme = if (rows_used > 0) "success" else "danger"),
-        value_box(title = "Rows left out", value = num(s$rows_read - rows_used),
-                  p("See the validation report for the reasons"))
-      ),
+      uiOutput("summary_card"),
       card(
-        card_header("Step 3: Validation report"),
-        p("Every check the file went through. Rows that fail a check are left out; if a required column is missing, nothing can be predicted."),
+        card_header("Step 3: Was the file valid?"),
+        p("Every check the file went through. Rows with a problem are left out; if a required column is missing, nothing can be predicted."),
         tableOutput("validation_table")
       ),
       if (!s$fatal) card(
-        card_header("Step 4: Predicted employment rates by group"),
-        p("The average predicted probability of being employed for each group", if (s$has_weight) ", weighted with person_weight" else "",
-          if (s$has_outcome) ", next to the actual rate in the file." else ".",
-          "Individual predictions are not shown. Groups with fewer than 50 people are marked as unreliable."),
-        selectInput("group_by", "Group by", c("Matric × internet", "Province", "Settlement type", "Sex", "Age band"), width = "300px"),
+        card_header("Step 4: What employment rate does the model predict for each group?"),
+        p("The share of each group the model expects to be employed", if (s$has_weight) " (weighted to represent the population)" else "",
+          if (s$has_outcome) ", next to the actual share in the file. A small difference means the model describes that group well." else ".",
+          "Predictions for individual people are not shown. Groups with fewer than 50 people are marked as unreliable."),
+        selectInput("group_by", "Show the results by", c("Matric × internet", "Province", "Settlement type", "Sex", "Age band"), width = "300px"),
         tableOutput("group_table")
       ),
       if (!s$fatal && s$has_outcome) card(
         card_header("Step 5: How accurate are the predictions?"),
-        p(paste0("The model's predictions compared with the actual outcomes in your file. For the yes/no measures, a person counts as predicted employed when their predicted probability is at least ",
-                 round(app_data$threshold, 3), ", the threshold chosen in the evaluation to give employed and unemployed people equal importance. ",
-                 "The Test set column shows the value on the ", num(app_data$baseline$people), " test people for comparison.")),
+        p("The model's predictions compared with what actually happened to the people in your file.",
+          strong("Read the \"In short\" column first."), "\"Expected\" is the score on the",
+          num(app_data$baseline$people), "people the model was tested on, and \"Result\" says whether your file is in line with it."),
         tableOutput("metrics_table"),
-        h6("Confusion matrix (number of people)"),
-        p(class = "text-muted small", "Rows: what actually happened. Columns: what the model predicted. The diagonal (employed-employed and unemployed-unemployed) is correct."),
-        tableOutput("confusion_table")
+        p(class = "text-muted small",
+          paste0("For the rows about people found and predictions, a person is counted as predicted employed when the model gives them a chance of at least ",
+                 round(100 * app_data$threshold), "% (the cut-off that treats employed and unemployed people equally).")),
+        h6("How many people were classified right and wrong"),
+        tableOutput("confusion_table"),
+        p(class = "text-muted small mb-0", "Each person is in one cell. Correct: employed and predicted employed, or unemployed and predicted unemployed. The other two cells are the mistakes.")
       ),
       if (!s$fatal && !s$has_outcome) card(
         card_header("Step 5: How accurate are the predictions?"),
-        p("Accuracy can only be measured when the file contains the actual outcome. Add an", code("employed"),
-          "column (Employed / Unemployed, with both present) to see the accuracy measures and the performance checks.")
+        p(class = "mb-0", "Accuracy can only be measured when the file contains what actually happened. Add an", code("employed"),
+          "column (Employed / Unemployed, with both present) to see the accuracy measures.")
       ),
       if (!s$fatal) card(
-        card_header("Step 6: Monitoring checks"),
+        card_header("Step 6: Can the model still be trusted on this data? (monitoring)"),
         uiOutput("verdict"),
-        p("Each check compares your file with the model's training data or test-set performance. Green: no action. Amber: investigate. Red: retrain or consider retiring the model.",
-          "The thresholds are set in", code("R/monitoring.R"), "."),
+        p("Each check compares your file with what the model was built and tested on.",
+          HTML(paste0(status_badge("Green"), " in line with expectations. ", status_badge("Amber"), " borderline: find out why. ",
+                      status_badge("Red"), " retrain the model or consider retiring it."))),
         tableOutput("monitoring_table")
       )
     )
@@ -611,7 +963,7 @@ server <- function(input, output, session) {
 
   output$validation_table <- html_table({
     scored()$checked$checks |>
-      transmute(Check = check, Status = status_badge(status), `Rows affected` = num(rows), Details = detail)
+      transmute(Check = check, Result = status_badge(status), `Rows affected` = num(rows), Details = detail)
   })
 
   output$group_table <- renderTable({
@@ -634,67 +986,35 @@ server <- function(input, output, session) {
       group_by(Group = group) |>
       summarise(
         People = n(),
-        `Predicted employment rate` = sum(weight * probability) / sum(weight),
-        `Actual employment rate` = if (s$has_outcome) sum(weight * (employed == "Employed")) / sum(weight) else NA_real_,
+        `Predicted to be employed` = sum(weight * probability) / sum(weight),
+        `Actually employed` = if (s$has_outcome) sum(weight * (employed == "Employed")) / sum(weight) else NA_real_,
         .groups = "drop"
       ) |>
       mutate(
-        Reliability = if_else(People < 50, "Fewer than 50 people: unreliable", ""),
-        Difference = `Predicted employment rate` - `Actual employment rate`
+        Difference = `Predicted to be employed` - `Actually employed`,
+        Note = if_else(People < 50, "Fewer than 50 people: unreliable", "")
       )
     summary <- summary |>
-      mutate(across(c(`Predicted employment rate`, `Actual employment rate`), pct),
+      mutate(across(c(`Predicted to be employed`, `Actually employed`), pct),
              Difference = if_else(is.na(Difference), "", change_points(Difference)),
              People = num(People))
-    if (!s$has_outcome) summary <- select(summary, -`Actual employment rate`, -Difference)
+    if (!s$has_outcome) summary <- select(summary, -`Actually employed`, -Difference)
     summary
   }, striped = TRUE, spacing = "s", width = "100%")
 
   output$metrics_table <- html_table({
     describe_metrics(upload_metrics(), app_data$baseline) |>
-      transmute(Measure = measure, `Your file` = format(value, nsmall = 3), `Test set` = format(test_set, nsmall = 3),
-                Status = if_else(status == "-", "", status_badge(if (too_few_rows()) "Not checked" else status)),
+      transmute(Measure = measure, `In short` = in_short, `Your file` = format(value, nsmall = 3),
+                Expected = format(test_set, nsmall = 3),
+                Result = if_else(status == "-", "", status_badge(if (too_few_rows()) "Not checked" else status)),
                 `What it means` = meaning)
   })
 
   output$confusion_table <- renderTable({
     confusion_table(upload_metrics()) |>
-      rename(Actual = actual) |>
-      mutate(across(-Actual, num))
+      transmute(` ` = paste("Actually", tolower(actual)), `Predicted employed` = num(`Predicted employed`),
+                `Predicted unemployed` = num(`Predicted unemployed`))
   }, striped = TRUE, spacing = "s")
-
-  # All monitoring checks in one table: drift (always) + performance and fairness
-  # (only with an employed column)
-  monitoring_checks <- reactive({
-    s <- scored()
-    req(!s$fatal)
-    drift <- drift_report(s$prepared, app_data$reference_shares) |>
-      transmute(check = paste("Drift (PSI):", str_replace_all(variable, "_", " ")),
-                value = round(psi, 3), test_set = "0", status, meaning)
-    if (!s$has_outcome) return(drift)
-
-    performance <- describe_metrics(upload_metrics(), app_data$baseline) |>
-      filter(status != "-") |>
-      transmute(check = measure, value, test_set = as.character(test_set), status,
-                meaning = "Compared with the thresholds in the About page. See Step 5 for what the measure means.")
-
-    groups <- subgroup_auc(s$prepared$employed, s$probability, s$prepared$population_group)
-    gap <- if (nrow(groups) >= 2) max(groups$auc) - min(groups$auc) else NA_real_
-    fairness <- tibble(
-      check = "Fairness: AUC gap between population groups",
-      value = round(gap, 3),
-      test_set = as.character(round(app_data$baseline_subgroup_gap, 3)),
-      status = subgroup_gap_status(gap, app_data$baseline_subgroup_gap),
-      meaning = if (is.na(gap)) paste0("Not checked: fewer than two population groups have ", monitoring_thresholds$min_group_rows, " or more people.")
-                else paste0("The best-ranked population group's AUC minus the worst's (groups of ", monitoring_thresholds$min_group_rows,
-                            "+ people). A widening gap means the model works less equally across groups.")
-    )
-    bind_rows(performance |> mutate(value = round(value, 3)), fairness, drift)
-  })
-
-  # With very few rows every measure is dominated by chance (a handful of people
-  # can make the mix look completely different), so the checks are not judged
-  too_few_rows <- reactive(nrow(scored()$prepared) < monitoring_thresholds$min_rows)
 
   output$verdict <- renderUI({
     checks <- monitoring_checks()
@@ -711,42 +1031,44 @@ server <- function(input, output, session) {
   output$monitoring_table <- html_table({
     monitoring_checks() |>
       mutate(status = if (too_few_rows()) "Not checked" else status) |>
-      transmute(Check = check, `Your file` = format(value), `Test set` = test_set,
-                Status = status_badge(status), `What it means` = meaning)
+      transmute(Check = check, `Your file` = format(value), Expected = expected,
+                Result = status_badge(status), `What it means` = meaning)
   })
 
   # Page 5: About the model -----------------------------------------------------------
 
   output$about_metrics <- renderTable(
     describe_metrics(app_data$baseline, app_data$baseline) |>
-      select(Measure = measure, Value = value, `What it means` = meaning),
+      select(Measure = measure, `In short` = in_short, Value = value, `What it means` = meaning),
     striped = TRUE, spacing = "s", width = "100%", digits = 3
   )
 
   output$about_subgroups <- renderTable(
     app_data$subgroups |>
-      transmute(Grouping = grouping, Group = group, `Test people` = num(people),
-                `Share employed` = pct(share_employed), AUC = round(auc, 3),
-                `Balanced accuracy` = round(balanced_accuracy, 3),
-                Sensitivity = round(sensitivity, 3), Specificity = round(specificity, 3)),
-    striped = TRUE, spacing = "s", width = "100%", digits = 3
+      transmute(`Grouped by` = grouping, Group = group, `Test people` = num(people),
+                `Employed in reality` = pct(share_employed, 0),
+                `Ranking accuracy (out of 100)` = round(100 * auc),
+                `Employed found` = pct(sensitivity, 0), `Unemployed found` = pct(specificity, 0)),
+    striped = TRUE, spacing = "s", width = "100%", digits = 0
   )
 
-  output$about_thresholds <- renderTable({
+  output$about_thresholds <- html_table({
     t <- monitoring_thresholds
     tribble(
-      ~Check, ~Green, ~Amber, ~Red,
-      "AUC", paste("≥", t$auc[["amber"]]), paste(t$auc[["red"]], "–", t$auc[["amber"]]), paste("<", t$auc[["red"]]),
-      "Balanced accuracy", paste("≥", t$balanced_accuracy[["amber"]]),
-        paste(t$balanced_accuracy[["red"]], "–", t$balanced_accuracy[["amber"]]), paste("<", t$balanced_accuracy[["red"]]),
-      "Brier score", paste("≤", t$brier[["amber"]]), paste(t$brier[["amber"]], "–", t$brier[["red"]]), paste(">", t$brier[["red"]]),
-      "Calibration gap", paste("within ±", t$calibration_gap[["amber"]]),
-        paste("±", t$calibration_gap[["amber"]], "–", t$calibration_gap[["red"]]), paste("beyond ±", t$calibration_gap[["red"]]),
-      "Drift (PSI)", paste("<", t$psi[["amber"]]), paste(t$psi[["amber"]], "–", t$psi[["red"]]), paste(">", t$psi[["red"]]),
-      "Subgroup AUC gap (widening)", paste("≤ +", t$subgroup_auc_gap[["amber"]]),
-        paste("+", t$subgroup_auc_gap[["amber"]], "–", t$subgroup_auc_gap[["red"]]), paste("> +", t$subgroup_auc_gap[["red"]])
-    )
-  }, striped = TRUE, spacing = "s", width = "100%")
+      ~Check, ~ok, ~investigate, ~action,
+      "Ranking accuracy (AUC)", paste("at least", t$auc[["amber"]]), paste(t$auc[["red"]], "to", t$auc[["amber"]]), paste("below", t$auc[["red"]]),
+      "Fair accuracy (balanced accuracy)", paste("at least", t$balanced_accuracy[["amber"]]),
+        paste(t$balanced_accuracy[["red"]], "to", t$balanced_accuracy[["amber"]]), paste("below", t$balanced_accuracy[["red"]]),
+      "Error of the predicted chances (Brier score)", paste("at most", t$brier[["amber"]]),
+        paste(t$brier[["amber"]], "to", t$brier[["red"]]), paste("above", t$brier[["red"]]),
+      "Predicted minus actual rate (calibration gap)", paste("within", t$calibration_gap[["amber"]], "either way"),
+        paste(t$calibration_gap[["amber"]], "to", t$calibration_gap[["red"]], "either way"), paste("more than", t$calibration_gap[["red"]], "either way"),
+      "Change in the mix of people (drift, PSI)", paste("below", t$psi[["amber"]]), paste(t$psi[["amber"]], "to", t$psi[["red"]]), paste("above", t$psi[["red"]]),
+      "Growth of the gap between population groups", paste("at most", t$subgroup_auc_gap[["amber"]]),
+        paste(t$subgroup_auc_gap[["amber"]], "to", t$subgroup_auc_gap[["red"]]), paste("more than", t$subgroup_auc_gap[["red"]])
+    ) |>
+      setNames(c("Check", status_badge("Green"), status_badge("Amber"), status_badge("Red")))
+  })
 }
 
 shinyApp(ui, server)
