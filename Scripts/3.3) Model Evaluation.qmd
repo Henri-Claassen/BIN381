@@ -23,7 +23,7 @@ This file covers the Milestone 3 rubric items "Model implementation and reproduc
 The file works in a fixed order, so that the test sets cannot influence any choice:
 
 | Section | Data used | What happens |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | 2–3 | Training files only | Household-grouped cross-validation folds are built. |
 | 4–5 | Training files only | The tree and forest parameters are tuned, the baseline models are cross-validated and each employment model's classification threshold is chosen, all from out-of-fold predictions. |
 | 6 | Training files only | The tuned models are refitted on the full training files and saved. |
@@ -59,7 +59,7 @@ model_directory <- "../Models/"
 ## 1.1 What is being compared
 
 | Question | Models | Task |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | Employment (research areas B and C) | Survey-weighted logistic regression, decision tree, random forest, and a demographics-only baseline | Binary classification of `employed` |
 | Income (research area D) | Survey-weighted linear regression, random forest, and a demographics-only baseline | Regression of `log_salary` |
 
@@ -72,7 +72,7 @@ No single metric is enough, so each task gets several that measure different thi
 **Employment (classification).** The models predict the probability of being **Employed**, so Employed is the positive class. About 35% of the labour force is unemployed, so a model that always predicts Employed would already be 65% accurate; accuracy on its own is therefore misleading.
 
 | Metric | What it measures | Why it is used |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | ROC-AUC | How well the predicted probabilities rank employed people above unemployed people, over every possible threshold | Main tuning and comparison metric: it does not depend on the threshold or on the class balance. Milestone 2 set AUC ≥ 0.70 as the minimum acceptable performance. |
 | Balanced accuracy | The average of sensitivity and specificity | Treats both classes as equally important, unlike accuracy. |
 | Sensitivity (recall) | Share of employed people predicted Employed |  |
@@ -298,7 +298,7 @@ tibble(
 `Employment Model.qmd` fitted the tree with `maxdepth = 5`, `minbucket = 100` and `cp = 0.001` as starting values. Three parameters control the tree's size, and they are tuned together over a grid:
 
 | Parameter | Values tried | Effect |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | `maxdepth` | 3, 4, 5 | Maximum number of questions from the top of the tree to a prediction. Not above 5, because the tree was chosen for readability (`Employment Model.qmd`, section 5.1). |
 | `minbucket` | 50, 100, 200 | Minimum number of people in a leaf. Not below 50, so no rule describes a very small, possibly identifiable group. |
 | `cp` | 0.0005, 0.001, 0.002, 0.005 | Minimum improvement a split must give to be kept (pruning). |
@@ -375,7 +375,7 @@ Every tree's AUC lies in a narrow band, and the best trees all use the maximum d
 The forest's main parameters are `mtry` (how many predictors each split may choose from) and `min.node.size` (the smallest leaf in each tree). `num.trees` is not tuned: more trees only make the predictions more stable. During tuning 300 trees are grown to save time, and the final forest in section 6 has 500, as in `Employment Model.qmd`.
 
 | Parameter | Values tried | Effect |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | `mtry` | 2, 3, 4, 6 | Small values make the trees more different from each other; large values let each split use the strongest predictors. 3 (√15) was the starting value. |
 | `min.node.size` | 10, 30, 100, 200, 400 | Larger leaves give smoother, often better-calibrated probabilities; smaller leaves fit more detail. 10 was the starting value. The range goes well above it because a first run of this grid, which stopped at 100, chose 100: the best value was at the edge of the grid, so larger values had to be tried. |
 
@@ -518,7 +518,7 @@ bind_rows(
 ## 5.2 Random forest tuning
 
 | Parameter | Values tried | Effect |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | `mtry` | 1, 2, 3, 4, 6, 8 | The full range for 8 predictors; 2 (one third) was the starting value. `mtry = 8` lets every split use every predictor (bagging). |
 | `min.node.size` | 5, 20, 50, 100, 200 | 5 was the starting value; larger leaves average more people and smooth the predictions. As for the employment forest, a first run that stopped at 50 chose 50, so larger values were added. |
 
@@ -1323,7 +1323,7 @@ Every random step uses seed 67: the cross-validation folds (`set.seed(67)` befor
 The files this notebook produces:
 
 | File | Contents |
-|----|----|
+|------------------------------------|------------------------------------|
 | `Models/employment_tree_tuned.rds` | Tuned decision tree |
 | `Models/employment_forest_tuned.rds` | Tuned employment random forest |
 | `Models/employment_baseline.rds` | Demographics-only employment baseline |

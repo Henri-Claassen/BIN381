@@ -9,7 +9,7 @@
 <meta name="author" content="Group 5">
 <meta name="dcterms.date" content="2026-09-29">
 
-<title>Income Model: Model Selection and Implementation</title>
+<title>Deployment Preparation</title>
 <style>
 
 code{white-space: pre-wrap;}
@@ -2211,40 +2211,35 @@ vertical-align: -.125em;
   <ul>
   <li><a href="#about-this-file" id="toc-about-this-file" class="nav-link active" data-scroll-target="#about-this-file">About this file</a></li>
   <li><a href="#how-this-notebook-works" id="toc-how-this-notebook-works" class="nav-link" data-scroll-target="#how-this-notebook-works">How this notebook works</a></li>
-  <li><a href="#loading-the-packages-we-need" id="toc-loading-the-packages-we-need" class="nav-link" data-scroll-target="#loading-the-packages-we-need">Loading the packages we need</a></li>
-  <li><a href="#file-paths" id="toc-file-paths" class="nav-link" data-scroll-target="#file-paths">File paths</a></li>
-  <li><a href="#analytical-question-and-modelling-task" id="toc-analytical-question-and-modelling-task" class="nav-link" data-scroll-target="#analytical-question-and-modelling-task">1. Analytical question and modelling task</a></li>
-  <li><a href="#data-and-predictors" id="toc-data-and-predictors" class="nav-link" data-scroll-target="#data-and-predictors">2. Data and predictors</a>
+  <li><a href="#deployment-strategy" id="toc-deployment-strategy" class="nav-link" data-scroll-target="#deployment-strategy">1. Deployment strategy</a></li>
+  <li><a href="#deployment-tools-compared" id="toc-deployment-tools-compared" class="nav-link" data-scroll-target="#deployment-tools-compared">2. Deployment tools compared</a></li>
+  <li><a href="#what-the-app-loads-and-why-not-the-saved-model" id="toc-what-the-app-loads-and-why-not-the-saved-model" class="nav-link" data-scroll-target="#what-the-app-loads-and-why-not-the-saved-model">3. What the app loads, and why not the saved model</a></li>
+  <li><a href="#loading-the-model-and-data" id="toc-loading-the-model-and-data" class="nav-link" data-scroll-target="#loading-the-model-and-data">4. Loading the model and data</a></li>
+  <li><a href="#the-slim-model" id="toc-the-slim-model" class="nav-link" data-scroll-target="#the-slim-model">5. The slim model</a></li>
+  <li><a href="#education-internet-page-group-predictions" id="toc-education-internet-page-group-predictions" class="nav-link" data-scroll-target="#education-internet-page-group-predictions">6. Education × internet page: group predictions</a></li>
+  <li><a href="#province-scenarios-page" id="toc-province-scenarios-page" class="nav-link" data-scroll-target="#province-scenarios-page">7. Province scenarios page</a></li>
+  <li><a href="#monitoring-baseline" id="toc-monitoring-baseline" class="nav-link" data-scroll-target="#monitoring-baseline">8. Monitoring baseline</a>
   <ul class="collapse">
-  <li><a href="#reading-the-training-data" id="toc-reading-the-training-data" class="nav-link" data-scroll-target="#reading-the-training-data">2.1 Reading the training data</a></li>
-  <li><a href="#the-outcome" id="toc-the-outcome" class="nav-link" data-scroll-target="#the-outcome">2.2 The outcome</a></li>
-  <li><a href="#choosing-the-predictors" id="toc-choosing-the-predictors" class="nav-link" data-scroll-target="#choosing-the-predictors">2.3 Choosing the predictors</a></li>
+  <li><a href="#test-set-accuracy" id="toc-test-set-accuracy" class="nav-link" data-scroll-target="#test-set-accuracy">8.1 Test-set accuracy</a></li>
+  <li><a href="#performance-by-group" id="toc-performance-by-group" class="nav-link" data-scroll-target="#performance-by-group">8.2 Performance by group</a></li>
+  <li><a href="#the-training-mix" id="toc-the-training-mix" class="nav-link" data-scroll-target="#the-training-mix">8.3 The training mix</a></li>
   </ul></li>
-  <li><a href="#candidate-models" id="toc-candidate-models" class="nav-link" data-scroll-target="#candidate-models">3. Candidate models</a></li>
-  <li><a href="#model-1-survey-weighted-linear-regression" id="toc-model-1-survey-weighted-linear-regression" class="nav-link" data-scroll-target="#model-1-survey-weighted-linear-regression">4. Model 1: Survey-weighted linear regression</a>
+  <li><a href="#key-results-for-the-overview-and-about-pages" id="toc-key-results-for-the-overview-and-about-pages" class="nav-link" data-scroll-target="#key-results-for-the-overview-and-about-pages">9. Key results for the Overview and About pages</a></li>
+  <li><a href="#saving-appapp_data.rds" id="toc-saving-appapp_data.rds" class="nav-link" data-scroll-target="#saving-appapp_data.rds">10. Saving <code>App/app_data.rds</code></a></li>
+  <li><a href="#validating-and-monitoring-new-data" id="toc-validating-and-monitoring-new-data" class="nav-link" data-scroll-target="#validating-and-monitoring-new-data">11. Validating and monitoring new data</a>
   <ul class="collapse">
-  <li><a href="#assumptions-and-parameter-choices" id="toc-assumptions-and-parameter-choices" class="nav-link" data-scroll-target="#assumptions-and-parameter-choices">4.1 Assumptions and parameter choices</a></li>
-  <li><a href="#fitting-the-model" id="toc-fitting-the-model" class="nav-link" data-scroll-target="#fitting-the-model">4.2 Fitting the model</a></li>
-  <li><a href="#fitted-coefficients" id="toc-fitted-coefficients" class="nav-link" data-scroll-target="#fitted-coefficients">4.3 Fitted coefficients</a></li>
-  </ul></li>
-  <li><a href="#model-2-random-forest-regression" id="toc-model-2-random-forest-regression" class="nav-link" data-scroll-target="#model-2-random-forest-regression">5. Model 2: Random forest (regression)</a>
-  <ul class="collapse">
-  <li><a href="#assumptions-and-parameter-choices-1" id="toc-assumptions-and-parameter-choices-1" class="nav-link" data-scroll-target="#assumptions-and-parameter-choices-1">5.1 Assumptions and parameter choices</a></li>
-  <li><a href="#fitting-the-model-1" id="toc-fitting-the-model-1" class="nav-link" data-scroll-target="#fitting-the-model-1">5.2 Fitting the model</a></li>
-  <li><a href="#variable-importance" id="toc-variable-importance" class="nav-link" data-scroll-target="#variable-importance">5.3 Variable importance</a></li>
-  </ul></li>
-  <li><a href="#saving-the-models-and-handing-over-to-evaluation" id="toc-saving-the-models-and-handing-over-to-evaluation" class="nav-link" data-scroll-target="#saving-the-models-and-handing-over-to-evaluation">6. Saving the models and handing over to evaluation</a>
-  <ul class="collapse">
-  <li><a href="#handover-to-tuning-and-evaluation" id="toc-handover-to-tuning-and-evaluation" class="nav-link" data-scroll-target="#handover-to-tuning-and-evaluation">Handover to tuning and evaluation</a></li>
+  <li><a href="#how-new-data-is-validated-and-scored" id="toc-how-new-data-is-validated-and-scored" class="nav-link" data-scroll-target="#how-new-data-is-validated-and-scored">11.1 How new data is validated and scored</a></li>
+  <li><a href="#monitoring-measures-and-thresholds" id="toc-monitoring-measures-and-thresholds" class="nav-link" data-scroll-target="#monitoring-measures-and-thresholds">11.2 Monitoring measures and thresholds</a></li>
+  <li><a href="#when-to-retrain-or-retire-the-model" id="toc-when-to-retrain-or-retire-the-model" class="nav-link" data-scroll-target="#when-to-retrain-or-retire-the-model">11.3 When to retrain or retire the model</a></li>
   </ul></li>
   </ul>
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="3.2--Income-Model.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="4--Deployment-Preparation.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
 </div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Income Model: Model Selection and Implementation</h1>
+<h1 class="title">Deployment Preparation</h1>
 </div>
 
 
@@ -2275,19 +2270,65 @@ vertical-align: -.125em;
 
 <section id="about-this-file" class="level2">
 <h2 class="anchored" data-anchor-id="about-this-file">About this file</h2>
-<p>This file covers model selection and implementation for the <strong>income question</strong> (research area D). It follows the same structure as <code>3.1) Employment Model.qmd</code>: it restates the question, chooses the candidate models, explains why each one was chosen and fits them to the training data.</p>
-<p>As with the employment models, <strong>the test set is not used here</strong> and no parameters are tuned. Each model is fitted once with documented starting parameters and saved to <code>Models/</code>, for tuning and evaluation in the evaluation notebook. The reasoning is also written up in <code>Model Choices.docx</code>.</p>
+<p>This file covers the Milestone 3 deployment task (Task 4). It documents the deployment strategy and the choice of deployment tool, and it builds <code>App/app_data.rds</code>: the one file the Shiny app in <code>App/app.R</code> loads. It also documents how new data is validated and how the deployed model is monitored.</p>
+<p>The deployed model is the <strong>survey-weighted logistic regression</strong> for employment, selected in <code>3.3) Model Evaluation.qmd</code> (section 9.3).</p>
 </section>
 <section id="how-this-notebook-works" class="level2">
 <h2 class="anchored" data-anchor-id="how-this-notebook-works">How this notebook works</h2>
-<p>The steps are the same as in <code>3.1) Employment Model.qmd</code>:</p>
 <ol type="1">
-<li><strong>Load the shared setup</strong> with <code>source(&quot;../R/model_preparation.R&quot;)</code>, which gives the notebook the predictor lists, the formulas and <code>prepare_income_data()</code>.</li>
-<li><strong>Prepare the training data</strong> with <code>prepare_income_data()</code>, which reads <code>income_train.csv</code> the same way in every notebook (section 2.1).</li>
-<li><strong>Fit two models</strong> on the same rows (sections 4–5). Parameters that work as in the employment models are only briefly commented here; the differences are explained in full.</li>
-<li><strong>Save</strong> both models to <code>Models/</code> and check that they reload with identical predictions (section 6).</li>
-<li><code>3.3) Model Evaluation.qmd</code> then tunes and tests them.</li>
+<li><strong>Load</strong> the selected model, the thresholds and the data (section 4).</li>
+<li><strong>Make the slim model</strong>, the part of the logistic regression the app needs to predict, and check that it predicts exactly like the full model (section 5).</li>
+<li><strong>Calculate the numbers each app page shows</strong>, so the app never needs the survey microdata:
+<ul>
+<li>the predicted employment rates of the four matric × internet groups, for every combination of the app’s filters (section 6);</li>
+<li>the province scenario figures (section 7);</li>
+<li>the test-set baseline and training-data mix that monitoring compares new data with (section 8);</li>
+<li>the key results and subgroup table for the Overview and About pages (section 9).</li>
+</ul></li>
+<li><strong>Save</strong> everything to <code>App/app_data.rds</code> (section 10).</li>
 </ol>
+<p>Rerun this notebook whenever the deployed model is retrained, then restart the app.</p>
+</section>
+<section id="deployment-strategy" class="level1">
+<h1>1. Deployment strategy</h1>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Element</th>
+<th>Plan</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Intended users</strong></td>
+<td>Policy analysts at National Treasury (the Milestone 1 stakeholder), and the analysts who maintain the model.</td>
+</tr>
+<tr class="even">
+<td><strong>Decisions supported</strong></td>
+<td>How to divide limited funding between digital-access subsidies and education programmes: whether the two reinforce each other (complements) and in which provinces more home internet access is associated with the largest employment gains.</td>
+</tr>
+<tr class="odd">
+<td><strong>Inputs</strong></td>
+<td>(1) Filter choices: province, settlement type, age band and sex. (2) A scenario target: the share of households with home internet. (3) New survey data as a CSV file in the documented format, for checking and scoring.</td>
+</tr>
+<tr class="even">
+<td><strong>Outputs</strong></td>
+<td>Predicted employment rates for groups of people, with 95% confidence intervals; province scenarios; accuracy measures with plain-language explanations; a data validation report; monitoring checks with a green / amber / red status. <strong>No output is ever a prediction for an individual person.</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>Operational workflow</strong></td>
+<td>The notebooks 2.1–3.3 and this one are run in order to (re)build the models and <code>App/app_data.rds</code>. Users open the app (<code>shiny::runApp(&quot;App&quot;)</code>). When a new survey wave arrives, an analyst uploads it on the “Check and predict new data” page; the app validates it, predicts, and runs the monitoring checks. A red check triggers retraining: the notebooks are rerun on the new data.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why group-level only.</strong> The evaluation found that the model’s classifications are unreliable for individuals in some groups (section 7.6 of the evaluation: specificity of 0.04 for White and 0.20 for Indian/Asian people). Treasury’s decisions are also about groups and provinces, not people. The app therefore shows predicted employment <strong>rates</strong> for groups, and accuracy measures for whole files, but never labels a person as employed or unemployed.</p>
+</section>
+<section id="deployment-tools-compared" class="level1">
+<h1>2. Deployment tools compared</h1>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 25%">
@@ -2297,105 +2338,211 @@ vertical-align: -.125em;
 </colgroup>
 <thead>
 <tr class="header">
-<th>Model</th>
-<th>Function</th>
-<th>What fitting does</th>
-<th>What comes out</th>
+<th>Tool</th>
+<th>What it is</th>
+<th>Strengths</th>
+<th>Weaknesses for this project</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Linear regression</td>
-<td><code>survey::svyglm()</code></td>
-<td>Finds the coefficients that make the predicted <code>log_salary</code> as close as possible to the actual values (least squares), using the survey weights</td>
-<td>One coefficient per predictor, readable as a percentage difference in salary</td>
+<td><strong>R Shiny</strong> (with <code>bslib</code>)</td>
+<td>Interactive web app written in R</td>
+<td>Runs the R model directly, no translation; interactive filters, uploads and charts; recommended in the project outline; can run locally or be hosted on shinyapps.io</td>
+<td>Needs R (locally) or a hosting service</td>
 </tr>
 <tr class="even">
-<td>Random forest</td>
-<td><code>ranger::ranger()</code></td>
-<td>Grows 500 regression trees on random resamples and averages their predicted <code>log_salary</code></td>
-<td>Predicted <code>log_salary</code>, and a ranking of how much each predictor is used</td>
+<td><code>plumber</code></td>
+<td>Turns R functions into a web API</td>
+<td>Good for other software to request predictions</td>
+<td>No user interface: Treasury analysts need screens, not an API</td>
+</tr>
+<tr class="odd">
+<td><code>vetiver</code></td>
+<td>Versions and deploys models as APIs</td>
+<td>Model versioning and monitoring helpers</td>
+<td>Also API-first; more infrastructure than a student project needs</td>
+</tr>
+<tr class="even">
+<td><code>flexdashboard</code> / Quarto dashboard</td>
+<td>Dashboard produced from an R Markdown or Quarto file</td>
+<td>Simple to build</td>
+<td>Static unless combined with Shiny; cannot validate and score uploaded data</td>
+</tr>
+<tr class="odd">
+<td>Power BI with R visuals</td>
+<td>R scripts inside Power BI</td>
+<td>The team already uses Power BI</td>
+<td>R visuals are static images, uploads cannot be validated or scored, and publishing R visuals needs a Power BI service licence</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Formulas.</strong> The <code>+</code> and <code>*</code> work exactly as explained with the four-group tables in <code>3.1) Employment Model.qmd</code> (and in <code>R/model_preparation.R</code>), but the outcome is salary instead of employment:</p>
-<ul>
-<li><strong>With <code>+</code></strong>, the salary difference that goes with home internet is forced to be the same for people with and without matric.</li>
-<li><strong>With <code>*</code></strong>, the regression adds a fourth number for people with <strong>both</strong> matric and home internet. Above zero means the salary premium for matric is larger in connected households (complements); below zero means it is smaller (substitutes).</li>
-</ul>
-<p>The linear regression uses <code>matric_plus * any_home_internet</code> and <code>+</code> for the six controls. The random forest uses <code>+</code> only, because its trees find interactions themselves.</p>
+<p><strong>Recommendation: Shiny.</strong> It is the only option that gives Treasury analysts an interactive interface <strong>and</strong> runs the validation, prediction and monitoring code in the same R environment the model was built in. It runs locally with <code>shiny::runApp(&quot;App&quot;)</code>. Because the app contains only the slim model and aggregated tables (section 3), it could also be hosted on shinyapps.io without publishing any survey microdata.</p>
 </section>
-<section id="loading-the-packages-we-need" class="level2">
-<h2 class="anchored" data-anchor-id="loading-the-packages-we-need">Loading the packages we need</h2>
+<section id="what-the-app-loads-and-why-not-the-saved-model" class="level1">
+<h1>3. What the app loads, and why not the saved model</h1>
+<p>The app does <strong>not</strong> load <code>Models/employment_logistic.rds</code>. That file is about 7 MB because the fitted <code>svyglm</code> object stores a full copy of the training data (22,671 people, including every <code>household_id</code>) inside it, plus working matrices from the fit. A deployed app should never carry survey microdata: if it were hosted, the data would be published with it, which the Milestone 1 ethics section (disclosure risk, usage terms) rules out.</p>
+<p>Instead, this notebook saves <code>App/app_data.rds</code>, which holds only:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Item</th>
+<th>What it contains</th>
+<th>Used on app page</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>slim_model</code></td>
+<td>Coefficients, their covariance matrix, the formula terms and category levels: all that is needed to predict (section 5)</td>
+<td>Check and predict new data</td>
+</tr>
+<tr class="even">
+<td><code>threshold</code></td>
+<td>The classification threshold (0.639) chosen in the evaluation</td>
+<td>Check and predict new data</td>
+</tr>
+<tr class="odd">
+<td><code>group_cells</code>, <code>group_gradients</code></td>
+<td>Predicted employment rates of the four matric × internet groups for every filter combination, with what is needed for their confidence intervals. Combinations with fewer than 50 people are suppressed (section 6)</td>
+<td>Education × internet</td>
+</tr>
+<tr class="even">
+<td><code>provinces</code></td>
+<td>Province totals for the scenario calculation (section 7)</td>
+<td>Province scenarios</td>
+</tr>
+<tr class="odd">
+<td><code>baseline</code>, <code>baseline_subgroups</code>, <code>baseline_subgroup_gap</code></td>
+<td>Test-set accuracy measures the monitoring checks compare with (section 8)</td>
+<td>Check and predict new data, About the model</td>
+</tr>
+<tr class="even">
+<td><code>reference_shares</code></td>
+<td>The share of training people in each category of the drift variables (section 8)</td>
+<td>Check and predict new data</td>
+</tr>
+<tr class="odd">
+<td><code>key_results</code>, <code>subgroups</code></td>
+<td>The interaction result, the income result and the subgroup performance table (section 9)</td>
+<td>Overview, About the model</td>
+</tr>
+<tr class="even">
+<td><code>built</code></td>
+<td>When the file was built and from which data</td>
+<td>About the model</td>
+</tr>
+</tbody>
+</table>
+<p>Every item is a model parameter, a total or an average. None is a row of survey data.</p>
+</section>
+<section id="loading-the-model-and-data" class="level1">
+<h1>4. Loading the model and data</h1>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse) <span class="co"># data handling (also loaded by the preparation script)</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)    <span class="co"># svyglm(): linear regression with survey weights and household clustering</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ranger)    <span class="co"># random forest</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse) <span class="co"># data handling</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)    <span class="co"># regTermTest(): likelihood-ratio test of the interaction</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pROC)      <span class="co"># AUC (through R/monitoring.R)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-</section>
-<section id="file-paths" class="level2">
-<h2 class="anchored" data-anchor-id="file-paths">File paths</h2>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>analytical_directory <span class="ot">&lt;-</span> <span class="st">&quot;../Datasets/Analytical/&quot;</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>model_directory <span class="ot">&lt;-</span> <span class="st">&quot;../Models/&quot;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(model_directory, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>) <span class="co"># created on the first run only</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-</div>
-</section>
-<section id="analytical-question-and-modelling-task" class="level1">
-<h1>1. Analytical question and modelling task</h1>
-<p>The Milestone 1 business success criterion includes determining <em>“whether internet access is associated with higher income among those who report it”</em>. This extends the employment question: the employment models ask whether education and internet access go with <strong>having</strong> a job, and this model asks whether they go with <strong>earning more</strong> in a job.</p>
-<ul>
-<li><strong>Modelling task:</strong> <strong>regression</strong>. The outcome <code>log_salary</code> is the natural log of the monthly salary, which is continuous.</li>
-<li><strong>Population:</strong> employed people who reported a salary of at least R100, from <code>income_train.csv</code>.</li>
-<li><strong>What the models must deliver:</strong> an estimate of how much higher salaries are, on average, with matric and with home internet, including whether the two together are associated with more than the sum of their separate effects (the same education × internet interaction as in the employment model).</li>
-</ul>
-<p>This question is <strong>exploratory</strong>. Salaries are missing for a large share of employed people (Milestone 1 data-quality assessment), and people who report a salary may differ from those who do not. The results describe people who reported a salary, not all employed people, and they are associations, not causes.</p>
-</section>
-<section id="data-and-predictors" class="level1">
-<h1>2. Data and predictors</h1>
-<section id="reading-the-training-data" class="level2">
-<h2 class="anchored" data-anchor-id="reading-the-training-data">2.1 Reading the training data</h2>
-<p>The data are read through <code>prepare_income_data()</code> in <code>R/model_preparation.R</code>, which the evaluation notebook and the Shiny app also use. It reads <code>household_id</code> as text, applies the fixed category levels and leaves out people with unknown education (<code>matric_plus</code> blank) or unknown household internet (<code>any_home_internet</code> blank). Milestone 2 left these missing values in <code>income_data.csv</code> to be handled here; they are left out rather than imputed, as in the employment data.</p>
-<div class="cell">
-<details open class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../R/model_preparation.R&quot;</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Raw file, only to count the rows before preparation</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>income_train_raw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;income_train.csv&quot;</span>),</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">household_id =</span> <span class="fu">col_character</span>()),</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">show_col_types =</span> <span class="cn">FALSE</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>income_train <span class="ot">&lt;-</span> <span class="fu">prepare_income_data</span>(<span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;income_train.csv&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>app_directory <span class="ot">&lt;-</span> <span class="st">&quot;../App/&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../R/model_preparation.R&quot;</span>) <span class="co"># predictor lists, formulas, prepare_employment_data()</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../R/deployment_model.R&quot;</span>)  <span class="co"># slim model functions</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../R/monitoring.R&quot;</span>)        <span class="co"># accuracy measures, drift and thresholds</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">check =</span> <span class="fu">c</span>(</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Rows in income_train.csv&quot;</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Rows removed: unknown education or unknown household internet&quot;</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Rows used for model fitting&quot;</span>,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Households used for model fitting&quot;</span>,</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Missing values left in the predictors or outcome&quot;</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(income_train_raw),</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(income_train_raw) <span class="sc">-</span> <span class="fu">nrow</span>(income_train),</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(income_train),</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">n_distinct</span>(income_train<span class="sc">$</span>household_id),</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(<span class="fu">select</span>(income_train, <span class="sc">-</span>household_id, <span class="sc">-</span>person_weight)))</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>employment_logistic <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;employment_logistic.rds&quot;</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>income_linear <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_linear.rds&quot;</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># The threshold chosen in the evaluation (section 4.4 of 3.3) for the logistic regression</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>threshold <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;employment_thresholds.csv&quot;</span>), <span class="at">show_col_types =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(model <span class="sc">==</span> <span class="st">&quot;Logistic regression&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(threshold)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># model_data = the whole labour force (training + test), used for the population</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># figures on the app&#39;s pages; model_train for the training mix; model_test for the baseline</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>population <span class="ot">&lt;-</span> <span class="fu">prepare_employment_data</span>(<span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;model_data.csv&quot;</span>))</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>model_train <span class="ot">&lt;-</span> <span class="fu">prepare_employment_data</span>(<span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;model_train.csv&quot;</span>))</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>model_test <span class="ot">&lt;-</span> <span class="fu">prepare_employment_data</span>(<span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;model_test.csv&quot;</span>))</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">item =</span> <span class="fu">c</span>(<span class="st">&quot;Deployed model&quot;</span>, <span class="st">&quot;Threshold&quot;</span>, <span class="st">&quot;Population rows (model_data)&quot;</span>, <span class="st">&quot;Training rows&quot;</span>, <span class="st">&quot;Test rows&quot;</span>),</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(<span class="st">&quot;Survey-weighted logistic regression&quot;</span>, <span class="fu">round</span>(threshold, <span class="dv">3</span>),</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>            <span class="fu">nrow</span>(population), <span class="fu">nrow</span>(model_train), <span class="fu">nrow</span>(model_test))</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">item</th>
+<th style="text-align: left;">value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Deployed model</td>
+<td style="text-align: left;">Survey-weighted logistic regression</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Threshold</td>
+<td style="text-align: left;">0.639</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Population rows (model_data)</td>
+<td style="text-align: left;">28245</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Training rows</td>
+<td style="text-align: left;">22671</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Test rows</td>
+<td style="text-align: left;">5574</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="the-slim-model" class="level1">
+<h1>5. The slim model</h1>
+<p><code>make_slim_model()</code> (in <code>R/deployment_model.R</code>) keeps only the coefficients, their covariance matrix, the formula terms and the category levels. The check below confirms that it predicts <strong>exactly</strong> like the full model on the whole population:</p>
+<div class="cell">
+<details open class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>slim_model <span class="ot">&lt;-</span> <span class="fu">make_slim_model</span>(employment_logistic)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>full_predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">predict</span>(employment_logistic, population, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>slim_predictions <span class="ot">&lt;-</span> <span class="fu">predict_slim</span>(slim_model, population)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">check =</span> <span class="fu">c</span>(<span class="st">&quot;Size of the full model in memory (MB)&quot;</span>, <span class="st">&quot;Size of the slim model in memory (KB)&quot;</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Largest difference between full and slim predictions&quot;</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Coefficient names match the design matrix columns&quot;</span>),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">as.numeric</span>(<span class="fu">object.size</span>(employment_logistic)) <span class="sc">/</span> <span class="dv">1024</span><span class="sc">^</span><span class="dv">2</span>, <span class="dv">1</span>),</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">as.numeric</span>(<span class="fu">object.size</span>(slim_model)) <span class="sc">/</span> <span class="dv">1024</span>, <span class="dv">1</span>),</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">format</span>(<span class="fu">signif</span>(<span class="fu">max</span>(<span class="fu">abs</span>(full_predictions <span class="sc">-</span> slim_predictions)), <span class="dv">3</span>)),</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">identical</span>(<span class="fu">names</span>(slim_model<span class="sc">$</span>coefficients), <span class="fu">colnames</span>(<span class="fu">slim_design_matrix</span>(slim_model, <span class="fu">head</span>(population))))</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> <span class="fu">as.character</span>()</span>
 <span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
@@ -2404,657 +2551,777 @@ vertical-align: -.125em;
 <thead>
 <tr class="header">
 <th style="text-align: left;">check</th>
-<th style="text-align: right;">value</th>
+<th style="text-align: left;">value</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Rows in income_train.csv</td>
-<td style="text-align: right;">14371</td>
+<td style="text-align: left;">Size of the full model in memory (MB)</td>
+<td style="text-align: left;">30.8</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Rows removed: unknown education or unknown household internet</td>
-<td style="text-align: right;">316</td>
+<td style="text-align: left;">Size of the slim model in memory (KB)</td>
+<td style="text-align: left;">35.9</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">Rows used for model fitting</td>
-<td style="text-align: right;">14055</td>
+<td style="text-align: left;">Largest difference between full and slim predictions</td>
+<td style="text-align: left;">2.22e-16</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Households used for model fitting</td>
-<td style="text-align: right;">10272</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Missing values left in the predictors or outcome</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: left;">Coefficient names match the design matrix columns</td>
+<td style="text-align: left;">TRUE</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 </div>
+<p>The largest difference is at the level of rounding error in the last decimal places, so the app’s predictions are the model’s predictions.</p>
 </section>
-<section id="the-outcome" class="level2">
-<h2 class="anchored" data-anchor-id="the-outcome">2.2 The outcome</h2>
-<p>Salaries are strongly right-skewed: a few very high salaries would dominate a model of the raw amounts. Milestone 2 therefore created <code>log_salary</code>. On the log scale the distribution is close to symmetric, which suits linear regression, and a coefficient <em>b</em> can be read as a percentage difference in salary: exp(<em>b</em>) − 1.</p>
+<section id="education-internet-page-group-predictions" class="level1">
+<h1>6. Education × internet page: group predictions</h1>
+<p>The main app page compares the predicted employment rate of the four matric × internet groups. The method is the one used in section 8.2 of the evaluation: <strong>every person</strong> matching the user’s filters is given each group’s <code>matric_plus</code> and <code>any_home_internet</code> values in turn, with all their other characteristics unchanged, and the predictions are averaged using <code>person_weight</code>. The four groups then differ only in education and internet access, and the averages describe the real mix of people (including their population groups and households) rather than one invented “typical” person. This is why population group does not need to be a filter.</p>
+<p>This is calculated here for every combination of the app’s filters (province, settlement type, age band and sex, each including “All”), so the app only looks the result up.</p>
+<p><strong>Confidence intervals.</strong> The uncertainty of an average prediction comes from the uncertainty of the coefficients. For each average, its gradient (how the average changes when each coefficient changes slightly) is stored; the app combines it with the coefficient covariance matrix (the delta method) to give a 95% confidence interval. For a person with predicted probability <em>p</em> and design row <em>x</em>, the gradient of <em>p</em> is <em>p</em>(1 − <em>p</em>)<em>x</em>; the gradient of a weighted average is the weighted average of these.</p>
+<p><strong>Small groups.</strong> Combinations with fewer than 50 people in the survey are suppressed: their estimates would be unreliable, and publishing results for very small groups risks identifying people (Milestone 1 ethics).</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(income_train, <span class="fu">aes</span>(<span class="at">x =</span> log_salary)) <span class="sc">+</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">50</span>, <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Distribution of log monthly salary (training data)&quot;</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;log(salary in rand)&quot;</span>,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;People&quot;</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img role="img" src="data:image/png;base64,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" class="img-fluid figure-img" width="768"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="choosing-the-predictors" class="level2">
-<h2 class="anchored" data-anchor-id="choosing-the-predictors">2.3 Choosing the predictors</h2>
-<p><code>income_data.csv</code> has fewer candidate predictors than <code>model_data.csv</code>: it was built with the education, digital-access and demographic columns only (Milestone 2, section 10.6). The same choices are made as for the employment model, so the two models can be compared:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Kept</th>
-<th>Left out</th>
-<th>Reason</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>matric_plus</code></td>
-<td><code>education_band</code></td>
-<td>One 0/1 education variable gives one interaction coefficient, the same question as in the employment model.</td>
-</tr>
-<tr class="even">
-<td><code>any_home_internet</code></td>
-<td><code>digital_access_score</code></td>
-<td><code>digital_access_score</code> includes internet access, so using both would count it twice. <code>any_home_internet</code> is also the column used in the employment model.</td>
-</tr>
-<tr class="odd">
-<td><code>age_centred</code>, <code>age_centred_squared</code></td>
-<td></td>
-<td>Salaries rise with experience and level off, a curved pattern that the squared term allows for.</td>
-</tr>
-<tr class="even">
-<td><code>female</code>, <code>population_group</code>, <code>province</code>, <code>settlement_type</code></td>
-<td></td>
-<td>Controls for the gender pay gap, historical inequality and regional wage differences. Without them, the internet effect would partly be one of these. <code>population_group</code> is a sensitive attribute, used as a control and for fairness checks, not to predict any individual’s salary.</td>
-</tr>
-</tbody>
-</table>
-<p>As in the employment model, <code>household_id</code> and <code>person_weight</code> are design columns, not predictors.</p>
-<p>Each combination of matric and internet access has enough people to estimate the interaction:</p>
-<div class="cell">
-<details open class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>income_train <span class="sc">|&gt;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(matric_plus, any_home_internet, <span class="at">name =</span> <span class="st">&quot;people&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>minimum_people <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The four groups: matric_plus x any_home_internet</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>scenarios <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>scenario, <span class="sc">~</span>matric_plus, <span class="sc">~</span>any_home_internet,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;00&quot;</span>, <span class="dv">0</span>, <span class="dv">0</span>,  <span class="co"># below matric, no internet</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;01&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>,  <span class="co"># below matric, internet</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;10&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>,  <span class="co"># matric, no internet</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;11&quot;</span>, <span class="dv">1</span>, <span class="dv">1</span>   <span class="co"># matric, internet</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># For each group: everyone&#39;s design matrix, probability and gradient, with only</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># matric_plus and any_home_internet changed</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>scenario_results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(scenarios)), <span class="cf">function</span>(s) {</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> population <span class="sc">|&gt;</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">matric_plus =</span> scenarios<span class="sc">$</span>matric_plus[s], <span class="at">any_home_internet =</span> scenarios<span class="sc">$</span>any_home_internet[s])</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  design <span class="ot">&lt;-</span> <span class="fu">slim_design_matrix</span>(slim_model, data)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  probability <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">plogis</span>(design <span class="sc">%*%</span> slim_model<span class="sc">$</span>coefficients))</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">probability =</span> probability, <span class="at">gradient_rows =</span> probability <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> probability) <span class="sc">*</span> design)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(scenario_results) <span class="ot">&lt;-</span> scenarios<span class="sc">$</span>scenario</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter values for each person, and every combination of the app&#39;s filters</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>person_filters <span class="ot">&lt;-</span> population <span class="sc">|&gt;</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">province =</span> <span class="fu">as.character</span>(province),</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">settlement_type =</span> <span class="fu">as.character</span>(settlement_type),</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_band =</span> <span class="fu">as.character</span>(<span class="fu">make_age_band</span>(age_centred)),</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">if_else</span>(female <span class="sc">==</span> <span class="dv">1</span>, <span class="st">&quot;Female&quot;</span>, <span class="st">&quot;Male&quot;</span>)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>group_cells <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">province =</span> <span class="fu">c</span>(<span class="st">&quot;All provinces&quot;</span>, category_levels<span class="sc">$</span>province),</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">settlement_type =</span> <span class="fu">c</span>(<span class="st">&quot;All settlement types&quot;</span>, category_levels<span class="sc">$</span>settlement_type),</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">age_band =</span> <span class="fu">c</span>(<span class="st">&quot;All ages&quot;</span>, age_band_levels),</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">sex =</span> <span class="fu">c</span>(<span class="st">&quot;Both sexes&quot;</span>, <span class="st">&quot;Male&quot;</span>, <span class="st">&quot;Female&quot;</span>)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>group_gradients <span class="ot">&lt;-</span> <span class="fu">setNames</span>(</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(scenarios<span class="sc">$</span>scenario, \(s) <span class="fu">matrix</span>(<span class="cn">NA_real_</span>, <span class="fu">nrow</span>(group_cells), <span class="fu">length</span>(slim_model<span class="sc">$</span>coefficients),</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>                                          <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, <span class="fu">names</span>(slim_model<span class="sc">$</span>coefficients)))),</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>  scenarios<span class="sc">$</span>scenario</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>group_cells <span class="ot">&lt;-</span> group_cells <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">people =</span> <span class="cn">NA_integer_</span>, <span class="at">p00 =</span> <span class="cn">NA_real_</span>, <span class="at">p01 =</span> <span class="cn">NA_real_</span>, <span class="at">p10 =</span> <span class="cn">NA_real_</span>, <span class="at">p11 =</span> <span class="cn">NA_real_</span>)</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(group_cells))) {</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>  cell <span class="ot">&lt;-</span> group_cells[i, ]</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>  in_cell <span class="ot">&lt;-</span> (cell<span class="sc">$</span>province <span class="sc">==</span> <span class="st">&quot;All provinces&quot;</span> <span class="sc">|</span> person_filters<span class="sc">$</span>province <span class="sc">==</span> cell<span class="sc">$</span>province) <span class="sc">&amp;</span></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    (cell<span class="sc">$</span>settlement_type <span class="sc">==</span> <span class="st">&quot;All settlement types&quot;</span> <span class="sc">|</span> person_filters<span class="sc">$</span>settlement_type <span class="sc">==</span> cell<span class="sc">$</span>settlement_type) <span class="sc">&amp;</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    (cell<span class="sc">$</span>age_band <span class="sc">==</span> <span class="st">&quot;All ages&quot;</span> <span class="sc">|</span> person_filters<span class="sc">$</span>age_band <span class="sc">==</span> cell<span class="sc">$</span>age_band) <span class="sc">&amp;</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    (cell<span class="sc">$</span>sex <span class="sc">==</span> <span class="st">&quot;Both sexes&quot;</span> <span class="sc">|</span> person_filters<span class="sc">$</span>sex <span class="sc">==</span> cell<span class="sc">$</span>sex)</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>  group_cells<span class="sc">$</span>people[i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(in_cell)</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">sum</span>(in_cell) <span class="sc">&lt;</span> minimum_people) <span class="cf">next</span> <span class="co"># suppressed: left as NA</span></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>  weight <span class="ot">&lt;-</span> population<span class="sc">$</span>person_weight[in_cell]</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> scenarios<span class="sc">$</span>scenario) {</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> scenario_results[[s]]</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    group_cells[[<span class="fu">paste0</span>(<span class="st">&quot;p&quot;</span>, s)]][i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(weight <span class="sc">*</span> result<span class="sc">$</span>probability[in_cell]) <span class="sc">/</span> <span class="fu">sum</span>(weight)</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>    group_gradients[[s]][i, ] <span class="ot">&lt;-</span> <span class="fu">colSums</span>(weight <span class="sc">*</span> result<span class="sc">$</span>gradient_rows[in_cell, , <span class="at">drop =</span> <span class="cn">FALSE</span>]) <span class="sc">/</span> <span class="fu">sum</span>(weight)</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>  <span class="at">measure =</span> <span class="fu">c</span>(<span class="st">&quot;Filter combinations&quot;</span>, <span class="st">&quot;Combinations shown&quot;</span>, <span class="st">&quot;Combinations suppressed (&lt; 50 people)&quot;</span>),</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(<span class="fu">nrow</span>(group_cells), <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(group_cells<span class="sc">$</span>p00)), <span class="fu">sum</span>(<span class="fu">is.na</span>(group_cells<span class="sc">$</span>p00)))</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
 <table class="caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
-<th style="text-align: right;">matric_plus</th>
-<th style="text-align: right;">any_home_internet</th>
+<th style="text-align: left;">measure</th>
+<th style="text-align: right;">value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Filter combinations</td>
+<td style="text-align: right;">900</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Combinations shown</td>
+<td style="text-align: right;">585</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Combinations suppressed (&lt; 50 people)</td>
+<td style="text-align: right;">315</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<details open class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The national figures: all filters on &quot;All&quot;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>group_cells <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(province <span class="sc">==</span> <span class="st">&quot;All provinces&quot;</span>, settlement_type <span class="sc">==</span> <span class="st">&quot;All settlement types&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>         age_band <span class="sc">==</span> <span class="st">&quot;All ages&quot;</span>, sex <span class="sc">==</span> <span class="st">&quot;Both sexes&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(p00<span class="sc">:</span>p11, \(x) <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> x, <span class="dv">1</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 25%">
+<col style="width: 10%">
+<col style="width: 13%">
+<col style="width: 8%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">province</th>
+<th style="text-align: left;">settlement_type</th>
+<th style="text-align: left;">age_band</th>
+<th style="text-align: left;">sex</th>
 <th style="text-align: right;">people</th>
+<th style="text-align: right;">p00</th>
+<th style="text-align: right;">p01</th>
+<th style="text-align: right;">p10</th>
+<th style="text-align: right;">p11</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1285</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">4410</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">555</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">7805</td>
+<td style="text-align: left;">All provinces</td>
+<td style="text-align: left;">All settlement types</td>
+<td style="text-align: left;">All ages</td>
+<td style="text-align: left;">Both sexes</td>
+<td style="text-align: right;">28245</td>
+<td style="text-align: right;">60.9</td>
+<td style="text-align: right;">62.7</td>
+<td style="text-align: right;">63.5</td>
+<td style="text-align: right;">69.7</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 </div>
+<p>The national rates (in %) should match the logistic regression’s group probabilities in section 8.2 of the evaluation, apart from small differences because the evaluation averaged over the training people only and this uses the whole labour force.</p>
 </section>
-</section>
-<section id="candidate-models" class="level1">
-<h1>3. Candidate models</h1>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Model</th>
-<th>Package</th>
-<th>Role</th>
-<th>Why it suits this problem</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>1. Survey-weighted linear regression</strong></td>
-<td><code>survey::svyglm()</code></td>
-<td>Main explanatory model</td>
-<td>Estimates the education × internet interaction directly, as a percentage difference in salary with a confidence interval and significance test. It uses the survey weights and household clustering, like the employment model.</td>
-</tr>
-<tr class="even">
-<td><strong>2. Random forest (regression)</strong></td>
-<td><code>ranger::ranger()</code></td>
-<td>Predictive benchmark and robustness check</td>
-<td>Allows non-linear effects and any interactions. It shows whether the linear model misses important structure, and whether education and internet remain important predictors of income without the linear model’s assumptions.</td>
-</tr>
-</tbody>
-</table>
-<p>Two models meet the brief’s requirement of at least two candidates, and a linear model paired with a tree-based model matches the robustness check promised in Milestone 1. A single decision tree was not added here: the income question is exploratory, and the decision tree’s role (a readable check) is already covered in the employment model.</p>
-<p>Models considered but not used:</p>
+<section id="province-scenarios-page" class="level1">
+<h1>7. Province scenarios page</h1>
+<p>The scenario page asks: <em>if the share of households with home internet in a province rose to a target level, what employment rate would the model’s association predict?</em></p>
+<p>For each province this section stores:</p>
 <ul>
-<li><strong>Gamma or log-normal GLM on the raw salary:</strong> gives much the same answer as a linear model of <code>log_salary</code>, but is harder to explain.</li>
-<li><strong>Quantile regression:</strong> would show effects at low and high salaries separately. A possible extension, but beyond what the business question asks.</li>
+<li>the labour force (the sum of <code>person_weight</code>) and the actual weighted employment rate,</li>
+<li>the current share of people with home internet and the model’s current predicted employment rate,</li>
+<li>the <strong>uplift for the unconnected</strong>: for each person currently without home internet, the model’s predicted probability with internet minus without it (everything else unchanged), averaged with <code>person_weight</code>.</li>
 </ul>
-</section>
-<section id="model-1-survey-weighted-linear-regression" class="level1">
-<h1>4. Model 1: Survey-weighted linear regression</h1>
-<section id="assumptions-and-parameter-choices" class="level2">
-<h2 class="anchored" data-anchor-id="assumptions-and-parameter-choices">4.1 Assumptions and parameter choices</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Assumption</th>
-<th>How it is handled</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Linear relationship with the numeric predictors</td>
-<td>Age enters as a linear and a squared term. The other predictors are 0/1 or categorical, so linearity does not apply to them.</td>
-</tr>
-<tr class="even">
-<td>Roughly normal, constant-variance errors</td>
-<td>The log transformation makes salaries roughly symmetric. The residuals are checked during evaluation.</td>
-</tr>
-<tr class="odd">
-<td>Independent observations</td>
-<td>Household members share household-level predictors, so households are the clusters in the survey design, and the standard errors allow for this.</td>
-</tr>
-<tr class="even">
-<td>No strong multicollinearity</td>
-<td>Overlapping columns were left out in section 2.3.</td>
-</tr>
-<tr class="odd">
-<td>Representative estimates</td>
-<td><code>person_weight</code> makes the estimates describe the salaried population rather than the sample.</td>
-</tr>
-</tbody>
-</table>
-<p>Parameter choices: <code>family = gaussian()</code> (ordinary linear regression), with the design <code>ids = ~household_id, weights = ~person_weight</code>. The interaction <code>matric_plus * any_home_internet</code> is included as in the employment model. On the log scale, a positive interaction coefficient means the salary premium for matric is larger in connected households (complements), and a negative one means it is smaller (substitutes). There are no hyperparameters to tune.</p>
-</section>
-<section id="fitting-the-model" class="level2">
-<h2 class="anchored" data-anchor-id="fitting-the-model">4.2 Fitting the model</h2>
+<p>The app then calculates, for a target share <em>t</em> above the current share <em>c</em>:</p>
+<blockquote class="blockquote">
+<p>predicted rate at <em>t</em> = current predicted rate + ((<em>t</em> − <em>c</em>) / (1 − <em>c</em>)) × uplift for the unconnected</p>
+</blockquote>
+<p>(<em>t</em> − <em>c</em>) / (1 − <em>c</em>) is the fraction of currently unconnected people who would need to be connected to reach the target. This assumes the newly connected are a typical mix of the currently unconnected, and that the association between internet and employment seen today would hold for them. It is a scenario, not a forecast of what a subsidy would cause.</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Survey design, as in the employment model: households as clusters, person_weight as the survey weight</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>income_design <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">ids =</span> <span class="sc">~</span>household_id,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">weights =</span> <span class="sc">~</span>person_weight,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> income_train</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>income_linear <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  income_regression_formula, <span class="co"># log_salary ~ matric_plus * any_home_internet + the 6 controls (R/model_preparation.R)</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">design =</span> income_design,</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">gaussian</span>()        <span class="co"># ordinary linear regression: the outcome is a number, not yes/no</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>income_regression_formula <span class="co"># prints the formula in full</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>with_internet <span class="ot">&lt;-</span> <span class="fu">predict_slim</span>(slim_model, population <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">any_home_internet =</span> <span class="dv">1</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>without_internet <span class="ot">&lt;-</span> <span class="fu">predict_slim</span>(slim_model, population <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">any_home_internet =</span> <span class="dv">0</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>province_summary <span class="ot">&lt;-</span> <span class="cf">function</span>(data, rows) {</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  weight <span class="ot">&lt;-</span> data<span class="sc">$</span>person_weight</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  unconnected <span class="ot">&lt;-</span> data<span class="sc">$</span>any_home_internet <span class="sc">==</span> <span class="dv">0</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">people =</span> <span class="fu">nrow</span>(data),</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">labour_force =</span> <span class="fu">sum</span>(weight),</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">actual_rate =</span> <span class="fu">sum</span>(weight <span class="sc">*</span> (data<span class="sc">$</span>employed <span class="sc">==</span> <span class="st">&quot;Employed&quot;</span>)) <span class="sc">/</span> <span class="fu">sum</span>(weight),</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">internet_share =</span> <span class="fu">sum</span>(weight <span class="sc">*</span> data<span class="sc">$</span>any_home_internet) <span class="sc">/</span> <span class="fu">sum</span>(weight),</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">predicted_rate =</span> <span class="fu">sum</span>(weight <span class="sc">*</span> slim_predictions[rows]) <span class="sc">/</span> <span class="fu">sum</span>(weight),</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">uplift_unconnected =</span> <span class="fu">sum</span>(weight[unconnected] <span class="sc">*</span> (with_internet[rows] <span class="sc">-</span> without_internet[rows])[unconnected]) <span class="sc">/</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sum</span>(weight[unconnected])</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>provinces <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">lapply</span>(category_levels<span class="sc">$</span>province, <span class="cf">function</span>(p) {</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  rows <span class="ot">&lt;-</span> <span class="fu">which</span>(population<span class="sc">$</span>province <span class="sc">==</span> p)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">province_summary</span>(population[rows, ], rows) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">province =</span> p, <span class="at">.before =</span> <span class="dv">1</span>)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>provinces <span class="sc">|&gt;</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">labour_force =</span> <span class="fu">round</span>(labour_force),</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>         <span class="fu">across</span>(actual_rate<span class="sc">:</span>uplift_unconnected, \(x) <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> x, <span class="dv">1</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 7%">
+<col style="width: 13%">
+<col style="width: 12%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">province</th>
+<th style="text-align: right;">people</th>
+<th style="text-align: right;">labour_force</th>
+<th style="text-align: right;">actual_rate</th>
+<th style="text-align: right;">internet_share</th>
+<th style="text-align: right;">predicted_rate</th>
+<th style="text-align: right;">uplift_unconnected</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Gauteng</td>
+<td style="text-align: right;">8236</td>
+<td style="text-align: right;">8767874</td>
+<td style="text-align: right;">69.5</td>
+<td style="text-align: right;">87.5</td>
+<td style="text-align: right;">69.6</td>
+<td style="text-align: right;">4.1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Western Cape</td>
+<td style="text-align: right;">3030</td>
+<td style="text-align: right;">3607897</td>
+<td style="text-align: right;">78.7</td>
+<td style="text-align: right;">91.7</td>
+<td style="text-align: right;">78.8</td>
+<td style="text-align: right;">3.3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Eastern Cape</td>
+<td style="text-align: right;">2813</td>
+<td style="text-align: right;">2129683</td>
+<td style="text-align: right;">62.5</td>
+<td style="text-align: right;">76.8</td>
+<td style="text-align: right;">62.7</td>
+<td style="text-align: right;">3.6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Northern Cape</td>
+<td style="text-align: right;">1136</td>
+<td style="text-align: right;">522324</td>
+<td style="text-align: right;">66.2</td>
+<td style="text-align: right;">74.2</td>
+<td style="text-align: right;">66.4</td>
+<td style="text-align: right;">3.7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Free State</td>
+<td style="text-align: right;">1551</td>
+<td style="text-align: right;">1257471</td>
+<td style="text-align: right;">58.8</td>
+<td style="text-align: right;">80.4</td>
+<td style="text-align: right;">59.5</td>
+<td style="text-align: right;">3.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">KwaZulu-Natal</td>
+<td style="text-align: right;">4991</td>
+<td style="text-align: right;">5027519</td>
+<td style="text-align: right;">58.2</td>
+<td style="text-align: right;">92.5</td>
+<td style="text-align: right;">58.4</td>
+<td style="text-align: right;">3.3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">North West</td>
+<td style="text-align: right;">1434</td>
+<td style="text-align: right;">1579410</td>
+<td style="text-align: right;">68.1</td>
+<td style="text-align: right;">85.5</td>
+<td style="text-align: right;">68.3</td>
+<td style="text-align: right;">3.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mpumalanga</td>
+<td style="text-align: right;">2493</td>
+<td style="text-align: right;">2280335</td>
+<td style="text-align: right;">57.5</td>
+<td style="text-align: right;">87.5</td>
+<td style="text-align: right;">58.2</td>
+<td style="text-align: right;">3.2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Limpopo</td>
+<td style="text-align: right;">2561</td>
+<td style="text-align: right;">2131270</td>
+<td style="text-align: right;">64.9</td>
+<td style="text-align: right;">85.0</td>
+<td style="text-align: right;">63.5</td>
+<td style="text-align: right;">3.1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p><code>labour_force</code> estimates the number of people in each province’s labour force (aged 15–64, with known education). All rates are in %. The actual and predicted rates are close in every province, as expected from a well-calibrated model.</p>
+</section>
+<section id="monitoring-baseline" class="level1">
+<h1>8. Monitoring baseline</h1>
+<section id="test-set-accuracy" class="level2">
+<h2 class="anchored" data-anchor-id="test-set-accuracy">8.1 Test-set accuracy</h2>
+<p>Every monitoring check compares new data with the deployed model’s performance on the test set. The measures are calculated with <code>compute_metrics()</code> in <code>R/monitoring.R</code>, which uses the same definitions as the evaluation, so the values must match section 9.1 of <code>3.3) Model Evaluation.qmd</code> (AUC 0.765, balanced accuracy 0.693, Brier score 0.183):</p>
+<div class="cell">
+<details open class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>test_probability <span class="ot">&lt;-</span> <span class="fu">predict_slim</span>(slim_model, model_test)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>baseline <span class="ot">&lt;-</span> <span class="fu">compute_metrics</span>(model_test<span class="sc">$</span>employed, test_probability, threshold)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">measure =</span> <span class="fu">c</span>(<span class="st">&quot;AUC&quot;</span>, <span class="st">&quot;Balanced accuracy&quot;</span>, <span class="st">&quot;Sensitivity&quot;</span>, <span class="st">&quot;Specificity&quot;</span>, <span class="st">&quot;Precision&quot;</span>, <span class="st">&quot;F1&quot;</span>, <span class="st">&quot;Accuracy&quot;</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;Brier score&quot;</span>, <span class="st">&quot;Calibration gap&quot;</span>),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">round</span>(<span class="fu">c</span>(baseline<span class="sc">$</span>auc, baseline<span class="sc">$</span>balanced_accuracy, baseline<span class="sc">$</span>sensitivity, baseline<span class="sc">$</span>specificity,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>                  baseline<span class="sc">$</span>precision, baseline<span class="sc">$</span>f1, baseline<span class="sc">$</span>accuracy, baseline<span class="sc">$</span>brier,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                  baseline<span class="sc">$</span>calibration_gap), <span class="dv">3</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">measure</th>
+<th style="text-align: right;">value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">AUC</td>
+<td style="text-align: right;">0.765</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Balanced accuracy</td>
+<td style="text-align: right;">0.693</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sensitivity</td>
+<td style="text-align: right;">0.707</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Specificity</td>
+<td style="text-align: right;">0.679</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Precision</td>
+<td style="text-align: right;">0.801</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F1</td>
+<td style="text-align: right;">0.751</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Accuracy</td>
+<td style="text-align: right;">0.698</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Brier score</td>
+<td style="text-align: right;">0.183</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Calibration gap</td>
+<td style="text-align: right;">0.005</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p><strong>AUC</strong> (area under the ROC curve) is the main monitoring measure. Take one employed and one unemployed person at random: the AUC is the probability that the model gives the employed person the higher predicted probability. 0.5 is no better than a coin toss and 1 is perfect. Unlike accuracy, it does not depend on the threshold or on how many people are employed, so a change in AUC means the model ranks people less well, not just that the employment rate changed.</p>
+</section>
+<section id="performance-by-group" class="level2">
+<h2 class="anchored" data-anchor-id="performance-by-group">8.2 Performance by group</h2>
+<p>The subgroup table is shown on the app’s About page. The AUC gap between population groups is also the baseline for the fairness check: new data is flagged if the gap widens by more than 0.05.</p>
+<div class="cell">
+<details open class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>subgroups <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">lapply</span>(<span class="fu">c</span>(<span class="st">&quot;population_group&quot;</span>, <span class="st">&quot;female&quot;</span>, <span class="st">&quot;settlement_type&quot;</span>), <span class="cf">function</span>(column) {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  model_test <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">group =</span> <span class="fu">as.character</span>(.data[[column]]), <span class="at">probability =</span> test_probability) <span class="sc">|&gt;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(group) <span class="sc">|&gt;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_modify</span>(\(d, key) {</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>      m <span class="ot">&lt;-</span> <span class="fu">compute_metrics</span>(d<span class="sc">$</span>employed, d<span class="sc">$</span>probability, threshold)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tibble</span>(<span class="at">people =</span> m<span class="sc">$</span>people, <span class="at">share_employed =</span> m<span class="sc">$</span>actual_rate, <span class="at">auc =</span> m<span class="sc">$</span>auc,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">balanced_accuracy =</span> m<span class="sc">$</span>balanced_accuracy, <span class="at">sensitivity =</span> m<span class="sc">$</span>sensitivity, <span class="at">specificity =</span> m<span class="sc">$</span>specificity)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    }) <span class="sc">|&gt;</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">grouping =</span> column, <span class="at">.before =</span> <span class="dv">1</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>})) <span class="sc">|&gt;</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">grouping =</span> <span class="fu">recode</span>(grouping, <span class="at">population_group =</span> <span class="st">&quot;Population group&quot;</span>, <span class="at">female =</span> <span class="st">&quot;Sex&quot;</span>,</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>                      <span class="at">settlement_type =</span> <span class="st">&quot;Settlement type&quot;</span>),</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> <span class="fu">case_when</span>(grouping <span class="sc">==</span> <span class="st">&quot;Sex&quot;</span> <span class="sc">&amp;</span> group <span class="sc">==</span> <span class="st">&quot;1&quot;</span> <span class="sc">~</span> <span class="st">&quot;Female&quot;</span>, grouping <span class="sc">==</span> <span class="st">&quot;Sex&quot;</span> <span class="sc">&amp;</span> group <span class="sc">==</span> <span class="st">&quot;0&quot;</span> <span class="sc">~</span> <span class="st">&quot;Male&quot;</span>,</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>                      <span class="cn">TRUE</span> <span class="sc">~</span> group)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>subgroups <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="fu">across</span>(share_employed<span class="sc">:</span>specificity, \(x) <span class="fu">round</span>(x, <span class="dv">3</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 15%">
+<col style="width: 6%">
+<col style="width: 14%">
+<col style="width: 5%">
+<col style="width: 17%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">grouping</th>
+<th style="text-align: left;">group</th>
+<th style="text-align: right;">people</th>
+<th style="text-align: right;">share_employed</th>
+<th style="text-align: right;">auc</th>
+<th style="text-align: right;">balanced_accuracy</th>
+<th style="text-align: right;">sensitivity</th>
+<th style="text-align: right;">specificity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Population group</td>
+<td style="text-align: left;">Black African</td>
+<td style="text-align: right;">4642</td>
+<td style="text-align: right;">0.609</td>
+<td style="text-align: right;">0.749</td>
+<td style="text-align: right;">0.681</td>
+<td style="text-align: right;">0.652</td>
+<td style="text-align: right;">0.711</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Population group</td>
+<td style="text-align: left;">Coloured</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">0.758</td>
+<td style="text-align: right;">0.717</td>
+<td style="text-align: right;">0.624</td>
+<td style="text-align: right;">0.838</td>
+<td style="text-align: right;">0.411</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Population group</td>
+<td style="text-align: left;">Indian/Asian</td>
+<td style="text-align: right;">104</td>
+<td style="text-align: right;">0.856</td>
+<td style="text-align: right;">0.831</td>
+<td style="text-align: right;">0.600</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.200</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Population group</td>
+<td style="text-align: left;">White</td>
+<td style="text-align: right;">316</td>
+<td style="text-align: right;">0.921</td>
+<td style="text-align: right;">0.697</td>
+<td style="text-align: right;">0.513</td>
+<td style="text-align: right;">0.986</td>
+<td style="text-align: right;">0.040</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sex</td>
+<td style="text-align: left;">Male</td>
+<td style="text-align: right;">2867</td>
+<td style="text-align: right;">0.679</td>
+<td style="text-align: right;">0.770</td>
+<td style="text-align: right;">0.689</td>
+<td style="text-align: right;">0.773</td>
+<td style="text-align: right;">0.605</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sex</td>
+<td style="text-align: left;">Female</td>
+<td style="text-align: right;">2707</td>
+<td style="text-align: right;">0.610</td>
+<td style="text-align: right;">0.757</td>
+<td style="text-align: right;">0.687</td>
+<td style="text-align: right;">0.630</td>
+<td style="text-align: right;">0.745</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Settlement type</td>
+<td style="text-align: left;">Farms</td>
+<td style="text-align: right;">221</td>
+<td style="text-align: right;">0.724</td>
+<td style="text-align: right;">0.809</td>
+<td style="text-align: right;">0.740</td>
+<td style="text-align: right;">0.825</td>
+<td style="text-align: right;">0.656</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Settlement type</td>
+<td style="text-align: left;">Metro urban</td>
+<td style="text-align: right;">2244</td>
+<td style="text-align: right;">0.699</td>
+<td style="text-align: right;">0.758</td>
+<td style="text-align: right;">0.674</td>
+<td style="text-align: right;">0.770</td>
+<td style="text-align: right;">0.578</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Settlement type</td>
+<td style="text-align: left;">Non-metro urban</td>
+<td style="text-align: right;">1582</td>
+<td style="text-align: right;">0.665</td>
+<td style="text-align: right;">0.764</td>
+<td style="text-align: right;">0.688</td>
+<td style="text-align: right;">0.794</td>
+<td style="text-align: right;">0.583</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Settlement type</td>
+<td style="text-align: left;">Traditional</td>
+<td style="text-align: right;">1527</td>
+<td style="text-align: right;">0.534</td>
+<td style="text-align: right;">0.732</td>
+<td style="text-align: right;">0.651</td>
+<td style="text-align: right;">0.452</td>
+<td style="text-align: right;">0.850</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<details open class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>baseline_subgroups <span class="ot">&lt;-</span> <span class="fu">subgroup_auc</span>(model_test<span class="sc">$</span>employed, test_probability, model_test<span class="sc">$</span>population_group)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>baseline_subgroup_gap <span class="ot">&lt;-</span> <span class="fu">max</span>(baseline_subgroups<span class="sc">$</span>auc) <span class="sc">-</span> <span class="fu">min</span>(baseline_subgroups<span class="sc">$</span>auc)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(baseline_subgroup_gap, <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>log_salary ~ matric_plus * any_home_internet + age_centred + 
-    age_centred_squared + female + population_group + province + 
-    settlement_type</code></pre>
+<pre><code>[1] 0.052</code></pre>
 </div>
 </div>
 </section>
-<section id="fitted-coefficients" class="level2">
-<h2 class="anchored" data-anchor-id="fitted-coefficients">4.3 Fitted coefficients</h2>
-<p>Each coefficient is shown on the log scale and as a percentage difference in salary, with 95% confidence intervals. Interpreting the results is part of evaluation.</p>
+<section id="the-training-mix" class="level2">
+<h2 class="anchored" data-anchor-id="the-training-mix">8.3 The training mix</h2>
+<p>Drift is measured with the population stability index (PSI, <code>R/monitoring.R</code>), which compares the share of people in each category of new data with the training data. The training shares are stored here:</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>coefficient_table <span class="ot">&lt;-</span> <span class="fu">summary</span>(income_linear)<span class="sc">$</span>coefficients</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>confidence_limits <span class="ot">&lt;-</span> <span class="fu">confint</span>(income_linear) <span class="co"># Wald intervals, using the clustered standard errors</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">term =</span> <span class="fu">rownames</span>(coefficient_table),</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate =</span> coefficient_table[, <span class="st">&quot;Estimate&quot;</span>],</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># exp(b) - 1 turns a log-scale coefficient into a percentage difference in salary</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">percent_difference =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(coefficient_table[, <span class="st">&quot;Estimate&quot;</span>]) <span class="sc">-</span> <span class="dv">1</span>),</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_lower_percent =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(confidence_limits[, <span class="dv">1</span>]) <span class="sc">-</span> <span class="dv">1</span>),</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_upper_percent =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(confidence_limits[, <span class="dv">2</span>]) <span class="sc">-</span> <span class="dv">1</span>),</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">p_value =</span> coefficient_table[, <span class="st">&quot;Pr(&gt;|t|)&quot;</span>]</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(estimate<span class="sc">:</span>ci_upper_percent, \(x) <span class="fu">round</span>(x, <span class="dv">3</span>)),</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">p_value =</span> <span class="fu">format.pval</span>(p_value, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">eps =</span> <span class="fl">0.0001</span>)) <span class="co"># very small p-values show as &quot;&lt;1e-04&quot;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>training_mix <span class="ot">&lt;-</span> <span class="fu">drift_frame</span>(model_train)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>reference_shares <span class="ot">&lt;-</span> <span class="fu">lapply</span>(drift_variables, \(v) <span class="fu">category_shares</span>(training_mix[[v]])) <span class="sc">|&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setNames</span>(drift_variables)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check: the test set comes from the same survey, so its drift should be small (green)</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">drift_report</span>(model_test, reference_shares) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">psi =</span> <span class="fu">round</span>(psi, <span class="dv">4</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 30%">
-<col style="width: 8%">
-<col style="width: 18%">
-<col style="width: 16%">
-<col style="width: 16%">
+<col style="width: 19%">
 <col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 65%">
 </colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;">term</th>
-<th style="text-align: right;">estimate</th>
-<th style="text-align: right;">percent_difference</th>
-<th style="text-align: right;">ci_lower_percent</th>
-<th style="text-align: right;">ci_upper_percent</th>
-<th style="text-align: left;">p_value</th>
+<th style="text-align: left;">variable</th>
+<th style="text-align: right;">psi</th>
+<th style="text-align: left;">status</th>
+<th style="text-align: left;">meaning</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">8.002</td>
-<td style="text-align: right;">298542.127</td>
-<td style="text-align: right;">278148.364</td>
-<td style="text-align: right;">320430.618</td>
-<td style="text-align: left;">&lt; 1e-04</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">matric_plus</td>
-<td style="text-align: right;">0.723</td>
-<td style="text-align: right;">106.016</td>
-<td style="text-align: right;">85.041</td>
-<td style="text-align: right;">129.369</td>
-<td style="text-align: left;">&lt; 1e-04</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">any_home_internet</td>
-<td style="text-align: right;">0.500</td>
-<td style="text-align: right;">64.808</td>
-<td style="text-align: right;">54.115</td>
-<td style="text-align: right;">76.243</td>
-<td style="text-align: left;">&lt; 1e-04</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">age_centred</td>
-<td style="text-align: right;">0.018</td>
-<td style="text-align: right;">1.787</td>
-<td style="text-align: right;">1.616</td>
-<td style="text-align: right;">1.959</td>
-<td style="text-align: left;">&lt; 1e-04</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">age_centred_squared</td>
-<td style="text-align: right;">-0.001</td>
-<td style="text-align: right;">-0.069</td>
-<td style="text-align: right;">-0.084</td>
-<td style="text-align: right;">-0.055</td>
-<td style="text-align: left;">&lt; 1e-04</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">female</td>
-<td style="text-align: right;">-0.170</td>
-<td style="text-align: right;">-15.652</td>
-<td style="text-align: right;">-18.365</td>
-<td style="text-align: right;">-12.848</td>
-<td style="text-align: left;">&lt; 1e-04</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">population_groupColoured</td>
-<td style="text-align: right;">0.257</td>
-<td style="text-align: right;">29.255</td>
-<td style="text-align: right;">19.558</td>
-<td style="text-align: right;">39.739</td>
-<td style="text-align: left;">&lt; 1e-04</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">population_groupIndian/Asian</td>
-<td style="text-align: right;">0.625</td>
-<td style="text-align: right;">86.823</td>
-<td style="text-align: right;">56.630</td>
-<td style="text-align: right;">122.835</td>
-<td style="text-align: left;">&lt; 1e-04</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">population_groupWhite</td>
-<td style="text-align: right;">0.988</td>
-<td style="text-align: right;">168.708</td>
-<td style="text-align: right;">149.021</td>
-<td style="text-align: right;">189.952</td>
-<td style="text-align: left;">&lt; 1e-04</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">provinceWestern Cape</td>
-<td style="text-align: right;">0.090</td>
-<td style="text-align: right;">9.428</td>
-<td style="text-align: right;">1.971</td>
-<td style="text-align: right;">17.430</td>
-<td style="text-align: left;">0.01235</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">provinceEastern Cape</td>
-<td style="text-align: right;">-0.063</td>
-<td style="text-align: right;">-6.119</td>
-<td style="text-align: right;">-13.032</td>
-<td style="text-align: right;">1.345</td>
-<td style="text-align: left;">0.10571</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">provinceNorthern Cape</td>
-<td style="text-align: right;">0.110</td>
-<td style="text-align: right;">11.679</td>
-<td style="text-align: right;">-1.751</td>
-<td style="text-align: right;">26.944</td>
-<td style="text-align: left;">0.09107</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">provinceFree State</td>
-<td style="text-align: right;">-0.116</td>
-<td style="text-align: right;">-10.924</td>
-<td style="text-align: right;">-19.234</td>
-<td style="text-align: right;">-1.758</td>
-<td style="text-align: left;">0.02062</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">provinceKwaZulu-Natal</td>
-<td style="text-align: right;">-0.107</td>
-<td style="text-align: right;">-10.191</td>
-<td style="text-align: right;">-16.622</td>
-<td style="text-align: right;">-3.264</td>
-<td style="text-align: left;">0.00458</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">provinceNorth West</td>
-<td style="text-align: right;">0.133</td>
-<td style="text-align: right;">14.270</td>
-<td style="text-align: right;">2.852</td>
-<td style="text-align: right;">26.956</td>
-<td style="text-align: left;">0.01302</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">provinceMpumalanga</td>
-<td style="text-align: right;">0.037</td>
-<td style="text-align: right;">3.774</td>
-<td style="text-align: right;">-5.126</td>
-<td style="text-align: right;">13.510</td>
-<td style="text-align: left;">0.41803</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">provinceLimpopo</td>
-<td style="text-align: right;">0.218</td>
-<td style="text-align: right;">24.323</td>
-<td style="text-align: right;">13.917</td>
-<td style="text-align: right;">35.679</td>
-<td style="text-align: left;">&lt; 1e-04</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">settlement_typeNon-metro urban</td>
-<td style="text-align: right;">-0.221</td>
-<td style="text-align: right;">-19.794</td>
-<td style="text-align: right;">-24.236</td>
-<td style="text-align: right;">-15.090</td>
-<td style="text-align: left;">&lt; 1e-04</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">settlement_typeTraditional</td>
-<td style="text-align: right;">-0.510</td>
-<td style="text-align: right;">-39.928</td>
-<td style="text-align: right;">-44.054</td>
-<td style="text-align: right;">-35.498</td>
-<td style="text-align: left;">&lt; 1e-04</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">settlement_typeFarms</td>
-<td style="text-align: right;">-0.154</td>
-<td style="text-align: right;">-14.259</td>
-<td style="text-align: right;">-21.914</td>
-<td style="text-align: right;">-5.854</td>
-<td style="text-align: left;">0.00127</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">matric_plus:any_home_internet</td>
-<td style="text-align: right;">0.030</td>
-<td style="text-align: right;">3.088</td>
-<td style="text-align: right;">-8.010</td>
-<td style="text-align: right;">15.525</td>
-<td style="text-align: left;">0.60073</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<p>The intercept is on the log scale, and its percentage column has no meaning.</p>
-<div class="cell">
-<details open class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">check =</span> <span class="fu">c</span>(<span class="st">&quot;Rows used in the fit&quot;</span>, <span class="st">&quot;Coefficients estimated&quot;</span>, <span class="st">&quot;Coefficients not estimated (NA)&quot;</span>),</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nobs</span>(income_linear),</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">length</span>(<span class="fu">coef</span>(income_linear)),</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(<span class="fu">coef</span>(income_linear)))</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output-display">
-<div class="kable-table">
-<table class="caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">check</th>
-<th style="text-align: right;">value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Rows used in the fit</td>
-<td style="text-align: right;">14055</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Coefficients estimated</td>
-<td style="text-align: right;">21</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Coefficients not estimated (NA)</td>
-<td style="text-align: right;">0</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</section>
-</section>
-<section id="model-2-random-forest-regression" class="level1">
-<h1>5. Model 2: Random forest (regression)</h1>
-<section id="assumptions-and-parameter-choices-1" class="level2">
-<h2 class="anchored" data-anchor-id="assumptions-and-parameter-choices-1">5.1 Assumptions and parameter choices</h2>
-<p>The regression forest works like the employment forest, but each tree predicts the average <code>log_salary</code> of the people in its leaf rather than a class probability, and the forest averages those predictions. It makes no assumptions about the shape of the effects.</p>
-<p>Starting parameters (to be tuned in the evaluation notebook):</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Parameter</th>
-<th>Value</th>
-<th>Reason</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>num.trees</code></td>
-<td>500</td>
-<td>Enough trees for the predictions and importance scores to stabilise.</td>
-</tr>
-<tr class="even">
-<td><code>mtry</code></td>
-<td>2</td>
-<td>Predictors considered at each split: the standard one third of the 8 predictors for regression. The main tuning parameter.</td>
-</tr>
-<tr class="odd">
-<td><code>min.node.size</code></td>
-<td>5</td>
-<td>The standard minimum leaf size for regression forests.</td>
-</tr>
-<tr class="even">
-<td><code>respect.unordered.factors</code></td>
-<td><code>&quot;order&quot;</code></td>
-<td>Orders the levels of each categorical predictor by their average salary before splitting, instead of treating their alphabetical order as meaningful.</td>
-</tr>
-<tr class="odd">
-<td><code>importance</code></td>
-<td><code>&quot;permutation&quot;</code></td>
-<td>Measures how much the predictions worsen when a predictor’s values are shuffled.</td>
-</tr>
-<tr class="even">
-<td><code>seed</code></td>
-<td>67</td>
-<td>Makes the forest reproducible.</td>
-</tr>
-</tbody>
-</table>
-<p>Survey weights are not used, for the reason given in the employment model: <code>ranger</code> would use them as bootstrap sampling probabilities, so a few heavily weighted people would appear in almost every tree.</p>
-</section>
-<section id="fitting-the-model-1" class="level2">
-<h2 class="anchored" data-anchor-id="fitting-the-model-1">5.2 Fitting the model</h2>
-<div class="cell">
-<details open class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Works like the employment forest; only the settings that differ are explained in full</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>income_forest <span class="ot">&lt;-</span> <span class="fu">ranger</span>(</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  income_tree_formula,                 <span class="co"># log_salary ~ the same 8 predictors joined with +</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> income_train,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">num.trees =</span> <span class="dv">500</span>,                     <span class="co"># as in the employment forest</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="dv">2</span>,                            <span class="co"># predictors each split may choose from: one third of 8, the standard for regression</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">min.node.size =</span> <span class="dv">5</span>,                   <span class="co"># smallest group a tree may end in: the standard for regression forests</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">respect.unordered.factors =</span> <span class="st">&quot;order&quot;</span>, <span class="co"># categories sorted by average salary (not share employed) before splitting</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">importance =</span> <span class="st">&quot;permutation&quot;</span>,          <span class="co"># as in the employment forest</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">67</span>                            <span class="co"># as in the employment forest</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># No probability = TRUE: with a numeric outcome the forest averages the trees&#39; predicted log_salary</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-</div>
-</section>
-<section id="variable-importance" class="level2">
-<h2 class="anchored" data-anchor-id="variable-importance">5.3 Variable importance</h2>
-<div class="cell">
-<details open class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">predictor =</span> <span class="fu">names</span>(<span class="fu">importance</span>(income_forest)),</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">permutation_importance =</span> <span class="fu">importance</span>(income_forest)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(permutation_importance)) <span class="sc">|&gt;</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">permutation_importance =</span> <span class="fu">signif</span>(permutation_importance, <span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output-display">
-<div class="kable-table">
-<table class="caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">predictor</th>
-<th style="text-align: right;">permutation_importance</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">matric_plus</td>
-<td style="text-align: right;">0.2950</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">population_group</td>
-<td style="text-align: right;">0.1980</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">settlement_type</td>
-<td style="text-align: right;">0.1010</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">age_centred</td>
-<td style="text-align: right;">0.0885</td>
-</tr>
 <tr class="odd">
 <td style="text-align: left;">province</td>
-<td style="text-align: right;">0.0794</td>
+<td style="text-align: right;">0.0018</td>
+<td style="text-align: left;">Green</td>
+<td style="text-align: left;">The mix of people is about the same as in the training data.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">settlement_type</td>
+<td style="text-align: right;">0.0016</td>
+<td style="text-align: left;">Green</td>
+<td style="text-align: left;">The mix of people is about the same as in the training data.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">population_group</td>
+<td style="text-align: right;">0.0006</td>
+<td style="text-align: left;">Green</td>
+<td style="text-align: left;">The mix of people is about the same as in the training data.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age_band</td>
+<td style="text-align: right;">0.0003</td>
+<td style="text-align: left;">Green</td>
+<td style="text-align: left;">The mix of people is about the same as in the training data.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">matric_plus</td>
+<td style="text-align: right;">0.0000</td>
+<td style="text-align: left;">Green</td>
+<td style="text-align: left;">The mix of people is about the same as in the training data.</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">any_home_internet</td>
-<td style="text-align: right;">0.0698</td>
+<td style="text-align: right;">0.0003</td>
+<td style="text-align: left;">Green</td>
+<td style="text-align: left;">The mix of people is about the same as in the training data.</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">age_centred_squared</td>
-<td style="text-align: right;">0.0297</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">female</td>
-<td style="text-align: right;">0.0236</td>
+<td style="text-align: left;">smartphone_access</td>
+<td style="text-align: right;">0.0003</td>
+<td style="text-align: left;">Green</td>
+<td style="text-align: left;">The mix of people is about the same as in the training data.</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 </div>
-<p>Importance shows how much the forest <em>uses</em> a predictor, not the direction of its effect and not a causal effect.</p>
 </section>
 </section>
-<section id="saving-the-models-and-handing-over-to-evaluation" class="level1">
-<h1>6. Saving the models and handing over to evaluation</h1>
+<section id="key-results-for-the-overview-and-about-pages" class="level1">
+<h1>9. Key results for the Overview and About pages</h1>
+<p>The interaction result for employment and income, with the Rao-Scott likelihood-ratio test used in section 8.1 of the evaluation:</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(income_linear, <span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_linear.rds&quot;</span>))</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(income_forest, <span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_forest.rds&quot;</span>))</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="fu">c</span>(<span class="st">&quot;income_linear.rds&quot;</span>, <span class="st">&quot;income_forest.rds&quot;</span>),</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">size_mb =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(<span class="fu">file.path</span>(model_directory, file)) <span class="sc">/</span> <span class="dv">1024</span><span class="sc">^</span><span class="dv">2</span>, <span class="dv">1</span>)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>employment_lrt <span class="ot">&lt;-</span> <span class="fu">regTermTest</span>(employment_logistic, <span class="sc">~</span> matric_plus<span class="sc">:</span>any_home_internet, <span class="at">method =</span> <span class="st">&quot;LRT&quot;</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>income_lrt <span class="ot">&lt;-</span> <span class="fu">regTermTest</span>(income_linear, <span class="sc">~</span> matric_plus<span class="sc">:</span>any_home_internet, <span class="at">method =</span> <span class="st">&quot;LRT&quot;</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>interaction_ci <span class="ot">&lt;-</span> <span class="fu">confint</span>(employment_logistic)[<span class="st">&quot;matric_plus:any_home_internet&quot;</span>, ]</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>income_ci <span class="ot">&lt;-</span> <span class="fu">confint</span>(income_linear)[<span class="st">&quot;matric_plus:any_home_internet&quot;</span>, ]</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>key_results <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">odds_ratio =</span> <span class="fu">exp</span>(<span class="fu">coef</span>(employment_logistic)[[<span class="st">&quot;matric_plus:any_home_internet&quot;</span>]]),</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">odds_ratio_lower =</span> <span class="fu">exp</span>(interaction_ci[[<span class="dv">1</span>]]),</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">odds_ratio_upper =</span> <span class="fu">exp</span>(interaction_ci[[<span class="dv">2</span>]]),</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">employment_p =</span> employment_lrt<span class="sc">$</span>p,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">income_percent =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(<span class="fu">coef</span>(income_linear)[[<span class="st">&quot;matric_plus:any_home_internet&quot;</span>]]) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">income_percent_lower =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(income_ci[[<span class="dv">1</span>]]) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">income_percent_upper =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(income_ci[[<span class="dv">2</span>]]) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">income_p =</span> income_lrt<span class="sc">$</span>p,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">training_people =</span> <span class="fu">nrow</span>(model_train),</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">test_people =</span> <span class="fu">nrow</span>(model_test)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">result =</span> <span class="fu">names</span>(key_results),</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">value =</span> <span class="fu">map_chr</span>(key_results, \(x) <span class="fu">format</span>(<span class="cf">if</span> (x <span class="sc">==</span> <span class="fu">round</span>(x)) x <span class="cf">else</span> <span class="fu">signif</span>(x, <span class="dv">4</span>), <span class="at">big.mark =</span> <span class="st">&quot;,&quot;</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">result</th>
+<th style="text-align: left;">value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">odds_ratio</td>
+<td style="text-align: left;">1.292</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">odds_ratio_lower</td>
+<td style="text-align: left;">1.057</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">odds_ratio_upper</td>
+<td style="text-align: left;">1.58</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">employment_p</td>
+<td style="text-align: left;">0.01322</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">income_percent</td>
+<td style="text-align: left;">3.088</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">income_percent_lower</td>
+<td style="text-align: left;">-8.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">income_percent_upper</td>
+<td style="text-align: left;">15.52</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">income_p</td>
+<td style="text-align: left;">0.5965</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">training_people</td>
+<td style="text-align: left;">22,671</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">test_people</td>
+<td style="text-align: left;">5,574</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="saving-appapp_data.rds" class="level1">
+<h1>10. Saving <code>App/app_data.rds</code></h1>
+<div class="cell">
+<details open class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Everything the Shiny app needs, and nothing that identifies a person: model</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># parameters, totals and averages only (see section 3 for what each item is for)</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>app_data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">slim_model =</span> slim_model,                     <span class="co"># predicts like the full model, without the microdata</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">threshold =</span> threshold,                       <span class="co"># 0.639: turns a probability into Employed / Unemployed</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">group_cells =</span> group_cells,                   <span class="co"># education x internet page: rates per filter combination</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">group_gradients =</span> group_gradients,           <span class="co"># ... and what is needed for their confidence intervals</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">provinces =</span> provinces,                       <span class="co"># province scenarios page: province totals</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline =</span> baseline,                         <span class="co"># test-set accuracy: what monitoring compares with</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline_subgroups =</span> baseline_subgroups,     <span class="co"># AUC per population group on the test set</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline_subgroup_gap =</span> baseline_subgroup_gap, <span class="co"># best minus worst population-group AUC on the test set</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">reference_shares =</span> reference_shares,         <span class="co"># training mix, for the drift (PSI) check</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">key_results =</span> key_results,                   <span class="co"># interaction results for the Overview page</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">subgroups =</span> subgroups,                       <span class="co"># performance by group for the About page</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">built =</span> <span class="fu">list</span>(<span class="at">date =</span> <span class="fu">Sys.Date</span>(), <span class="at">model =</span> <span class="st">&quot;Models/employment_logistic.rds&quot;</span>,</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>               <span class="at">population =</span> <span class="st">&quot;Datasets/Analytical/model_data.csv&quot;</span>)</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(app_data, <span class="fu">file.path</span>(app_directory, <span class="st">&quot;app_data.rds&quot;</span>))</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;App/app_data.rds&quot;</span>,</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">size_kb =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(<span class="fu">file.path</span>(app_directory, <span class="st">&quot;app_data.rds&quot;</span>)) <span class="sc">/</span> <span class="dv">1024</span>, <span class="dv">1</span>),</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">contains_household_ids =</span> <span class="fu">any</span>(<span class="fu">str_detect</span>(<span class="fu">capture.output</span>(<span class="fu">str</span>(app_data, <span class="at">list.len =</span> <span class="dv">200</span>)), <span class="st">&quot;household_id&quot;</span>))</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -3062,97 +3329,127 @@ vertical-align: -.125em;
 <thead>
 <tr class="header">
 <th style="text-align: left;">file</th>
-<th style="text-align: right;">size_mb</th>
+<th style="text-align: right;">size_kb</th>
+<th style="text-align: left;">contains_household_ids</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">income_linear.rds</td>
-<td style="text-align: right;">3.4</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">income_forest.rds</td>
-<td style="text-align: right;">4.3</td>
+<td style="text-align: left;">App/app_data.rds</td>
+<td style="text-align: right;">357</td>
+<td style="text-align: left;">FALSE</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 </div>
-<p>The saved models are read back to confirm that they give the same predictions as the models in memory:</p>
-<div class="cell">
-<details open class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>check_rows <span class="ot">&lt;-</span> <span class="fu">head</span>(income_train, <span class="dv">20</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="fu">c</span>(<span class="st">&quot;Linear regression&quot;</span>, <span class="st">&quot;Random forest&quot;</span>),</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">predictions_identical =</span> <span class="fu">c</span>(</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">identical</span>(</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.numeric</span>(<span class="fu">predict</span>(income_linear, check_rows)),</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.numeric</span>(<span class="fu">predict</span>(<span class="fu">readRDS</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_linear.rds&quot;</span>)), check_rows))</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">identical</span>(</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">predict</span>(income_forest, check_rows)<span class="sc">$</span>predictions,</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">predict</span>(<span class="fu">readRDS</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_forest.rds&quot;</span>)), check_rows)<span class="sc">$</span>predictions</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output-display">
-<div class="kable-table">
-<table class="caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">model</th>
-<th style="text-align: left;">predictions_identical</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Linear regression</td>
-<td style="text-align: left;">TRUE</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Random forest</td>
-<td style="text-align: left;">TRUE</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<section id="handover-to-tuning-and-evaluation" class="level2">
-<h2 class="anchored" data-anchor-id="handover-to-tuning-and-evaluation">Handover to tuning and evaluation</h2>
-<p><strong>Preparing the test set</strong> with the same function:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../R/model_preparation.R&quot;</span>)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>income_test <span class="ot">&lt;-</span> <span class="fu">prepare_income_data</span>(<span class="st">&quot;../Datasets/Analytical/income_test.csv&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>Getting predicted <code>log_salary</code></strong> from each saved model:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>income_linear <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;../Models/income_linear.rds&quot;</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>income_forest <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;../Models/income_forest.rds&quot;</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>pred_linear <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">predict</span>(income_linear, income_test))</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>pred_forest <span class="ot">&lt;-</span> <span class="fu">predict</span>(income_forest, income_test)<span class="sc">$</span>predictions</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>What is left to tune:</strong></p>
+<p><code>contains_household_ids</code> checks that no household identifier ended up in the file.</p>
+</section>
+<section id="validating-and-monitoring-new-data" class="level1">
+<h1>11. Validating and monitoring new data</h1>
+<section id="how-new-data-is-validated-and-scored" class="level2">
+<h2 class="anchored" data-anchor-id="how-new-data-is-validated-and-scored">11.1 How new data is validated and scored</h2>
+<p>On the app’s “Check and predict new data” page, an uploaded CSV goes through these steps (<code>R/validate_input.R</code>, <code>R/model_preparation.R</code>, <code>R/deployment_model.R</code>):</p>
+<ol type="1">
+<li><strong>Read every column as text</strong>, so a value of the wrong type (for example “yes” in a 0/1 column) is reported instead of silently becoming missing.</li>
+<li><strong>Validate</strong> with <code>validate_input()</code>:
+<ul>
+<li>all 15 predictor columns are present (otherwise the file is rejected and the missing columns are named);</li>
+<li>numbers are numbers, 0/1 columns contain only 0 or 1, whole-number columns are whole, and values are in range (for example <code>age_centred</code> from −25 to 24, <code>household_size</code> from 1 to 25);</li>
+<li>categories only contain the values the model was trained with (for example the nine province names);</li>
+<li>calculated columns agree with their parts (<code>age_centred_squared</code> = <code>age_centred</code>², <code>female_x_children</code> = <code>female</code> × <code>n_children_under15</code>), and <code>n_children_under15</code> is smaller than <code>household_size</code>;</li>
+<li>rows with unknown education (blank <code>matric_plus</code>) are left out, as in training;</li>
+<li>a warning is given when fewer than 200 rows can be used.</li>
+</ul>
+Rows that fail a check are left out, and the report says how many and why.</li>
+<li><strong>Prepare</strong> the valid rows with <code>prepare_employment_frame()</code>, the same steps used for the training data.</li>
+<li><strong>Predict</strong> each person’s probability with the slim model, and show only group-level results: predicted (and, if available, actual) employment rates by province, settlement type and matric × internet group.</li>
+<li>If the file contains the actual outcome (<code>employed</code>), <strong>measure accuracy</strong> and <strong>run the monitoring checks</strong> below.</li>
+</ol>
+</section>
+<section id="monitoring-measures-and-thresholds" class="level2">
+<h2 class="anchored" data-anchor-id="monitoring-measures-and-thresholds">11.2 Monitoring measures and thresholds</h2>
+<p>The thresholds are defined once, in <code>R/monitoring.R</code>:</p>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
 <thead>
 <tr class="header">
-<th>Model</th>
-<th>Parameters to tune</th>
+<th>Check</th>
+<th>What it measures</th>
+<th>Test-set value</th>
+<th>Green</th>
+<th>Amber</th>
+<th>Red</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Linear regression</td>
-<td>None</td>
+<td>AUC</td>
+<td>How well the model ranks employed above unemployed people</td>
+<td>0.765</td>
+<td>≥ 0.715</td>
+<td>0.70–0.715</td>
+<td>&lt; 0.70 (Milestone 2 minimum)</td>
 </tr>
 <tr class="even">
-<td>Random forest</td>
-<td><code>mtry</code> (1–8), <code>min.node.size</code></td>
+<td>Balanced accuracy</td>
+<td>Average of sensitivity and specificity at the 0.639 threshold</td>
+<td>0.693</td>
+<td>≥ 0.65</td>
+<td>0.60–0.65</td>
+<td>&lt; 0.60</td>
+</tr>
+<tr class="odd">
+<td>Brier score</td>
+<td>Accuracy of the probabilities (lower is better)</td>
+<td>0.183</td>
+<td>≤ 0.20</td>
+<td>0.20–0.22</td>
+<td>&gt; 0.22</td>
+</tr>
+<tr class="even">
+<td>Calibration gap</td>
+<td>Predicted minus actual employment rate</td>
+<td>0.005</td>
+<td>within ±0.03</td>
+<td>±0.03–0.05</td>
+<td>beyond ±0.05</td>
+</tr>
+<tr class="odd">
+<td>PSI (drift)</td>
+<td>Change in the mix of province, settlement type, population group, age band, matric, home internet and smartphone access</td>
+<td>≈ 0</td>
+<td>&lt; 0.10</td>
+<td>0.10–0.25</td>
+<td>&gt; 0.25</td>
+</tr>
+<tr class="even">
+<td>Subgroup AUC gap</td>
+<td>Widening of the gap between the best and worst population group’s AUC</td>
+<td>0.052</td>
+<td>≤ +0.05</td>
+<td>+0.05–0.10</td>
+<td>&gt; +0.10</td>
 </tr>
 </tbody>
 </table>
-<p>As with the employment models, cross-validate <strong>by household</strong> (for example <code>caret::groupKFold(income_train$household_id, k = 5)</code>) and use <code>income_test</code> once, for the final comparison. The predictions are on the log scale: errors in log units are the natural measure, and <code>exp()</code> converts predictions back to rands where that is easier to explain.</p>
+<p>The drift checks need no outcome, so they run on every upload; the accuracy checks need the <code>employed</code> column.</p>
+</section>
+<section id="when-to-retrain-or-retire-the-model" class="level2">
+<h2 class="anchored" data-anchor-id="when-to-retrain-or-retire-the-model">11.3 When to retrain or retire the model</h2>
+<ul>
+<li><strong>Retrain</strong> (rerun notebooks 2.1–4 on new data) when Stats SA releases a new survey wave, or when any check is <strong>red</strong>.</li>
+<li><strong>Investigate</strong> when a check is <strong>amber</strong>: find out whether the data come from a different population or collection method before relying on the predictions.</li>
+<li><strong>Retire</strong> the model when: retraining does not bring the AUC back above 0.70; Stats SA changes the definitions of the variables (for example the education or internet questions), so new data no longer means what the model learned; the interaction’s confidence interval after retraining includes 1 in successive waves, so the complements finding no longer holds; or the app is found to be used to make decisions about individual people, which it was not designed for.</li>
+</ul>
 </section>
 </section>
 

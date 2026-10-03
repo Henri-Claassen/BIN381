@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Group 5">
-<meta name="dcterms.date" content="2026-09-24">
+<meta name="dcterms.date" content="2026-09-29">
 
 <title>Employment Model: Model Selection and Implementation</title>
 <style>
@@ -2210,6 +2210,10 @@ vertical-align: -.125em;
    
   <ul>
   <li><a href="#about-this-file" id="toc-about-this-file" class="nav-link active" data-scroll-target="#about-this-file">About this file</a></li>
+  <li><a href="#how-this-notebook-works" id="toc-how-this-notebook-works" class="nav-link" data-scroll-target="#how-this-notebook-works">How this notebook works</a>
+  <ul class="collapse">
+  <li><a href="#formulas-and" id="toc-formulas-and" class="nav-link" data-scroll-target="#formulas-and">Formulas: <code>+</code> and <code>*</code></a></li>
+  </ul></li>
   <li><a href="#loading-the-packages-we-need" id="toc-loading-the-packages-we-need" class="nav-link" data-scroll-target="#loading-the-packages-we-need">Loading the packages we need</a></li>
   <li><a href="#file-paths" id="toc-file-paths" class="nav-link" data-scroll-target="#file-paths">File paths</a></li>
   <li><a href="#analytical-question-and-modelling-task" id="toc-analytical-question-and-modelling-task" class="nav-link" data-scroll-target="#analytical-question-and-modelling-task">1. Analytical question and modelling task</a></li>
@@ -2242,7 +2246,7 @@ vertical-align: -.125em;
   <li><a href="#handover-to-tuning-and-evaluation" id="toc-handover-to-tuning-and-evaluation" class="nav-link" data-scroll-target="#handover-to-tuning-and-evaluation">Handover to tuning and evaluation</a></li>
   </ul></li>
   </ul>
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="Employment-Model.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="3.1--Employment-Model.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
 </div>
 <main class="content" id="quarto-document-content">
 
@@ -2265,7 +2269,7 @@ vertical-align: -.125em;
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 24, 2026</p>
+      <p class="date">September 29, 2026</p>
     </div>
   </div>
   
@@ -2279,9 +2283,132 @@ vertical-align: -.125em;
 
 <section id="about-this-file" class="level2">
 <h2 class="anchored" data-anchor-id="about-this-file">About this file</h2>
-<p>This file covers the Milestone 3 rubric items “Modelling strategy and technique selection” and “Model implementation and reproducibility” for the <strong>employment question</strong> (research areas B and C). It restates the analytical question, chooses the candidate models, explains why each one was chosen and fits them to the training data.</p>
-<p>Tuning and evaluation are done in a separate notebook. This file therefore <strong>does not use the test set</strong>, does not tune any parameters and does not calculate performance metrics. It fits each model once with documented starting parameters and saves it to <code>Models/</code>, so the evaluation notebook can load the models, tune them with household-grouped cross-validation and test them. Section 7 lists what is handed over.</p>
-<p>The income question (research area D) is modelled in <code>Income Model.qmd</code>. The reasoning behind each model is also written up in <code>Model Choices.docx</code>.</p>
+<p>This file covers the “Modelling strategy and technique selection” and “Model implementation and reproducibility” for the <strong>employment question</strong> (research areas B and C). It restates the analytical question, chooses the candidate models, explains why each one was chosen and fits them to the training data.</p>
+<p>Tuning and evaluation are done in a separate notebook. This file therefore <strong>does not use the test set</strong>, does not tune any parameters and does not calculate performance metrics. It fits each model once with documented starting parameters and saves it to <code>Models/</code>, so the evaluation notebook can load the models, tune them with household-grouped cross-validation and test them. The income question (research area D) is modelled in <code>3.2) Income Model.qmd</code>. The reasoning behind each model is also written up in <code>Model Choices.docx</code>.</p>
+</section>
+<section id="how-this-notebook-works" class="level2">
+<h2 class="anchored" data-anchor-id="how-this-notebook-works">How this notebook works</h2>
+<ol type="1">
+<li><strong>Load the shared setup</strong> with <code>source(&quot;../R/model_preparation.R&quot;)</code> (section 2.1). This gives the notebook the predictor lists, the model formulas and <code>prepare_employment_data()</code>. It has to be loaded in every notebook: rendering starts a new, empty R session, so nothing from an earlier run is still in memory.</li>
+<li><strong>Prepare the training data</strong> with <code>prepare_employment_data()</code>, which reads <code>model_train.csv</code> the same way in every notebook (section 2.1).</li>
+<li><strong>Fit three models</strong> on the same rows (sections 4–6). Each model is one function call that receives a formula, the training data and the model’s parameters. Each parameter is explained in a comment next to it.</li>
+<li><strong>Save</strong> each fitted model to <code>Models/</code> and check that it reloads with identical predictions (section 7).</li>
+<li><code>3.3) Model Evaluation.qmd</code> then tunes the saved models and tests them on the test set.</li>
+</ol>
+<p><strong>What “fitting” means for each model:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Function</th>
+<th>What fitting does</th>
+<th>What comes out</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Logistic regression</td>
+<td><code>survey::svyglm()</code></td>
+<td>Finds the coefficient for each predictor that makes the observed employment outcomes most likely, using the survey weights</td>
+<td>One odds ratio per predictor, including the education × internet interaction</td>
+</tr>
+<tr class="even">
+<td>Decision tree</td>
+<td><code>rpart::rpart()</code></td>
+<td>Repeatedly picks the predictor and cut-off that best separate employed from unemployed people, then does the same inside each group</td>
+<td>A set of if-then rules</td>
+</tr>
+<tr class="odd">
+<td>Random forest</td>
+<td><code>ranger::ranger()</code></td>
+<td>Grows 500 trees, each on a random resample of the people and choosing from a few random predictors at each split, and averages their predictions</td>
+<td>Probabilities, and a ranking of how much each predictor is used</td>
+</tr>
+</tbody>
+</table>
+<section id="formulas-and" class="level3">
+<h3 class="anchored" data-anchor-id="formulas-and">Formulas: <code>+</code> and <code>*</code></h3>
+<p>A formula tells a model what to predict and from what: the outcome goes on the left of <code>~</code> and the predictors on the right, for example <code>employed ~ matric_plus + female</code>. The formulas are defined once, in <code>R/model_preparation.R</code>.</p>
+<p><code>matric_plus</code> and <code>any_home_internet</code> are both 0/1, so together they split people into four groups. Their employment rates in the training data are:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>No internet</th>
+<th>Internet</th>
+<th>What internet access adds</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Below matric</strong></td>
+<td>57.6%</td>
+<td>59.7%</td>
+<td>+2.1 points</td>
+</tr>
+<tr class="even">
+<td><strong>Matric</strong></td>
+<td>58.1%</td>
+<td>69.9%</td>
+<td>+11.8 points</td>
+</tr>
+</tbody>
+</table>
+<p><strong>With <code>+</code></strong> (<code>employed ~ matric_plus + any_home_internet</code>), each predictor gets <strong>one effect that is the same for everyone</strong>. The model describes the four groups with three numbers: a starting point (below matric, no internet), a matric step (moving down a row, the same in both columns) and an internet step (moving right a column, the same in both rows). Fitted to the rates above:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>No internet</th>
+<th>Internet</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Below matric</strong></td>
+<td>55.0</td>
+<td>55.0 + 5.4 = 60.4</td>
+</tr>
+<tr class="even">
+<td><strong>Matric</strong></td>
+<td>55.0 + 8.9 = 63.9</td>
+<td>55.0 + 8.9 + 5.4 = 69.4</td>
+</tr>
+</tbody>
+</table>
+<p>The internet step has to be +5.4 in both rows, a compromise between the real +2.1 and +11.8. A <code>+</code> model therefore cannot show that internet access goes with a bigger advantage for people with matric, which is exactly the question Treasury is asking.</p>
+<p><strong>With <code>*</code></strong> (<code>employed ~ matric_plus * any_home_internet</code>), R adds both predictors <strong>and</strong> their interaction: it expands the formula to <code>matric_plus + any_home_internet + matric_plus:any_home_internet</code>. The interaction is a fourth number that applies <strong>only to the group with both matric and internet access</strong>, so every group gets its own value:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>No internet</th>
+<th>Internet</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Below matric</strong></td>
+<td>57.6</td>
+<td>57.6 + 2.1 = 59.7</td>
+</tr>
+<tr class="even">
+<td><strong>Matric</strong></td>
+<td>57.6 + 0.5 = 58.1</td>
+<td>57.6 + 0.5 + 2.1 + <strong>9.7</strong> = 69.9</td>
+</tr>
+</tbody>
+</table>
+<p>The fourth number (+9.7) is how much better the “both” group does than the matric step and the internet step added together. Above zero means education and internet access <strong>reinforce</strong> each other (complements); below zero means one <strong>makes up for</strong> the other (substitutes).</p>
+<p>These tables use raw percentages without the other predictors, to show the idea. The logistic regression works the same way on the log-odds scale with all 13 controls included, where the interaction is reported as an odds ratio (above 1 = complements, below 1 = substitutes).</p>
+<p>The logistic regression uses <code>*</code> for education × internet and <code>+</code> for every control. The tree and forest use <code>+</code> only, because a tree finds interactions itself by splitting on one variable inside a split on another.</p>
+</section>
 </section>
 <section id="loading-the-packages-we-need" class="level2">
 <h2 class="anchored" data-anchor-id="loading-the-packages-we-need">Loading the packages we need</h2>
@@ -2679,22 +2806,20 @@ age_centred_squared              -0.03       -0.15                1.00</code></p
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Survey design: people are clustered in households and each person has a survey weight</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Survey design: tells svyglm() how the sample was drawn</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>employment_design <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">ids =</span> <span class="sc">~</span>household_id,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">weights =</span> <span class="sc">~</span>person_weight,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">ids =</span> <span class="sc">~</span>household_id,      <span class="co"># clusters: household members share household predictors, so they are not independent</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">weights =</span> <span class="sc">~</span>person_weight, <span class="co"># survey weight: how many people in the population each row represents</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> model_train</span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># The formula comes from R/model_preparation.R:</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># employed ~ matric_plus * any_home_internet + the 13 control predictors</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>employment_logistic <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  employment_regression_formula,</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">design =</span> employment_design,</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">quasibinomial</span>()</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>employment_regression_formula</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>employment_logistic <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  employment_regression_formula, <span class="co"># employed ~ matric_plus * any_home_internet + the 13 controls (R/model_preparation.R)</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">design =</span> employment_design,    <span class="co"># the data, weights and clusters defined above</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">quasibinomial</span>()       <span class="co"># logistic regression for a yes/no outcome; &quot;quasi&quot; allows non-whole weighted counts</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>employment_regression_formula <span class="co"># prints the formula in full</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>employed ~ matric_plus * any_home_internet + has_computer + smartphone_access + 
@@ -3062,19 +3187,17 @@ age_centred_squared              -0.03       -0.15                1.00</code></p
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">67</span>) <span class="co"># Same seed as the train/test split, for reproducibility</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Same 15 predictors as the regression, without an interaction term: the tree</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># finds interactions itself by splitting within earlier splits</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>employment_tree <span class="ot">&lt;-</span> <span class="fu">rpart</span>(</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  employment_tree_formula,</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> model_train,</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;class&quot;</span>,</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">rpart.control</span>(</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">maxdepth =</span> <span class="dv">5</span>,</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">minbucket =</span> <span class="dv">100</span>,</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">cp =</span> <span class="fl">0.001</span>,</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">xval =</span> <span class="dv">0</span> <span class="co"># no person-level cross-validation (see 5.1)</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>employment_tree <span class="ot">&lt;-</span> <span class="fu">rpart</span>(</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  employment_tree_formula, <span class="co"># employed ~ the same 15 predictors joined with +; the tree finds interactions itself</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> model_train,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;class&quot;</span>,        <span class="co"># classification tree: predicts a class (and its probability), not a number</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">rpart.control</span>(</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">maxdepth =</span> <span class="dv">5</span>,          <span class="co"># at most 5 questions from the top of the tree to a prediction, so it stays readable</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">minbucket =</span> <span class="dv">100</span>,       <span class="co"># every final group (leaf) contains at least 100 people</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">cp =</span> <span class="fl">0.001</span>,            <span class="co"># a split is only kept if it improves the fit by at least 0.1%</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">xval =</span> <span class="dv">0</span>               <span class="co"># rpart&#39;s own cross-validation off: it splits by person, not by household (see 5.1)</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -3207,19 +3330,18 @@ age_centred_squared              -0.03       -0.15                1.00</code></p
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Same predictors as the tree. household_id and person_weight are not in the formula,</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># so they are not used.</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>employment_forest <span class="ot">&lt;-</span> <span class="fu">ranger</span>(</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  employment_tree_formula,</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> model_train,</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">num.trees =</span> <span class="dv">500</span>,</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="dv">3</span>,</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">min.node.size =</span> <span class="dv">10</span>,</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">probability =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">respect.unordered.factors =</span> <span class="st">&quot;order&quot;</span>,</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">importance =</span> <span class="st">&quot;permutation&quot;</span>,</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">67</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># household_id and person_weight are not in the formula, so they are not used</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>employment_forest <span class="ot">&lt;-</span> <span class="fu">ranger</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  employment_tree_formula,             <span class="co"># same formula as the tree</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> model_train,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">num.trees =</span> <span class="dv">500</span>,                     <span class="co"># number of trees grown; the forest averages their predictions</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="dv">3</span>,                            <span class="co"># predictors each split may choose from, picked at random (about √15)</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">min.node.size =</span> <span class="dv">10</span>,                  <span class="co"># smallest group of people a tree may end in</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">probability =</span> <span class="cn">TRUE</span>,                  <span class="co"># predict the probability of Employed, not only a class</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">respect.unordered.factors =</span> <span class="st">&quot;order&quot;</span>, <span class="co"># sort category levels by their share employed before splitting</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">importance =</span> <span class="st">&quot;permutation&quot;</span>,          <span class="co"># measure each predictor&#39;s importance by shuffling its values</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">67</span>                            <span class="co"># fixes the random resamples, so the same forest is grown every run</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
