@@ -2280,14 +2280,13 @@ vertical-align: -.125em;
 <details open class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Only needed if the packages are not installed yet: remove the # in front of</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages() and run this chunk once. It is skipped when rendering.</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c(&quot;tidyverse&quot;, &quot;survey&quot;, &quot;ranger&quot;))</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c(&quot;tidyverse&quot;, &quot;survey&quot;, &quot;ranger&quot;))</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
 <section id="about-this-file" class="level2">
 <h2 class="anchored" data-anchor-id="about-this-file">About this file</h2>
-<p>This file covers model selection and implementation for the <strong>income question</strong> (research area D). It follows the same structure as <code>3.1) Employment Model.qmd</code>: it restates the question, chooses the candidate models, explains why each one was chosen and fits them to the training data.</p>
+<p>This file covers model selection and implementation for the <strong>income question</strong>. It follows the same structure as <code>3.1) Employment Model.qmd</code>.It chooses the candidate models, explains why each one was chosen and fits them to the training data.</p>
 <p>As with the employment models, <strong>the test set is not used here</strong> and no parameters are tuned. Each model is fitted once with documented starting parameters and saved to <code>Models/</code>, for tuning and evaluation in the evaluation notebook. The reasoning is also written up in <code>Milestone 3 Submit.docx</code> (in <code>Documentation/Milestone Documentation/Milestone 3/</code>).</p>
 </section>
 <section id="how-this-notebook-works" class="level2">
@@ -2295,9 +2294,9 @@ vertical-align: -.125em;
 <p>The steps are the same as in <code>3.1) Employment Model.qmd</code>:</p>
 <ol type="1">
 <li><strong>Load the shared setup</strong> with <code>source(&quot;R/model_preparation.R&quot;)</code>, which gives the notebook the predictor lists, the formulas and <code>prepare_income_data()</code>.</li>
-<li><strong>Prepare the training data</strong> with <code>prepare_income_data()</code>, which reads <code>income_train.csv</code> the same way in every notebook (section 2.1).</li>
-<li><strong>Fit two models</strong> on the same rows (sections 4–5). Parameters that work as in the employment models are only briefly commented here; the differences are explained in full.</li>
-<li><strong>Save</strong> both models to <code>Models/</code> and check that they reload with identical predictions (section 6).</li>
+<li><strong>Prepare the training data</strong> with <code>prepare_income_data()</code>, which reads <code>income_train.csv</code> the same way in every notebook.</li>
+<li><strong>Fit two models</strong> parameters that work as in the employment models are only briefly commented here the differences are explained in full.</li>
+<li><strong>Save</strong> both models to <code>Models/</code> and check that they reload with identical predictions.</li>
 <li><code>3.3) Model Evaluation.qmd</code> then tunes and tests them.</li>
 </ol>
 <table class="caption-top table">
@@ -2333,7 +2332,7 @@ vertical-align: -.125em;
 <p><strong>Formulas.</strong> The <code>+</code> and <code>*</code> work exactly as explained with the four-group tables in <code>3.1) Employment Model.qmd</code> (and in <code>Scripts/R/model_preparation.R</code>), but the outcome is salary instead of employment:</p>
 <ul>
 <li><strong>With <code>+</code></strong>, the salary difference that goes with home internet is forced to be the same for people with and without matric.</li>
-<li><strong>With <code>*</code></strong>, the regression adds a fourth number for people with <strong>both</strong> matric and home internet. Above zero means the salary premium for matric is larger in connected households (complements); below zero means it is smaller (substitutes).</li>
+<li><strong>With <code>*</code></strong>, the regression adds a fourth number for people with <strong>both</strong> matric and home internet. Above zero means the salary premium for matric is larger in connected households (complements) while below zero means it is smaller (substitutes).</li>
 </ul>
 <p>The linear regression uses <code>matric_plus * any_home_internet</code> and <code>+</code> for the six controls. The random forest uses <code>+</code> only, because its trees find interactions themselves.</p>
 </section>
@@ -2362,19 +2361,19 @@ vertical-align: -.125em;
 </section>
 <section id="analytical-question-and-modelling-task" class="level1">
 <h1>1. Analytical question and modelling task</h1>
-<p>The Milestone 1 business success criterion includes determining <em>“whether internet access is associated with higher income among those who report it”</em>. This extends the employment question: the employment models ask whether education and internet access go with <strong>having</strong> a job, and this model asks whether they go with <strong>earning more</strong> in a job.</p>
+<p>In Milestone 1 the question whether internet access is associated with higher income among those who report it was one of the goals of this project, and to address it the following model was created.</p>
 <ul>
 <li><strong>Modelling task:</strong> <strong>regression</strong>. The outcome <code>log_salary</code> is the natural log of the monthly salary, which is continuous.</li>
 <li><strong>Population:</strong> employed people who reported a salary of at least R100, from <code>income_train.csv</code>.</li>
-<li><strong>What the models must deliver:</strong> an estimate of how much higher salaries are, on average, with matric and with home internet, including whether the two together are associated with more than the sum of their separate effects (the same education × internet interaction as in the employment model).</li>
+<li><strong>What the models must deliver:</strong> an estimate of how much higher salaries are, on average, with matric and with home internet, including whether the two together are associated with more than the sum of their separate effects.</li>
 </ul>
-<p>This question is <strong>exploratory</strong>. Salaries are missing for a large share of employed people (Milestone 1 data-quality assessment), and people who report a salary may differ from those who do not. The results describe people who reported a salary, not all employed people, and they are associations, not causes.</p>
+<p>This question is <strong>exploratory</strong>. Salaries are missing for a large share of employed people, and people who report a salary may differ from those who do not. So with these missing values we cannot conclusively determine whether salary is better with internet and education or not, we can merely explore the data provided.</p>
 </section>
 <section id="data-and-predictors" class="level1">
 <h1>2. Data and predictors</h1>
 <section id="reading-the-training-data" class="level2">
 <h2 class="anchored" data-anchor-id="reading-the-training-data">2.1 Reading the training data</h2>
-<p>The data are read through <code>prepare_income_data()</code> in <code>Scripts/R/model_preparation.R</code>, which the evaluation notebook and the Shiny app also use. It reads <code>household_id</code> as text, applies the fixed category levels and leaves out people with unknown education (<code>matric_plus</code> blank) or unknown household internet (<code>any_home_internet</code> blank). Milestone 2 left these missing values in <code>income_data.csv</code> to be handled here; they are left out rather than imputed, as in the employment data.</p>
+<p>The data is read through <code>prepare_income_data()</code> in <code>Scripts/R/model_preparation.R</code>, which the evaluation notebook and the Shiny app also use. It reads <code>household_id</code> as text, applies the fixed category levels and leaves out people with unknown education (<code>matric_plus</code> blank) or unknown household internet (<code>any_home_internet</code> blank).</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
@@ -2472,7 +2471,7 @@ vertical-align: -.125em;
 </section>
 <section id="choosing-the-predictors" class="level2">
 <h2 class="anchored" data-anchor-id="choosing-the-predictors">2.3 Choosing the predictors</h2>
-<p><code>income_data.csv</code> has fewer candidate predictors than <code>model_data.csv</code>: it was built with the education, digital-access and demographic columns only (Milestone 2, section 10.6). The same choices are made as for the employment model, so the two models can be compared:</p>
+<p><code>income_data.csv</code> has fewer candidate predictors than <code>model_data.csv</code>: it was built with the education, digital-access and demographic columns only. The same choices are made as for the employment model, so the two models can be compared:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -2587,11 +2586,10 @@ vertical-align: -.125em;
 </tr>
 </tbody>
 </table>
-<p>Two models meet the brief’s requirement of at least two candidates, and a linear model paired with a tree-based model matches the robustness check promised in Milestone 1. A single decision tree was not added here: the income question is exploratory, and the decision tree’s role (a readable check) is already covered in the employment model.</p>
 <p>Models considered but not used:</p>
 <ul>
-<li><strong>Gamma or log-normal GLM on the raw salary:</strong> gives much the same answer as a linear model of <code>log_salary</code>, but is harder to explain.</li>
-<li><strong>Quantile regression:</strong> would show effects at low and high salaries separately. A possible extension, but beyond what the business question asks.</li>
+<li><strong>Gamma or log-normal GLM on the raw salary:</strong> gives similar answers as a linear model of <code>log_salary</code>, but is harder to explain.</li>
+<li><strong>Quantile regression:</strong> would show effects at low and high salaries separately. It could be used as a possible extension, but is not needed here.</li>
 </ul>
 </section>
 <section id="model-1-survey-weighted-linear-regression" class="level1">
@@ -2624,7 +2622,7 @@ vertical-align: -.125em;
 </tr>
 <tr class="even">
 <td>No strong multicollinearity</td>
-<td>Overlapping columns were left out in section 2.3.</td>
+<td>Overlapping columns were left out.</td>
 </tr>
 <tr class="odd">
 <td>Representative estimates</td>
@@ -2649,7 +2647,7 @@ vertical-align: -.125em;
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>income_linear <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  income_regression_formula, <span class="co"># log_salary ~ matric_plus * any_home_internet + the 6 controls (R/model_preparation.R)</span></span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">design =</span> income_design,</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">gaussian</span>()        <span class="co"># ordinary linear regression: the outcome is a number, not yes/no</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">gaussian</span>()       </span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>income_regression_formula <span class="co"># prints the formula in full</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -2978,18 +2976,17 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Works like the employment forest; only the settings that differ are explained in full</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>income_forest <span class="ot">&lt;-</span> <span class="fu">ranger</span>(</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  income_tree_formula,                 <span class="co"># log_salary ~ the same 8 predictors joined with +</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> income_train,</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">num.trees =</span> <span class="dv">500</span>,                     <span class="co"># as in the employment forest</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="dv">2</span>,                            <span class="co"># predictors each split may choose from: one third of 8, the standard for regression</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">min.node.size =</span> <span class="dv">5</span>,                   <span class="co"># smallest group a tree may end in: the standard for regression forests</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">respect.unordered.factors =</span> <span class="st">&quot;order&quot;</span>, <span class="co"># categories sorted by average salary (not share employed) before splitting</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">importance =</span> <span class="st">&quot;permutation&quot;</span>,          <span class="co"># as in the employment forest</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">67</span>                            <span class="co"># as in the employment forest</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co"># No probability = TRUE: with a numeric outcome the forest averages the trees&#39; predicted log_salary</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>income_forest <span class="ot">&lt;-</span> <span class="fu">ranger</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  income_tree_formula,                 </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> income_train,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">num.trees =</span> <span class="dv">500</span>,                     </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="dv">2</span>,                            </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">min.node.size =</span> <span class="dv">5</span>,                   </span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">respect.unordered.factors =</span> <span class="st">&quot;order&quot;</span>, </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">importance =</span> <span class="st">&quot;permutation&quot;</span>,          </span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">67</span>                            </span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co"># No probability = TRUE: with a numeric outcome the forest averages the trees&#39; predicted log_salary</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -3145,25 +3142,6 @@ vertical-align: -.125em;
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>pred_linear <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">predict</span>(income_linear, income_test))</span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>pred_forest <span class="ot">&lt;-</span> <span class="fu">predict</span>(income_forest, income_test)<span class="sc">$</span>predictions</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>What is left to tune:</strong></p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Model</th>
-<th>Parameters to tune</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Linear regression</td>
-<td>None</td>
-</tr>
-<tr class="even">
-<td>Random forest</td>
-<td><code>mtry</code> (1–8), <code>min.node.size</code></td>
-</tr>
-</tbody>
-</table>
 <p>As with the employment models, cross-validate <strong>by household</strong> (for example <code>caret::groupKFold(income_train$household_id, k = 5)</code>) and use <code>income_test</code> once, for the final comparison. The predictions are on the log scale: errors in log units are the natural measure, and <code>exp()</code> converts predictions back to rands where that is easier to explain.</p>
 </section>
 </section>

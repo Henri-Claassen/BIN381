@@ -1,14 +1,13 @@
 # ---- Run this if you need the packages ----------------------------------------
-# Only needed if the packages are not installed yet: remove the # in front of
-# install.packages() and run this line once.
+# Only needed if the packages are not installed yet:
 # install.packages(c("tidyverse", "pROC"))
 
 # Milestone 3: accuracy measures and monitoring for the deployed employment model
-#
+
 # Used by Scripts/3.4) Deployment Preparation.qmd (which calculates the test-set
 # baseline every later check is compared with) and by the Shiny app (which runs
 # the checks on uploaded data and explains each measure to the user).
-#
+
 # The measures are calculated exactly as in Scripts/3.3) Model Evaluation.qmd, so
 # the baseline here matches the evaluation's test-set results.
 
@@ -197,7 +196,7 @@ drift_report <- function(prepared, reference) {
     )
 }
 
-# 5. Fairness: does the model rank people equally well in every population group? --
+# 5. Fairness: does the model rank people equally well in every population group? 
 # AUC per population group; the gap is the best group's AUC minus the worst's.
 # Groups with fewer than min_group_rows people, or without both employed and
 # unemployed people, are left out because their AUC would be too imprecise.

@@ -21,14 +21,13 @@ execute:
 ```{r}
 #| label: Install Packages
 #| eval: false
-# Only needed if the packages are not installed yet: remove the # in front of
-# install.packages() and run this chunk once. It is skipped when rendering.
+# Only needed if the packages are not installed yet: 
 # install.packages(c("tidyverse", "survey", "ranger"))
 ```
 
 ## About this file
 
-This file covers model selection and implementation for the **income question** (research area D). It follows the same structure as `3.1) Employment Model.qmd`: it restates the question, chooses the candidate models, explains why each one was chosen and fits them to the training data.
+This file covers model selection and implementation for the **income question**. It follows the same structure as `3.1) Employment Model.qmd`.It chooses the candidate models, explains why each one was chosen and fits them to the training data.
 
 As with the employment models, **the test set is not used here** and no parameters are tuned. Each model is fitted once with documented starting parameters and saved to `Models/`, for tuning and evaluation in the evaluation notebook. The reasoning is also written up in `Milestone 3 Submit.docx` (in `Documentation/Milestone Documentation/Milestone 3/`).
 
@@ -37,20 +36,20 @@ As with the employment models, **the test set is not used here** and no paramete
 The steps are the same as in `3.1) Employment Model.qmd`:
 
 1.  **Load the shared setup** with `source("R/model_preparation.R")`, which gives the notebook the predictor lists, the formulas and `prepare_income_data()`.
-2.  **Prepare the training data** with `prepare_income_data()`, which reads `income_train.csv` the same way in every notebook (section 2.1).
-3.  **Fit two models** on the same rows (sections 4–5). Parameters that work as in the employment models are only briefly commented here; the differences are explained in full.
-4.  **Save** both models to `Models/` and check that they reload with identical predictions (section 6).
+2.  **Prepare the training data** with `prepare_income_data()`, which reads `income_train.csv` the same way in every notebook.
+3.  **Fit two models** parameters that work as in the employment models are only briefly commented here the differences are explained in full.
+4.  **Save** both models to `Models/` and check that they reload with identical predictions.
 5.  `3.3) Model Evaluation.qmd` then tunes and tests them.
 
 | Model | Function | What fitting does | What comes out |
-|----|----|----|----|
+|------------------|------------------|------------------|------------------|
 | Linear regression | `survey::svyglm()` | Finds the coefficients that make the predicted `log_salary` as close as possible to the actual values (least squares), using the survey weights | One coefficient per predictor, readable as a percentage difference in salary |
 | Random forest | `ranger::ranger()` | Grows 500 regression trees on random resamples and averages their predicted `log_salary` | Predicted `log_salary`, and a ranking of how much each predictor is used |
 
 **Formulas.** The `+` and `*` work exactly as explained with the four-group tables in `3.1) Employment Model.qmd` (and in `Scripts/R/model_preparation.R`), but the outcome is salary instead of employment:
 
 - **With `+`**, the salary difference that goes with home internet is forced to be the same for people with and without matric.
-- **With `*`**, the regression adds a fourth number for people with **both** matric and home internet. Above zero means the salary premium for matric is larger in connected households (complements); below zero means it is smaller (substitutes).
+- **With `*`**, the regression adds a fourth number for people with **both** matric and home internet. Above zero means the salary premium for matric is larger in connected households (complements) while below zero means it is smaller (substitutes).
 
 The linear regression uses `matric_plus * any_home_internet` and `+` for the six controls. The random forest uses `+` only, because its trees find interactions themselves.
 
@@ -77,19 +76,19 @@ dir.create(model_directory, showWarnings = FALSE) # created on the first run onl
 
 # 1. Analytical question and modelling task
 
-The Milestone 1 business success criterion includes determining *"whether internet access is associated with higher income among those who report it"*. This extends the employment question: the employment models ask whether education and internet access go with **having** a job, and this model asks whether they go with **earning more** in a job.
+In Milestone 1 the question whether internet access is associated with higher income among those who report it was one of the goals of this project, and to address it the following model was created.
 
 - **Modelling task:** **regression**. The outcome `log_salary` is the natural log of the monthly salary, which is continuous.
 - **Population:** employed people who reported a salary of at least R100, from `income_train.csv`.
-- **What the models must deliver:** an estimate of how much higher salaries are, on average, with matric and with home internet, including whether the two together are associated with more than the sum of their separate effects (the same education × internet interaction as in the employment model).
+- **What the models must deliver:** an estimate of how much higher salaries are, on average, with matric and with home internet, including whether the two together are associated with more than the sum of their separate effects.
 
-This question is **exploratory**. Salaries are missing for a large share of employed people (Milestone 1 data-quality assessment), and people who report a salary may differ from those who do not. The results describe people who reported a salary, not all employed people, and they are associations, not causes.
+This question is **exploratory**. Salaries are missing for a large share of employed people, and people who report a salary may differ from those who do not. So with these missing values we cannot conclusively determine whether salary is better with internet and education or not, we can merely explore the data provided.
 
 # 2. Data and predictors
 
 ## 2.1 Reading the training data
 
-The data are read through `prepare_income_data()` in `Scripts/R/model_preparation.R`, which the evaluation notebook and the Shiny app also use. It reads `household_id` as text, applies the fixed category levels and leaves out people with unknown education (`matric_plus` blank) or unknown household internet (`any_home_internet` blank). Milestone 2 left these missing values in `income_data.csv` to be handled here; they are left out rather than imputed, as in the employment data.
+The data is read through `prepare_income_data()` in `Scripts/R/model_preparation.R`, which the evaluation notebook and the Shiny app also use. It reads `household_id` as text, applies the fixed category levels and leaves out people with unknown education (`matric_plus` blank) or unknown household internet (`any_home_internet` blank).
 
 ```{r}
 #| label: Read Training Data
@@ -148,10 +147,10 @@ ggplot(income_train, aes(x = log_salary)) +
 
 ## 2.3 Choosing the predictors
 
-`income_data.csv` has fewer candidate predictors than `model_data.csv`: it was built with the education, digital-access and demographic columns only (Milestone 2, section 10.6). The same choices are made as for the employment model, so the two models can be compared:
+`income_data.csv` has fewer candidate predictors than `model_data.csv`: it was built with the education, digital-access and demographic columns only. The same choices are made as for the employment model, so the two models can be compared:
 
 | Kept | Left out | Reason |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | `matric_plus` | `education_band` | One 0/1 education variable gives one interaction coefficient, the same question as in the employment model. |
 | `any_home_internet` | `digital_access_score` | `digital_access_score` includes internet access, so using both would count it twice. `any_home_internet` is also the column used in the employment model. |
 | `age_centred`, `age_centred_squared` |  | Salaries rise with experience and level off, a curved pattern that the squared term allows for. |
@@ -171,27 +170,25 @@ income_train |>
 # 3. Candidate models
 
 | Model | Package | Role | Why it suits this problem |
-|----|----|----|----|
+|------------------|------------------|------------------|------------------|
 | **1. Survey-weighted linear regression** | `survey::svyglm()` | Main explanatory model | Estimates the education × internet interaction directly, as a percentage difference in salary with a confidence interval and significance test. It uses the survey weights and household clustering, like the employment model. |
 | **2. Random forest (regression)** | `ranger::ranger()` | Predictive benchmark and robustness check | Allows non-linear effects and any interactions. It shows whether the linear model misses important structure, and whether education and internet remain important predictors of income without the linear model's assumptions. |
 
-Two models meet the brief's requirement of at least two candidates, and a linear model paired with a tree-based model matches the robustness check promised in Milestone 1. A single decision tree was not added here: the income question is exploratory, and the decision tree's role (a readable check) is already covered in the employment model.
-
 Models considered but not used:
 
-- **Gamma or log-normal GLM on the raw salary:** gives much the same answer as a linear model of `log_salary`, but is harder to explain.
-- **Quantile regression:** would show effects at low and high salaries separately. A possible extension, but beyond what the business question asks.
+- **Gamma or log-normal GLM on the raw salary:** gives similar answers as a linear model of `log_salary`, but is harder to explain.
+- **Quantile regression:** would show effects at low and high salaries separately. It could be used as a possible extension, but is not needed here.
 
 # 4. Model 1: Survey-weighted linear regression
 
 ## 4.1 Assumptions and parameter choices
 
 | Assumption | How it is handled |
-|----|----|
+|------------------------------------|------------------------------------|
 | Linear relationship with the numeric predictors | Age enters as a linear and a squared term. The other predictors are 0/1 or categorical, so linearity does not apply to them. |
 | Roughly normal, constant-variance errors | The log transformation makes salaries roughly symmetric. The residuals are checked during evaluation. |
 | Independent observations | Household members share household-level predictors, so households are the clusters in the survey design, and the standard errors allow for this. |
-| No strong multicollinearity | Overlapping columns were left out in section 2.3. |
+| No strong multicollinearity | Overlapping columns were left out. |
 | Representative estimates | `person_weight` makes the estimates describe the salaried population rather than the sample. |
 
 Parameter choices: `family = gaussian()` (ordinary linear regression), with the design `ids = ~household_id, weights = ~person_weight`. The interaction `matric_plus * any_home_internet` is included as in the employment model. On the log scale, a positive interaction coefficient means the salary premium for matric is larger in connected households (complements), and a negative one means it is smaller (substitutes). There are no hyperparameters to tune.
@@ -211,7 +208,7 @@ income_design <- svydesign(
 income_linear <- svyglm(
   income_regression_formula, # log_salary ~ matric_plus * any_home_internet + the 6 controls (R/model_preparation.R)
   design = income_design,
-  family = gaussian()        # ordinary linear regression: the outcome is a number, not yes/no
+  family = gaussian()       
 )
 
 income_regression_formula # prints the formula in full
@@ -264,7 +261,7 @@ The regression forest works like the employment forest, but each tree predicts t
 Starting parameters (to be tuned in the evaluation notebook):
 
 | Parameter | Value | Reason |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | `num.trees` | 500 | Enough trees for the predictions and importance scores to stabilise. |
 | `mtry` | 2 | Predictors considered at each split: the standard one third of the 8 predictors for regression. The main tuning parameter. |
 | `min.node.size` | 5 | The standard minimum leaf size for regression forests. |
@@ -279,16 +276,15 @@ Survey weights are not used, for the reason given in the employment model: `rang
 ```{r}
 #| label: Fit Random Forest
 
-# Works like the employment forest; only the settings that differ are explained in full
 income_forest <- ranger(
-  income_tree_formula,                 # log_salary ~ the same 8 predictors joined with +
+  income_tree_formula,                 
   data = income_train,
-  num.trees = 500,                     # as in the employment forest
-  mtry = 2,                            # predictors each split may choose from: one third of 8, the standard for regression
-  min.node.size = 5,                   # smallest group a tree may end in: the standard for regression forests
-  respect.unordered.factors = "order", # categories sorted by average salary (not share employed) before splitting
-  importance = "permutation",          # as in the employment forest
-  seed = 67                            # as in the employment forest
+  num.trees = 500,                     
+  mtry = 2,                            
+  min.node.size = 5,                   
+  respect.unordered.factors = "order", 
+  importance = "permutation",          
+  seed = 67                            
 )
 # No probability = TRUE: with a numeric outcome the forest averages the trees' predicted log_salary
 ```
@@ -362,12 +358,5 @@ income_forest <- readRDS("../Models/income_forest.rds")
 pred_linear <- as.numeric(predict(income_linear, income_test))
 pred_forest <- predict(income_forest, income_test)$predictions
 ```
-
-**What is left to tune:**
-
-| Model             | Parameters to tune            |
-|-------------------|-------------------------------|
-| Linear regression | None                          |
-| Random forest     | `mtry` (1–8), `min.node.size` |
 
 As with the employment models, cross-validate **by household** (for example `caret::groupKFold(income_train$household_id, k = 5)`) and use `income_test` once, for the final comparison. The predictions are on the log scale: errors in log units are the natural measure, and `exp()` converts predictions back to rands where that is easier to explain.
