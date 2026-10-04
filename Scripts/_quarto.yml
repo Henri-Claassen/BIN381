@@ -1,0 +1,6 @@
+project:
+  # Every notebook in this folder renders to Documentation/Rendered Documentation.
+  # The code still runs with Scripts/ as the working directory.
+  output-dir: "../Documentation/Rendered Documentation"
+  render:
+    - "*.qmd"
