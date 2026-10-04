@@ -2209,7 +2209,8 @@ vertical-align: -.125em;
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#about-this-file" id="toc-about-this-file" class="nav-link active" data-scroll-target="#about-this-file">About this file</a></li>
+  <li><a href="#run-this-if-you-need-the-packages" id="toc-run-this-if-you-need-the-packages" class="nav-link active" data-scroll-target="#run-this-if-you-need-the-packages">Run this if you need the packages</a></li>
+  <li><a href="#about-this-file" id="toc-about-this-file" class="nav-link" data-scroll-target="#about-this-file">About this file</a></li>
   <li><a href="#how-this-notebook-works" id="toc-how-this-notebook-works" class="nav-link" data-scroll-target="#how-this-notebook-works">How this notebook works</a></li>
   <li><a href="#deployment-strategy" id="toc-deployment-strategy" class="nav-link" data-scroll-target="#deployment-strategy">1. Deployment strategy</a></li>
   <li><a href="#deployment-tools-compared" id="toc-deployment-tools-compared" class="nav-link" data-scroll-target="#deployment-tools-compared">2. Deployment tools compared</a></li>
@@ -2225,7 +2226,7 @@ vertical-align: -.125em;
   <li><a href="#the-training-mix" id="toc-the-training-mix" class="nav-link" data-scroll-target="#the-training-mix">8.3 The training mix</a></li>
   </ul></li>
   <li><a href="#key-results-for-the-overview-and-about-pages" id="toc-key-results-for-the-overview-and-about-pages" class="nav-link" data-scroll-target="#key-results-for-the-overview-and-about-pages">9. Key results for the Overview and About pages</a></li>
-  <li><a href="#saving-appapp_data.rds" id="toc-saving-appapp_data.rds" class="nav-link" data-scroll-target="#saving-appapp_data.rds">10. Saving <code>App/app_data.rds</code></a></li>
+  <li><a href="#saving-shiny-appapp_data.rds" id="toc-saving-shiny-appapp_data.rds" class="nav-link" data-scroll-target="#saving-shiny-appapp_data.rds">10. Saving <code>Shiny-App/app_data.rds</code></a></li>
   <li><a href="#validating-and-monitoring-new-data" id="toc-validating-and-monitoring-new-data" class="nav-link" data-scroll-target="#validating-and-monitoring-new-data">11. Validating and monitoring new data</a>
   <ul class="collapse">
   <li><a href="#how-new-data-is-validated-and-scored" id="toc-how-new-data-is-validated-and-scored" class="nav-link" data-scroll-target="#how-new-data-is-validated-and-scored">11.1 How new data is validated and scored</a></li>
@@ -2233,7 +2234,7 @@ vertical-align: -.125em;
   <li><a href="#when-to-retrain-or-retire-the-model" id="toc-when-to-retrain-or-retire-the-model" class="nav-link" data-scroll-target="#when-to-retrain-or-retire-the-model">11.3 When to retrain or retire the model</a></li>
   </ul></li>
   </ul>
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="4--Deployment-Preparation.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="3.4--Deployment-Preparation.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
 </div>
 <main class="content" id="quarto-document-content">
 
@@ -2268,9 +2269,20 @@ vertical-align: -.125em;
 </header>
 
 
+<section id="run-this-if-you-need-the-packages" class="level2">
+<h2 class="anchored" data-anchor-id="run-this-if-you-need-the-packages">Run this if you need the packages</h2>
+<div class="cell">
+<details open class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Only needed if the packages are not installed yet: remove the # in front of</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages() and run this chunk once. It is skipped when rendering.</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c(&quot;tidyverse&quot;, &quot;survey&quot;, &quot;pROC&quot;))</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
 <section id="about-this-file" class="level2">
 <h2 class="anchored" data-anchor-id="about-this-file">About this file</h2>
-<p>This file covers the Milestone 3 deployment task (Task 4). It documents the deployment strategy and the choice of deployment tool, and it builds <code>App/app_data.rds</code>: the one file the Shiny app in <code>App/app.R</code> loads. It also documents how new data is validated and how the deployed model is monitored.</p>
+<p>This file covers the Milestone 3 deployment task (Task 4). It documents the deployment strategy and the choice of deployment tool, and it builds <code>Shiny-App/app_data.rds</code>: the one file the Shiny app in <code>Shiny-App/app.R</code> loads. It also documents how new data is validated and how the deployed model is monitored.</p>
 <p>The deployed model is the <strong>survey-weighted logistic regression</strong> for employment, selected in <code>3.3) Model Evaluation.qmd</code> (section 9.3).</p>
 </section>
 <section id="how-this-notebook-works" class="level2">
@@ -2285,7 +2297,7 @@ vertical-align: -.125em;
 <li>the test-set baseline and training-data mix that monitoring compares new data with (section 8);</li>
 <li>the key results and subgroup table for the Overview and About pages (section 9).</li>
 </ul></li>
-<li><strong>Save</strong> everything to <code>App/app_data.rds</code> (section 10).</li>
+<li><strong>Save</strong> everything to <code>Shiny-App/app_data.rds</code> (section 10).</li>
 </ol>
 <p>Rerun this notebook whenever the deployed model is retrained, then restart the app.</p>
 </section>
@@ -2317,11 +2329,11 @@ vertical-align: -.125em;
 </tr>
 <tr class="even">
 <td><strong>Outputs</strong></td>
-<td>Predicted employment rates for groups of people, with 95% confidence intervals; province scenarios; accuracy measures with plain-language explanations; a data validation report; monitoring checks with a green / amber / red status. <strong>No output is ever a prediction for an individual person.</strong></td>
+<td>Predicted employment rates for groups of people, with 95% confidence intervals; province scenarios; accuracy measures with plain-language explanations; a data validation report; monitoring checks marked OK (green), Investigate (amber) or Action needed (red). <strong>No output is ever a prediction for an individual person.</strong></td>
 </tr>
 <tr class="odd">
 <td><strong>Operational workflow</strong></td>
-<td>The notebooks 2.1–3.3 and this one are run in order to (re)build the models and <code>App/app_data.rds</code>. Users open the app (<code>shiny::runApp(&quot;App&quot;)</code>). When a new survey wave arrives, an analyst uploads it on the “Check and predict new data” page; the app validates it, predicts, and runs the monitoring checks. A red check triggers retraining: the notebooks are rerun on the new data.</td>
+<td>The notebooks 2.1–3.3 and this one are run in order to (re)build the models and <code>Shiny-App/app_data.rds</code>. Users open the app (<code>shiny::runApp(&quot;Shiny-App&quot;)</code>). When a new survey wave arrives, an analyst uploads it on the “Check new data” page; the app validates it, predicts, and runs the monitoring checks. An “Action needed” (red) check triggers retraining: the notebooks are rerun on the new data.</td>
 </tr>
 </tbody>
 </table>
@@ -2377,12 +2389,12 @@ vertical-align: -.125em;
 </tr>
 </tbody>
 </table>
-<p><strong>Recommendation: Shiny.</strong> It is the only option that gives Treasury analysts an interactive interface <strong>and</strong> runs the validation, prediction and monitoring code in the same R environment the model was built in. It runs locally with <code>shiny::runApp(&quot;App&quot;)</code>. Because the app contains only the slim model and aggregated tables (section 3), it could also be hosted on shinyapps.io without publishing any survey microdata.</p>
+<p><strong>Recommendation: Shiny.</strong> It is the only option that gives Treasury analysts an interactive interface <strong>and</strong> runs the validation, prediction and monitoring code in the same R environment the model was built in. It runs locally with <code>shiny::runApp(&quot;Shiny-App&quot;)</code>. Because the app contains only the slim model and aggregated tables (section 3), it could also be hosted on shinyapps.io without publishing any survey microdata.</p>
 </section>
 <section id="what-the-app-loads-and-why-not-the-saved-model" class="level1">
 <h1>3. What the app loads, and why not the saved model</h1>
 <p>The app does <strong>not</strong> load <code>Models/employment_logistic.rds</code>. That file is about 7 MB because the fitted <code>svyglm</code> object stores a full copy of the training data (22,671 people, including every <code>household_id</code>) inside it, plus working matrices from the fit. A deployed app should never carry survey microdata: if it were hosted, the data would be published with it, which the Milestone 1 ethics section (disclosure risk, usage terms) rules out.</p>
-<p>Instead, this notebook saves <code>App/app_data.rds</code>, which holds only:</p>
+<p>Instead, this notebook saves <code>Shiny-App/app_data.rds</code>, which holds only:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -2400,12 +2412,12 @@ vertical-align: -.125em;
 <tr class="odd">
 <td><code>slim_model</code></td>
 <td>Coefficients, their covariance matrix, the formula terms and category levels: all that is needed to predict (section 5)</td>
-<td>Check and predict new data</td>
+<td>Check new data</td>
 </tr>
 <tr class="even">
 <td><code>threshold</code></td>
 <td>The classification threshold (0.639) chosen in the evaluation</td>
-<td>Check and predict new data</td>
+<td>Check new data</td>
 </tr>
 <tr class="odd">
 <td><code>group_cells</code>, <code>group_gradients</code></td>
@@ -2420,12 +2432,12 @@ vertical-align: -.125em;
 <tr class="odd">
 <td><code>baseline</code>, <code>baseline_subgroups</code>, <code>baseline_subgroup_gap</code></td>
 <td>Test-set accuracy measures the monitoring checks compare with (section 8)</td>
-<td>Check and predict new data, About the model</td>
+<td>Check new data, About the model</td>
 </tr>
 <tr class="even">
 <td><code>reference_shares</code></td>
 <td>The share of training people in each category of the drift variables (section 8)</td>
-<td>Check and predict new data</td>
+<td>Check new data</td>
 </tr>
 <tr class="odd">
 <td><code>key_results</code>, <code>subgroups</code></td>
@@ -2446,45 +2458,45 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse) <span class="co"># data handling</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)    <span class="co"># regTermTest(): likelihood-ratio test of the interaction</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pROC)      <span class="co"># AUC (through R/monitoring.R)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse) <span class="co"># data handling</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)    <span class="co"># regTermTest(): likelihood-ratio test of the interaction</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pROC)      <span class="co"># AUC (through R/monitoring.R)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>analytical_directory <span class="ot">&lt;-</span> <span class="st">&quot;../Datasets/Analytical/&quot;</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>model_directory <span class="ot">&lt;-</span> <span class="st">&quot;../Models/&quot;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>app_directory <span class="ot">&lt;-</span> <span class="st">&quot;../App/&quot;</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../R/model_preparation.R&quot;</span>) <span class="co"># predictor lists, formulas, prepare_employment_data()</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../R/deployment_model.R&quot;</span>)  <span class="co"># slim model functions</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../R/monitoring.R&quot;</span>)        <span class="co"># accuracy measures, drift and thresholds</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>analytical_directory <span class="ot">&lt;-</span> <span class="st">&quot;../Datasets/Analytical/&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>model_directory <span class="ot">&lt;-</span> <span class="st">&quot;../Models/&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>app_directory <span class="ot">&lt;-</span> <span class="st">&quot;../Shiny-App/&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;R/model_preparation.R&quot;</span>) <span class="co"># predictor lists, formulas, prepare_employment_data()</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../Shiny-App/deployment_model.R&quot;</span>)  <span class="co"># slim model functions</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../Shiny-App/monitoring.R&quot;</span>)        <span class="co"># accuracy measures, drift and thresholds</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>employment_logistic <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;employment_logistic.rds&quot;</span>))</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>income_linear <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_linear.rds&quot;</span>))</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># The threshold chosen in the evaluation (section 4.4 of 3.3) for the logistic regression</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>threshold <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;employment_thresholds.csv&quot;</span>), <span class="at">show_col_types =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(model <span class="sc">==</span> <span class="st">&quot;Logistic regression&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(threshold)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># model_data = the whole labour force (training + test), used for the population</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># figures on the app&#39;s pages; model_train for the training mix; model_test for the baseline</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>population <span class="ot">&lt;-</span> <span class="fu">prepare_employment_data</span>(<span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;model_data.csv&quot;</span>))</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>model_train <span class="ot">&lt;-</span> <span class="fu">prepare_employment_data</span>(<span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;model_train.csv&quot;</span>))</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>model_test <span class="ot">&lt;-</span> <span class="fu">prepare_employment_data</span>(<span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;model_test.csv&quot;</span>))</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">item =</span> <span class="fu">c</span>(<span class="st">&quot;Deployed model&quot;</span>, <span class="st">&quot;Threshold&quot;</span>, <span class="st">&quot;Population rows (model_data)&quot;</span>, <span class="st">&quot;Training rows&quot;</span>, <span class="st">&quot;Test rows&quot;</span>),</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(<span class="st">&quot;Survey-weighted logistic regression&quot;</span>, <span class="fu">round</span>(threshold, <span class="dv">3</span>),</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>            <span class="fu">nrow</span>(population), <span class="fu">nrow</span>(model_train), <span class="fu">nrow</span>(model_test))</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>employment_logistic <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;employment_logistic.rds&quot;</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>income_linear <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_linear.rds&quot;</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># The threshold chosen in the evaluation (section 4.4 of 3.3) for the logistic regression</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>threshold <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;employment_thresholds.csv&quot;</span>), <span class="at">show_col_types =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(model <span class="sc">==</span> <span class="st">&quot;Logistic regression&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(threshold)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># model_data = the whole labour force (training + test), used for the population</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># figures on the app&#39;s pages; model_train for the training mix; model_test for the baseline</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>population <span class="ot">&lt;-</span> <span class="fu">prepare_employment_data</span>(<span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;model_data.csv&quot;</span>))</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>model_train <span class="ot">&lt;-</span> <span class="fu">prepare_employment_data</span>(<span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;model_train.csv&quot;</span>))</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>model_test <span class="ot">&lt;-</span> <span class="fu">prepare_employment_data</span>(<span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;model_test.csv&quot;</span>))</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">item =</span> <span class="fu">c</span>(<span class="st">&quot;Deployed model&quot;</span>, <span class="st">&quot;Threshold&quot;</span>, <span class="st">&quot;Population rows (model_data)&quot;</span>, <span class="st">&quot;Training rows&quot;</span>, <span class="st">&quot;Test rows&quot;</span>),</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(<span class="st">&quot;Survey-weighted logistic regression&quot;</span>, <span class="fu">round</span>(threshold, <span class="dv">3</span>),</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>            <span class="fu">nrow</span>(population), <span class="fu">nrow</span>(model_train), <span class="fu">nrow</span>(model_test))</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -2524,26 +2536,26 @@ vertical-align: -.125em;
 </section>
 <section id="the-slim-model" class="level1">
 <h1>5. The slim model</h1>
-<p><code>make_slim_model()</code> (in <code>R/deployment_model.R</code>) keeps only the coefficients, their covariance matrix, the formula terms and the category levels. The check below confirms that it predicts <strong>exactly</strong> like the full model on the whole population:</p>
+<p><code>make_slim_model()</code> (in <code>Shiny-App/deployment_model.R</code>) keeps only the coefficients, their covariance matrix, the formula terms and the category levels. The check below confirms that it predicts <strong>exactly</strong> like the full model on the whole population:</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>slim_model <span class="ot">&lt;-</span> <span class="fu">make_slim_model</span>(employment_logistic)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>full_predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">predict</span>(employment_logistic, population, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>))</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>slim_predictions <span class="ot">&lt;-</span> <span class="fu">predict_slim</span>(slim_model, population)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">check =</span> <span class="fu">c</span>(<span class="st">&quot;Size of the full model in memory (MB)&quot;</span>, <span class="st">&quot;Size of the slim model in memory (KB)&quot;</span>,</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Largest difference between full and slim predictions&quot;</span>,</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Coefficient names match the design matrix columns&quot;</span>),</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">as.numeric</span>(<span class="fu">object.size</span>(employment_logistic)) <span class="sc">/</span> <span class="dv">1024</span><span class="sc">^</span><span class="dv">2</span>, <span class="dv">1</span>),</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">as.numeric</span>(<span class="fu">object.size</span>(slim_model)) <span class="sc">/</span> <span class="dv">1024</span>, <span class="dv">1</span>),</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">format</span>(<span class="fu">signif</span>(<span class="fu">max</span>(<span class="fu">abs</span>(full_predictions <span class="sc">-</span> slim_predictions)), <span class="dv">3</span>)),</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">identical</span>(<span class="fu">names</span>(slim_model<span class="sc">$</span>coefficients), <span class="fu">colnames</span>(<span class="fu">slim_design_matrix</span>(slim_model, <span class="fu">head</span>(population))))</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> <span class="fu">as.character</span>()</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>slim_model <span class="ot">&lt;-</span> <span class="fu">make_slim_model</span>(employment_logistic)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>full_predictions <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">predict</span>(employment_logistic, population, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>slim_predictions <span class="ot">&lt;-</span> <span class="fu">predict_slim</span>(slim_model, population)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">check =</span> <span class="fu">c</span>(<span class="st">&quot;Size of the full model in memory (MB)&quot;</span>, <span class="st">&quot;Size of the slim model in memory (KB)&quot;</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Largest difference between full and slim predictions&quot;</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;Coefficient names match the design matrix columns&quot;</span>),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">as.numeric</span>(<span class="fu">object.size</span>(employment_logistic)) <span class="sc">/</span> <span class="dv">1024</span><span class="sc">^</span><span class="dv">2</span>, <span class="dv">1</span>),</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">as.numeric</span>(<span class="fu">object.size</span>(slim_model)) <span class="sc">/</span> <span class="dv">1024</span>, <span class="dv">1</span>),</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">format</span>(<span class="fu">signif</span>(<span class="fu">max</span>(<span class="fu">abs</span>(full_predictions <span class="sc">-</span> slim_predictions)), <span class="dv">3</span>)),</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">identical</span>(<span class="fu">names</span>(slim_model<span class="sc">$</span>coefficients), <span class="fu">colnames</span>(<span class="fu">slim_design_matrix</span>(slim_model, <span class="fu">head</span>(population))))</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> <span class="fu">as.character</span>()</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -2587,72 +2599,72 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>minimum_people <span class="ot">&lt;-</span> <span class="dv">50</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The four groups: matric_plus x any_home_internet</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>scenarios <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>scenario, <span class="sc">~</span>matric_plus, <span class="sc">~</span>any_home_internet,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;00&quot;</span>, <span class="dv">0</span>, <span class="dv">0</span>,  <span class="co"># below matric, no internet</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;01&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>,  <span class="co"># below matric, internet</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;10&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>,  <span class="co"># matric, no internet</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;11&quot;</span>, <span class="dv">1</span>, <span class="dv">1</span>   <span class="co"># matric, internet</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># For each group: everyone&#39;s design matrix, probability and gradient, with only</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># matric_plus and any_home_internet changed</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>scenario_results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(scenarios)), <span class="cf">function</span>(s) {</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> population <span class="sc">|&gt;</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">matric_plus =</span> scenarios<span class="sc">$</span>matric_plus[s], <span class="at">any_home_internet =</span> scenarios<span class="sc">$</span>any_home_internet[s])</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  design <span class="ot">&lt;-</span> <span class="fu">slim_design_matrix</span>(slim_model, data)</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  probability <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">plogis</span>(design <span class="sc">%*%</span> slim_model<span class="sc">$</span>coefficients))</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">probability =</span> probability, <span class="at">gradient_rows =</span> probability <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> probability) <span class="sc">*</span> design)</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(scenario_results) <span class="ot">&lt;-</span> scenarios<span class="sc">$</span>scenario</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter values for each person, and every combination of the app&#39;s filters</span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>person_filters <span class="ot">&lt;-</span> population <span class="sc">|&gt;</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">province =</span> <span class="fu">as.character</span>(province),</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">settlement_type =</span> <span class="fu">as.character</span>(settlement_type),</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_band =</span> <span class="fu">as.character</span>(<span class="fu">make_age_band</span>(age_centred)),</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">if_else</span>(female <span class="sc">==</span> <span class="dv">1</span>, <span class="st">&quot;Female&quot;</span>, <span class="st">&quot;Male&quot;</span>)</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>group_cells <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">province =</span> <span class="fu">c</span>(<span class="st">&quot;All provinces&quot;</span>, category_levels<span class="sc">$</span>province),</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">settlement_type =</span> <span class="fu">c</span>(<span class="st">&quot;All settlement types&quot;</span>, category_levels<span class="sc">$</span>settlement_type),</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">age_band =</span> <span class="fu">c</span>(<span class="st">&quot;All ages&quot;</span>, age_band_levels),</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">sex =</span> <span class="fu">c</span>(<span class="st">&quot;Both sexes&quot;</span>, <span class="st">&quot;Male&quot;</span>, <span class="st">&quot;Female&quot;</span>)</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>group_gradients <span class="ot">&lt;-</span> <span class="fu">setNames</span>(</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(scenarios<span class="sc">$</span>scenario, \(s) <span class="fu">matrix</span>(<span class="cn">NA_real_</span>, <span class="fu">nrow</span>(group_cells), <span class="fu">length</span>(slim_model<span class="sc">$</span>coefficients),</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>                                          <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, <span class="fu">names</span>(slim_model<span class="sc">$</span>coefficients)))),</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>  scenarios<span class="sc">$</span>scenario</span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>group_cells <span class="ot">&lt;-</span> group_cells <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">people =</span> <span class="cn">NA_integer_</span>, <span class="at">p00 =</span> <span class="cn">NA_real_</span>, <span class="at">p01 =</span> <span class="cn">NA_real_</span>, <span class="at">p10 =</span> <span class="cn">NA_real_</span>, <span class="at">p11 =</span> <span class="cn">NA_real_</span>)</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(group_cells))) {</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>  cell <span class="ot">&lt;-</span> group_cells[i, ]</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>  in_cell <span class="ot">&lt;-</span> (cell<span class="sc">$</span>province <span class="sc">==</span> <span class="st">&quot;All provinces&quot;</span> <span class="sc">|</span> person_filters<span class="sc">$</span>province <span class="sc">==</span> cell<span class="sc">$</span>province) <span class="sc">&amp;</span></span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    (cell<span class="sc">$</span>settlement_type <span class="sc">==</span> <span class="st">&quot;All settlement types&quot;</span> <span class="sc">|</span> person_filters<span class="sc">$</span>settlement_type <span class="sc">==</span> cell<span class="sc">$</span>settlement_type) <span class="sc">&amp;</span></span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    (cell<span class="sc">$</span>age_band <span class="sc">==</span> <span class="st">&quot;All ages&quot;</span> <span class="sc">|</span> person_filters<span class="sc">$</span>age_band <span class="sc">==</span> cell<span class="sc">$</span>age_band) <span class="sc">&amp;</span></span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    (cell<span class="sc">$</span>sex <span class="sc">==</span> <span class="st">&quot;Both sexes&quot;</span> <span class="sc">|</span> person_filters<span class="sc">$</span>sex <span class="sc">==</span> cell<span class="sc">$</span>sex)</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>  group_cells<span class="sc">$</span>people[i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(in_cell)</span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">sum</span>(in_cell) <span class="sc">&lt;</span> minimum_people) <span class="cf">next</span> <span class="co"># suppressed: left as NA</span></span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>  weight <span class="ot">&lt;-</span> population<span class="sc">$</span>person_weight[in_cell]</span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> scenarios<span class="sc">$</span>scenario) {</span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> scenario_results[[s]]</span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    group_cells[[<span class="fu">paste0</span>(<span class="st">&quot;p&quot;</span>, s)]][i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(weight <span class="sc">*</span> result<span class="sc">$</span>probability[in_cell]) <span class="sc">/</span> <span class="fu">sum</span>(weight)</span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>    group_gradients[[s]][i, ] <span class="ot">&lt;-</span> <span class="fu">colSums</span>(weight <span class="sc">*</span> result<span class="sc">$</span>gradient_rows[in_cell, , <span class="at">drop =</span> <span class="cn">FALSE</span>]) <span class="sc">/</span> <span class="fu">sum</span>(weight)</span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>  <span class="at">measure =</span> <span class="fu">c</span>(<span class="st">&quot;Filter combinations&quot;</span>, <span class="st">&quot;Combinations shown&quot;</span>, <span class="st">&quot;Combinations suppressed (&lt; 50 people)&quot;</span>),</span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(<span class="fu">nrow</span>(group_cells), <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(group_cells<span class="sc">$</span>p00)), <span class="fu">sum</span>(<span class="fu">is.na</span>(group_cells<span class="sc">$</span>p00)))</span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>minimum_people <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The four groups: matric_plus x any_home_internet</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>scenarios <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>scenario, <span class="sc">~</span>matric_plus, <span class="sc">~</span>any_home_internet,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;00&quot;</span>, <span class="dv">0</span>, <span class="dv">0</span>,  <span class="co"># below matric, no internet</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;01&quot;</span>, <span class="dv">0</span>, <span class="dv">1</span>,  <span class="co"># below matric, internet</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;10&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>,  <span class="co"># matric, no internet</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;11&quot;</span>, <span class="dv">1</span>, <span class="dv">1</span>   <span class="co"># matric, internet</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># For each group: everyone&#39;s design matrix, probability and gradient, with only</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># matric_plus and any_home_internet changed</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>scenario_results <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(scenarios)), <span class="cf">function</span>(s) {</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> population <span class="sc">|&gt;</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">matric_plus =</span> scenarios<span class="sc">$</span>matric_plus[s], <span class="at">any_home_internet =</span> scenarios<span class="sc">$</span>any_home_internet[s])</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  design <span class="ot">&lt;-</span> <span class="fu">slim_design_matrix</span>(slim_model, data)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  probability <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">plogis</span>(design <span class="sc">%*%</span> slim_model<span class="sc">$</span>coefficients))</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">probability =</span> probability, <span class="at">gradient_rows =</span> probability <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> probability) <span class="sc">*</span> design)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(scenario_results) <span class="ot">&lt;-</span> scenarios<span class="sc">$</span>scenario</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter values for each person, and every combination of the app&#39;s filters</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>person_filters <span class="ot">&lt;-</span> population <span class="sc">|&gt;</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">province =</span> <span class="fu">as.character</span>(province),</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">settlement_type =</span> <span class="fu">as.character</span>(settlement_type),</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_band =</span> <span class="fu">as.character</span>(<span class="fu">make_age_band</span>(age_centred)),</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">if_else</span>(female <span class="sc">==</span> <span class="dv">1</span>, <span class="st">&quot;Female&quot;</span>, <span class="st">&quot;Male&quot;</span>)</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>group_cells <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">province =</span> <span class="fu">c</span>(<span class="st">&quot;All provinces&quot;</span>, category_levels<span class="sc">$</span>province),</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">settlement_type =</span> <span class="fu">c</span>(<span class="st">&quot;All settlement types&quot;</span>, category_levels<span class="sc">$</span>settlement_type),</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">age_band =</span> <span class="fu">c</span>(<span class="st">&quot;All ages&quot;</span>, age_band_levels),</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">sex =</span> <span class="fu">c</span>(<span class="st">&quot;Both sexes&quot;</span>, <span class="st">&quot;Male&quot;</span>, <span class="st">&quot;Female&quot;</span>)</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>group_gradients <span class="ot">&lt;-</span> <span class="fu">setNames</span>(</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(scenarios<span class="sc">$</span>scenario, \(s) <span class="fu">matrix</span>(<span class="cn">NA_real_</span>, <span class="fu">nrow</span>(group_cells), <span class="fu">length</span>(slim_model<span class="sc">$</span>coefficients),</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>                                          <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, <span class="fu">names</span>(slim_model<span class="sc">$</span>coefficients)))),</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>  scenarios<span class="sc">$</span>scenario</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>group_cells <span class="ot">&lt;-</span> group_cells <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">people =</span> <span class="cn">NA_integer_</span>, <span class="at">p00 =</span> <span class="cn">NA_real_</span>, <span class="at">p01 =</span> <span class="cn">NA_real_</span>, <span class="at">p10 =</span> <span class="cn">NA_real_</span>, <span class="at">p11 =</span> <span class="cn">NA_real_</span>)</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(group_cells))) {</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>  cell <span class="ot">&lt;-</span> group_cells[i, ]</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>  in_cell <span class="ot">&lt;-</span> (cell<span class="sc">$</span>province <span class="sc">==</span> <span class="st">&quot;All provinces&quot;</span> <span class="sc">|</span> person_filters<span class="sc">$</span>province <span class="sc">==</span> cell<span class="sc">$</span>province) <span class="sc">&amp;</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>    (cell<span class="sc">$</span>settlement_type <span class="sc">==</span> <span class="st">&quot;All settlement types&quot;</span> <span class="sc">|</span> person_filters<span class="sc">$</span>settlement_type <span class="sc">==</span> cell<span class="sc">$</span>settlement_type) <span class="sc">&amp;</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>    (cell<span class="sc">$</span>age_band <span class="sc">==</span> <span class="st">&quot;All ages&quot;</span> <span class="sc">|</span> person_filters<span class="sc">$</span>age_band <span class="sc">==</span> cell<span class="sc">$</span>age_band) <span class="sc">&amp;</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>    (cell<span class="sc">$</span>sex <span class="sc">==</span> <span class="st">&quot;Both sexes&quot;</span> <span class="sc">|</span> person_filters<span class="sc">$</span>sex <span class="sc">==</span> cell<span class="sc">$</span>sex)</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>  group_cells<span class="sc">$</span>people[i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(in_cell)</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">sum</span>(in_cell) <span class="sc">&lt;</span> minimum_people) <span class="cf">next</span> <span class="co"># suppressed: left as NA</span></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>  weight <span class="ot">&lt;-</span> population<span class="sc">$</span>person_weight[in_cell]</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> scenarios<span class="sc">$</span>scenario) {</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>    result <span class="ot">&lt;-</span> scenario_results[[s]]</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>    group_cells[[<span class="fu">paste0</span>(<span class="st">&quot;p&quot;</span>, s)]][i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(weight <span class="sc">*</span> result<span class="sc">$</span>probability[in_cell]) <span class="sc">/</span> <span class="fu">sum</span>(weight)</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>    group_gradients[[s]][i, ] <span class="ot">&lt;-</span> <span class="fu">colSums</span>(weight <span class="sc">*</span> result<span class="sc">$</span>gradient_rows[in_cell, , <span class="at">drop =</span> <span class="cn">FALSE</span>]) <span class="sc">/</span> <span class="fu">sum</span>(weight)</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>  <span class="at">measure =</span> <span class="fu">c</span>(<span class="st">&quot;Filter combinations&quot;</span>, <span class="st">&quot;Combinations shown&quot;</span>, <span class="st">&quot;Combinations suppressed (&lt; 50 people)&quot;</span>),</span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(<span class="fu">nrow</span>(group_cells), <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(group_cells<span class="sc">$</span>p00)), <span class="fu">sum</span>(<span class="fu">is.na</span>(group_cells<span class="sc">$</span>p00)))</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -2682,11 +2694,11 @@ vertical-align: -.125em;
 </div>
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The national figures: all filters on &quot;All&quot;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>group_cells <span class="sc">|&gt;</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(province <span class="sc">==</span> <span class="st">&quot;All provinces&quot;</span>, settlement_type <span class="sc">==</span> <span class="st">&quot;All settlement types&quot;</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>         age_band <span class="sc">==</span> <span class="st">&quot;All ages&quot;</span>, sex <span class="sc">==</span> <span class="st">&quot;Both sexes&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(p00<span class="sc">:</span>p11, \(x) <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> x, <span class="dv">1</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The national figures: all filters on &quot;All&quot;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>group_cells <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(province <span class="sc">==</span> <span class="st">&quot;All provinces&quot;</span>, settlement_type <span class="sc">==</span> <span class="st">&quot;All settlement types&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>         age_band <span class="sc">==</span> <span class="st">&quot;All ages&quot;</span>, sex <span class="sc">==</span> <span class="st">&quot;Both sexes&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(p00<span class="sc">:</span>p11, \(x) <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> x, <span class="dv">1</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -2751,31 +2763,31 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>with_internet <span class="ot">&lt;-</span> <span class="fu">predict_slim</span>(slim_model, population <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">any_home_internet =</span> <span class="dv">1</span>))</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>without_internet <span class="ot">&lt;-</span> <span class="fu">predict_slim</span>(slim_model, population <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">any_home_internet =</span> <span class="dv">0</span>))</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>province_summary <span class="ot">&lt;-</span> <span class="cf">function</span>(data, rows) {</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  weight <span class="ot">&lt;-</span> data<span class="sc">$</span>person_weight</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  unconnected <span class="ot">&lt;-</span> data<span class="sc">$</span>any_home_internet <span class="sc">==</span> <span class="dv">0</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">people =</span> <span class="fu">nrow</span>(data),</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">labour_force =</span> <span class="fu">sum</span>(weight),</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">actual_rate =</span> <span class="fu">sum</span>(weight <span class="sc">*</span> (data<span class="sc">$</span>employed <span class="sc">==</span> <span class="st">&quot;Employed&quot;</span>)) <span class="sc">/</span> <span class="fu">sum</span>(weight),</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">internet_share =</span> <span class="fu">sum</span>(weight <span class="sc">*</span> data<span class="sc">$</span>any_home_internet) <span class="sc">/</span> <span class="fu">sum</span>(weight),</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">predicted_rate =</span> <span class="fu">sum</span>(weight <span class="sc">*</span> slim_predictions[rows]) <span class="sc">/</span> <span class="fu">sum</span>(weight),</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">uplift_unconnected =</span> <span class="fu">sum</span>(weight[unconnected] <span class="sc">*</span> (with_internet[rows] <span class="sc">-</span> without_internet[rows])[unconnected]) <span class="sc">/</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sum</span>(weight[unconnected])</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>provinces <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">lapply</span>(category_levels<span class="sc">$</span>province, <span class="cf">function</span>(p) {</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  rows <span class="ot">&lt;-</span> <span class="fu">which</span>(population<span class="sc">$</span>province <span class="sc">==</span> p)</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">province_summary</span>(population[rows, ], rows) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">province =</span> p, <span class="at">.before =</span> <span class="dv">1</span>)</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>}))</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>provinces <span class="sc">|&gt;</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">labour_force =</span> <span class="fu">round</span>(labour_force),</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>         <span class="fu">across</span>(actual_rate<span class="sc">:</span>uplift_unconnected, \(x) <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> x, <span class="dv">1</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>with_internet <span class="ot">&lt;-</span> <span class="fu">predict_slim</span>(slim_model, population <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">any_home_internet =</span> <span class="dv">1</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>without_internet <span class="ot">&lt;-</span> <span class="fu">predict_slim</span>(slim_model, population <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">any_home_internet =</span> <span class="dv">0</span>))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>province_summary <span class="ot">&lt;-</span> <span class="cf">function</span>(data, rows) {</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  weight <span class="ot">&lt;-</span> data<span class="sc">$</span>person_weight</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  unconnected <span class="ot">&lt;-</span> data<span class="sc">$</span>any_home_internet <span class="sc">==</span> <span class="dv">0</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">people =</span> <span class="fu">nrow</span>(data),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">labour_force =</span> <span class="fu">sum</span>(weight),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">actual_rate =</span> <span class="fu">sum</span>(weight <span class="sc">*</span> (data<span class="sc">$</span>employed <span class="sc">==</span> <span class="st">&quot;Employed&quot;</span>)) <span class="sc">/</span> <span class="fu">sum</span>(weight),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">internet_share =</span> <span class="fu">sum</span>(weight <span class="sc">*</span> data<span class="sc">$</span>any_home_internet) <span class="sc">/</span> <span class="fu">sum</span>(weight),</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">predicted_rate =</span> <span class="fu">sum</span>(weight <span class="sc">*</span> slim_predictions[rows]) <span class="sc">/</span> <span class="fu">sum</span>(weight),</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">uplift_unconnected =</span> <span class="fu">sum</span>(weight[unconnected] <span class="sc">*</span> (with_internet[rows] <span class="sc">-</span> without_internet[rows])[unconnected]) <span class="sc">/</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sum</span>(weight[unconnected])</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>provinces <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">lapply</span>(category_levels<span class="sc">$</span>province, <span class="cf">function</span>(p) {</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  rows <span class="ot">&lt;-</span> <span class="fu">which</span>(population<span class="sc">$</span>province <span class="sc">==</span> p)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">province_summary</span>(population[rows, ], rows) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">province =</span> p, <span class="at">.before =</span> <span class="dv">1</span>)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>provinces <span class="sc">|&gt;</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">labour_force =</span> <span class="fu">round</span>(labour_force),</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>         <span class="fu">across</span>(actual_rate<span class="sc">:</span>uplift_unconnected, \(x) <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> x, <span class="dv">1</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -2893,20 +2905,20 @@ vertical-align: -.125em;
 <h1>8. Monitoring baseline</h1>
 <section id="test-set-accuracy" class="level2">
 <h2 class="anchored" data-anchor-id="test-set-accuracy">8.1 Test-set accuracy</h2>
-<p>Every monitoring check compares new data with the deployed model’s performance on the test set. The measures are calculated with <code>compute_metrics()</code> in <code>R/monitoring.R</code>, which uses the same definitions as the evaluation, so the values must match section 9.1 of <code>3.3) Model Evaluation.qmd</code> (AUC 0.765, balanced accuracy 0.693, Brier score 0.183):</p>
+<p>Every monitoring check compares new data with the deployed model’s performance on the test set. The measures are calculated with <code>compute_metrics()</code> in <code>Shiny-App/monitoring.R</code>, which uses the same definitions as the evaluation, so the values must match section 9.1 of <code>3.3) Model Evaluation.qmd</code> (AUC 0.765, balanced accuracy 0.693, Brier score 0.183):</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>test_probability <span class="ot">&lt;-</span> <span class="fu">predict_slim</span>(slim_model, model_test)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>baseline <span class="ot">&lt;-</span> <span class="fu">compute_metrics</span>(model_test<span class="sc">$</span>employed, test_probability, threshold)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">measure =</span> <span class="fu">c</span>(<span class="st">&quot;AUC&quot;</span>, <span class="st">&quot;Balanced accuracy&quot;</span>, <span class="st">&quot;Sensitivity&quot;</span>, <span class="st">&quot;Specificity&quot;</span>, <span class="st">&quot;Precision&quot;</span>, <span class="st">&quot;F1&quot;</span>, <span class="st">&quot;Accuracy&quot;</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;Brier score&quot;</span>, <span class="st">&quot;Calibration gap&quot;</span>),</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">round</span>(<span class="fu">c</span>(baseline<span class="sc">$</span>auc, baseline<span class="sc">$</span>balanced_accuracy, baseline<span class="sc">$</span>sensitivity, baseline<span class="sc">$</span>specificity,</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>                  baseline<span class="sc">$</span>precision, baseline<span class="sc">$</span>f1, baseline<span class="sc">$</span>accuracy, baseline<span class="sc">$</span>brier,</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                  baseline<span class="sc">$</span>calibration_gap), <span class="dv">3</span>)</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>test_probability <span class="ot">&lt;-</span> <span class="fu">predict_slim</span>(slim_model, model_test)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>baseline <span class="ot">&lt;-</span> <span class="fu">compute_metrics</span>(model_test<span class="sc">$</span>employed, test_probability, threshold)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">measure =</span> <span class="fu">c</span>(<span class="st">&quot;AUC&quot;</span>, <span class="st">&quot;Balanced accuracy&quot;</span>, <span class="st">&quot;Sensitivity&quot;</span>, <span class="st">&quot;Specificity&quot;</span>, <span class="st">&quot;Precision&quot;</span>, <span class="st">&quot;F1&quot;</span>, <span class="st">&quot;Accuracy&quot;</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;Brier score&quot;</span>, <span class="st">&quot;Calibration gap&quot;</span>),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">round</span>(<span class="fu">c</span>(baseline<span class="sc">$</span>auc, baseline<span class="sc">$</span>balanced_accuracy, baseline<span class="sc">$</span>sensitivity, baseline<span class="sc">$</span>specificity,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                  baseline<span class="sc">$</span>precision, baseline<span class="sc">$</span>f1, baseline<span class="sc">$</span>accuracy, baseline<span class="sc">$</span>brier,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                  baseline<span class="sc">$</span>calibration_gap), <span class="dv">3</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -2967,26 +2979,26 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>subgroups <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">lapply</span>(<span class="fu">c</span>(<span class="st">&quot;population_group&quot;</span>, <span class="st">&quot;female&quot;</span>, <span class="st">&quot;settlement_type&quot;</span>), <span class="cf">function</span>(column) {</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  model_test <span class="sc">|&gt;</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">group =</span> <span class="fu">as.character</span>(.data[[column]]), <span class="at">probability =</span> test_probability) <span class="sc">|&gt;</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(group) <span class="sc">|&gt;</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_modify</span>(\(d, key) {</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>      m <span class="ot">&lt;-</span> <span class="fu">compute_metrics</span>(d<span class="sc">$</span>employed, d<span class="sc">$</span>probability, threshold)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tibble</span>(<span class="at">people =</span> m<span class="sc">$</span>people, <span class="at">share_employed =</span> m<span class="sc">$</span>actual_rate, <span class="at">auc =</span> m<span class="sc">$</span>auc,</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">balanced_accuracy =</span> m<span class="sc">$</span>balanced_accuracy, <span class="at">sensitivity =</span> m<span class="sc">$</span>sensitivity, <span class="at">specificity =</span> m<span class="sc">$</span>specificity)</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    }) <span class="sc">|&gt;</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">grouping =</span> column, <span class="at">.before =</span> <span class="dv">1</span>)</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>})) <span class="sc">|&gt;</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">grouping =</span> <span class="fu">recode</span>(grouping, <span class="at">population_group =</span> <span class="st">&quot;Population group&quot;</span>, <span class="at">female =</span> <span class="st">&quot;Sex&quot;</span>,</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>                      <span class="at">settlement_type =</span> <span class="st">&quot;Settlement type&quot;</span>),</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> <span class="fu">case_when</span>(grouping <span class="sc">==</span> <span class="st">&quot;Sex&quot;</span> <span class="sc">&amp;</span> group <span class="sc">==</span> <span class="st">&quot;1&quot;</span> <span class="sc">~</span> <span class="st">&quot;Female&quot;</span>, grouping <span class="sc">==</span> <span class="st">&quot;Sex&quot;</span> <span class="sc">&amp;</span> group <span class="sc">==</span> <span class="st">&quot;0&quot;</span> <span class="sc">~</span> <span class="st">&quot;Male&quot;</span>,</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>                      <span class="cn">TRUE</span> <span class="sc">~</span> group)</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>subgroups <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="fu">across</span>(share_employed<span class="sc">:</span>specificity, \(x) <span class="fu">round</span>(x, <span class="dv">3</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>subgroups <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(<span class="fu">lapply</span>(<span class="fu">c</span>(<span class="st">&quot;population_group&quot;</span>, <span class="st">&quot;female&quot;</span>, <span class="st">&quot;settlement_type&quot;</span>), <span class="cf">function</span>(column) {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  model_test <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">group =</span> <span class="fu">as.character</span>(.data[[column]]), <span class="at">probability =</span> test_probability) <span class="sc">|&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(group) <span class="sc">|&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_modify</span>(\(d, key) {</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>      m <span class="ot">&lt;-</span> <span class="fu">compute_metrics</span>(d<span class="sc">$</span>employed, d<span class="sc">$</span>probability, threshold)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tibble</span>(<span class="at">people =</span> m<span class="sc">$</span>people, <span class="at">share_employed =</span> m<span class="sc">$</span>actual_rate, <span class="at">auc =</span> m<span class="sc">$</span>auc,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">balanced_accuracy =</span> m<span class="sc">$</span>balanced_accuracy, <span class="at">sensitivity =</span> m<span class="sc">$</span>sensitivity, <span class="at">specificity =</span> m<span class="sc">$</span>specificity)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    }) <span class="sc">|&gt;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">grouping =</span> column, <span class="at">.before =</span> <span class="dv">1</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>})) <span class="sc">|&gt;</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">grouping =</span> <span class="fu">recode</span>(grouping, <span class="at">population_group =</span> <span class="st">&quot;Population group&quot;</span>, <span class="at">female =</span> <span class="st">&quot;Sex&quot;</span>,</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>                      <span class="at">settlement_type =</span> <span class="st">&quot;Settlement type&quot;</span>),</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> <span class="fu">case_when</span>(grouping <span class="sc">==</span> <span class="st">&quot;Sex&quot;</span> <span class="sc">&amp;</span> group <span class="sc">==</span> <span class="st">&quot;1&quot;</span> <span class="sc">~</span> <span class="st">&quot;Female&quot;</span>, grouping <span class="sc">==</span> <span class="st">&quot;Sex&quot;</span> <span class="sc">&amp;</span> group <span class="sc">==</span> <span class="st">&quot;0&quot;</span> <span class="sc">~</span> <span class="st">&quot;Male&quot;</span>,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>                      <span class="cn">TRUE</span> <span class="sc">~</span> group)</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>subgroups <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="fu">across</span>(share_employed<span class="sc">:</span>specificity, \(x) <span class="fu">round</span>(x, <span class="dv">3</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -3120,9 +3132,9 @@ vertical-align: -.125em;
 </div>
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>baseline_subgroups <span class="ot">&lt;-</span> <span class="fu">subgroup_auc</span>(model_test<span class="sc">$</span>employed, test_probability, model_test<span class="sc">$</span>population_group)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>baseline_subgroup_gap <span class="ot">&lt;-</span> <span class="fu">max</span>(baseline_subgroups<span class="sc">$</span>auc) <span class="sc">-</span> <span class="fu">min</span>(baseline_subgroups<span class="sc">$</span>auc)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(baseline_subgroup_gap, <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>baseline_subgroups <span class="ot">&lt;-</span> <span class="fu">subgroup_auc</span>(model_test<span class="sc">$</span>employed, test_probability, model_test<span class="sc">$</span>population_group)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>baseline_subgroup_gap <span class="ot">&lt;-</span> <span class="fu">max</span>(baseline_subgroups<span class="sc">$</span>auc) <span class="sc">-</span> <span class="fu">min</span>(baseline_subgroups<span class="sc">$</span>auc)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(baseline_subgroup_gap, <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.133</code></pre>
@@ -3131,25 +3143,25 @@ vertical-align: -.125em;
 </section>
 <section id="the-training-mix" class="level2">
 <h2 class="anchored" data-anchor-id="the-training-mix">8.3 The training mix</h2>
-<p>Drift is measured with the population stability index (PSI, <code>R/monitoring.R</code>), which compares the share of people in each category of new data with the training data. The training shares are stored here:</p>
+<p>Drift is measured with the population stability index (PSI, <code>Shiny-App/monitoring.R</code>), which compares the share of people in each category of new data with the training data. The training shares are stored here:</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>training_mix <span class="ot">&lt;-</span> <span class="fu">drift_frame</span>(model_train)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>reference_shares <span class="ot">&lt;-</span> <span class="fu">lapply</span>(drift_variables, \(v) <span class="fu">category_shares</span>(training_mix[[v]])) <span class="sc">|&gt;</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setNames</span>(drift_variables)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check: the test set comes from the same survey, so its drift should be small (green)</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">drift_report</span>(model_test, reference_shares) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">psi =</span> <span class="fu">round</span>(psi, <span class="dv">4</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>training_mix <span class="ot">&lt;-</span> <span class="fu">drift_frame</span>(model_train)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>reference_shares <span class="ot">&lt;-</span> <span class="fu">lapply</span>(drift_variables, \(v) <span class="fu">category_shares</span>(training_mix[[v]])) <span class="sc">|&gt;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setNames</span>(drift_variables)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Check: the test set comes from the same survey, so its drift should be small (green)</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">drift_report</span>(model_test, reference_shares) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">psi =</span> <span class="fu">round</span>(psi, <span class="dv">4</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 19%">
-<col style="width: 7%">
-<col style="width: 7%">
-<col style="width: 65%">
+<col style="width: 20%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 63%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -3164,43 +3176,43 @@ vertical-align: -.125em;
 <td style="text-align: left;">province</td>
 <td style="text-align: right;">0.0018</td>
 <td style="text-align: left;">Green</td>
-<td style="text-align: left;">The mix of people is about the same as in the training data.</td>
+<td style="text-align: left;">About the same mix as the data the model learned from.</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">settlement_type</td>
 <td style="text-align: right;">0.0016</td>
 <td style="text-align: left;">Green</td>
-<td style="text-align: left;">The mix of people is about the same as in the training data.</td>
+<td style="text-align: left;">About the same mix as the data the model learned from.</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">population_group</td>
 <td style="text-align: right;">0.0006</td>
 <td style="text-align: left;">Green</td>
-<td style="text-align: left;">The mix of people is about the same as in the training data.</td>
+<td style="text-align: left;">About the same mix as the data the model learned from.</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">age_band</td>
 <td style="text-align: right;">0.0003</td>
 <td style="text-align: left;">Green</td>
-<td style="text-align: left;">The mix of people is about the same as in the training data.</td>
+<td style="text-align: left;">About the same mix as the data the model learned from.</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">matric_plus</td>
 <td style="text-align: right;">0.0000</td>
 <td style="text-align: left;">Green</td>
-<td style="text-align: left;">The mix of people is about the same as in the training data.</td>
+<td style="text-align: left;">About the same mix as the data the model learned from.</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">any_home_internet</td>
 <td style="text-align: right;">0.0003</td>
 <td style="text-align: left;">Green</td>
-<td style="text-align: left;">The mix of people is about the same as in the training data.</td>
+<td style="text-align: left;">About the same mix as the data the model learned from.</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">smartphone_access</td>
 <td style="text-align: right;">0.0003</td>
 <td style="text-align: left;">Green</td>
-<td style="text-align: left;">The mix of people is about the same as in the training data.</td>
+<td style="text-align: left;">About the same mix as the data the model learned from.</td>
 </tr>
 </tbody>
 </table>
@@ -3215,26 +3227,26 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>employment_lrt <span class="ot">&lt;-</span> <span class="fu">regTermTest</span>(employment_logistic, <span class="sc">~</span> matric_plus<span class="sc">:</span>any_home_internet, <span class="at">method =</span> <span class="st">&quot;LRT&quot;</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>income_lrt <span class="ot">&lt;-</span> <span class="fu">regTermTest</span>(income_linear, <span class="sc">~</span> matric_plus<span class="sc">:</span>any_home_internet, <span class="at">method =</span> <span class="st">&quot;LRT&quot;</span>)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>interaction_ci <span class="ot">&lt;-</span> <span class="fu">confint</span>(employment_logistic)[<span class="st">&quot;matric_plus:any_home_internet&quot;</span>, ]</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>income_ci <span class="ot">&lt;-</span> <span class="fu">confint</span>(income_linear)[<span class="st">&quot;matric_plus:any_home_internet&quot;</span>, ]</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>key_results <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">odds_ratio =</span> <span class="fu">exp</span>(<span class="fu">coef</span>(employment_logistic)[[<span class="st">&quot;matric_plus:any_home_internet&quot;</span>]]),</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">odds_ratio_lower =</span> <span class="fu">exp</span>(interaction_ci[[<span class="dv">1</span>]]),</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">odds_ratio_upper =</span> <span class="fu">exp</span>(interaction_ci[[<span class="dv">2</span>]]),</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">employment_p =</span> employment_lrt<span class="sc">$</span>p,</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">income_percent =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(<span class="fu">coef</span>(income_linear)[[<span class="st">&quot;matric_plus:any_home_internet&quot;</span>]]) <span class="sc">-</span> <span class="dv">1</span>),</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">income_percent_lower =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(income_ci[[<span class="dv">1</span>]]) <span class="sc">-</span> <span class="dv">1</span>),</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">income_percent_upper =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(income_ci[[<span class="dv">2</span>]]) <span class="sc">-</span> <span class="dv">1</span>),</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">income_p =</span> income_lrt<span class="sc">$</span>p,</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">training_people =</span> <span class="fu">nrow</span>(model_train),</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">test_people =</span> <span class="fu">nrow</span>(model_test)</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">result =</span> <span class="fu">names</span>(key_results),</span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">value =</span> <span class="fu">map_chr</span>(key_results, \(x) <span class="fu">format</span>(<span class="cf">if</span> (x <span class="sc">==</span> <span class="fu">round</span>(x)) x <span class="cf">else</span> <span class="fu">signif</span>(x, <span class="dv">4</span>), <span class="at">big.mark =</span> <span class="st">&quot;,&quot;</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>employment_lrt <span class="ot">&lt;-</span> <span class="fu">regTermTest</span>(employment_logistic, <span class="sc">~</span> matric_plus<span class="sc">:</span>any_home_internet, <span class="at">method =</span> <span class="st">&quot;LRT&quot;</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>income_lrt <span class="ot">&lt;-</span> <span class="fu">regTermTest</span>(income_linear, <span class="sc">~</span> matric_plus<span class="sc">:</span>any_home_internet, <span class="at">method =</span> <span class="st">&quot;LRT&quot;</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>interaction_ci <span class="ot">&lt;-</span> <span class="fu">confint</span>(employment_logistic)[<span class="st">&quot;matric_plus:any_home_internet&quot;</span>, ]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>income_ci <span class="ot">&lt;-</span> <span class="fu">confint</span>(income_linear)[<span class="st">&quot;matric_plus:any_home_internet&quot;</span>, ]</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>key_results <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">odds_ratio =</span> <span class="fu">exp</span>(<span class="fu">coef</span>(employment_logistic)[[<span class="st">&quot;matric_plus:any_home_internet&quot;</span>]]),</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">odds_ratio_lower =</span> <span class="fu">exp</span>(interaction_ci[[<span class="dv">1</span>]]),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">odds_ratio_upper =</span> <span class="fu">exp</span>(interaction_ci[[<span class="dv">2</span>]]),</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">employment_p =</span> employment_lrt<span class="sc">$</span>p,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">income_percent =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(<span class="fu">coef</span>(income_linear)[[<span class="st">&quot;matric_plus:any_home_internet&quot;</span>]]) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">income_percent_lower =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(income_ci[[<span class="dv">1</span>]]) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">income_percent_upper =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(income_ci[[<span class="dv">2</span>]]) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">income_p =</span> income_lrt<span class="sc">$</span>p,</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">training_people =</span> <span class="fu">nrow</span>(model_train),</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">test_people =</span> <span class="fu">nrow</span>(model_test)</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">result =</span> <span class="fu">names</span>(key_results),</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">value =</span> <span class="fu">map_chr</span>(key_results, \(x) <span class="fu">format</span>(<span class="cf">if</span> (x <span class="sc">==</span> <span class="fu">round</span>(x)) x <span class="cf">else</span> <span class="fu">signif</span>(x, <span class="dv">4</span>), <span class="at">big.mark =</span> <span class="st">&quot;,&quot;</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -3292,36 +3304,36 @@ vertical-align: -.125em;
 </div>
 </div>
 </section>
-<section id="saving-appapp_data.rds" class="level1">
-<h1>10. Saving <code>App/app_data.rds</code></h1>
+<section id="saving-shiny-appapp_data.rds" class="level1">
+<h1>10. Saving <code>Shiny-App/app_data.rds</code></h1>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Everything the Shiny app needs, and nothing that identifies a person: model</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># parameters, totals and averages only (see section 3 for what each item is for)</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>app_data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">slim_model =</span> slim_model,                     <span class="co"># predicts like the full model, without the microdata</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">threshold =</span> threshold,                       <span class="co"># 0.639: turns a probability into Employed / Unemployed</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">group_cells =</span> group_cells,                   <span class="co"># education x internet page: rates per filter combination</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">group_gradients =</span> group_gradients,           <span class="co"># ... and what is needed for their confidence intervals</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">provinces =</span> provinces,                       <span class="co"># province scenarios page: province totals</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline =</span> baseline,                         <span class="co"># test-set accuracy: what monitoring compares with</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline_subgroups =</span> baseline_subgroups,     <span class="co"># AUC per population group on the test set</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline_subgroup_gap =</span> baseline_subgroup_gap, <span class="co"># best minus worst population-group AUC on the test set</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">reference_shares =</span> reference_shares,         <span class="co"># training mix, for the drift (PSI) check</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">key_results =</span> key_results,                   <span class="co"># interaction results for the Overview page</span></span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">subgroups =</span> subgroups,                       <span class="co"># performance by group for the About page</span></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">built =</span> <span class="fu">list</span>(<span class="at">date =</span> <span class="fu">Sys.Date</span>(), <span class="at">model =</span> <span class="st">&quot;Models/employment_logistic.rds&quot;</span>,</span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>               <span class="at">population =</span> <span class="st">&quot;Datasets/Analytical/model_data.csv&quot;</span>)</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(app_data, <span class="fu">file.path</span>(app_directory, <span class="st">&quot;app_data.rds&quot;</span>))</span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;App/app_data.rds&quot;</span>,</span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">size_kb =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(<span class="fu">file.path</span>(app_directory, <span class="st">&quot;app_data.rds&quot;</span>)) <span class="sc">/</span> <span class="dv">1024</span>, <span class="dv">1</span>),</span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">contains_household_ids =</span> <span class="fu">any</span>(<span class="fu">str_detect</span>(<span class="fu">capture.output</span>(<span class="fu">str</span>(app_data, <span class="at">list.len =</span> <span class="dv">200</span>)), <span class="st">&quot;household_id&quot;</span>))</span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Everything the Shiny app needs, and nothing that identifies a person: model</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># parameters, totals and averages only (see section 3 for what each item is for)</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>app_data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">slim_model =</span> slim_model,                     <span class="co"># predicts like the full model, without the microdata</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">threshold =</span> threshold,                       <span class="co"># 0.639: turns a probability into Employed / Unemployed</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">group_cells =</span> group_cells,                   <span class="co"># education x internet page: rates per filter combination</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">group_gradients =</span> group_gradients,           <span class="co"># ... and what is needed for their confidence intervals</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">provinces =</span> provinces,                       <span class="co"># province scenarios page: province totals</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline =</span> baseline,                         <span class="co"># test-set accuracy: what monitoring compares with</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline_subgroups =</span> baseline_subgroups,     <span class="co"># AUC per population group on the test set</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline_subgroup_gap =</span> baseline_subgroup_gap, <span class="co"># best minus worst population-group AUC on the test set</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">reference_shares =</span> reference_shares,         <span class="co"># training mix, for the drift (PSI) check</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">key_results =</span> key_results,                   <span class="co"># interaction results for the Overview page</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">subgroups =</span> subgroups,                       <span class="co"># performance by group for the About page</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">built =</span> <span class="fu">list</span>(<span class="at">date =</span> <span class="fu">Sys.Date</span>(), <span class="at">model =</span> <span class="st">&quot;Models/employment_logistic.rds&quot;</span>,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>               <span class="at">population =</span> <span class="st">&quot;Datasets/Analytical/model_data.csv&quot;</span>)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(app_data, <span class="fu">file.path</span>(app_directory, <span class="st">&quot;app_data.rds&quot;</span>))</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="st">&quot;Shiny-App/app_data.rds&quot;</span>,</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">size_kb =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(<span class="fu">file.path</span>(app_directory, <span class="st">&quot;app_data.rds&quot;</span>)) <span class="sc">/</span> <span class="dv">1024</span>, <span class="dv">1</span>),</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">contains_household_ids =</span> <span class="fu">any</span>(<span class="fu">str_detect</span>(<span class="fu">capture.output</span>(<span class="fu">str</span>(app_data, <span class="at">list.len =</span> <span class="dv">200</span>)), <span class="st">&quot;household_id&quot;</span>))</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -3335,7 +3347,7 @@ vertical-align: -.125em;
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">App/app_data.rds</td>
+<td style="text-align: left;">Shiny-App/app_data.rds</td>
 <td style="text-align: right;">356.9</td>
 <td style="text-align: left;">FALSE</td>
 </tr>
@@ -3350,7 +3362,7 @@ vertical-align: -.125em;
 <h1>11. Validating and monitoring new data</h1>
 <section id="how-new-data-is-validated-and-scored" class="level2">
 <h2 class="anchored" data-anchor-id="how-new-data-is-validated-and-scored">11.1 How new data is validated and scored</h2>
-<p>On the app’s “Check and predict new data” page, an uploaded CSV goes through these steps (<code>R/validate_input.R</code>, <code>R/model_preparation.R</code>, <code>R/deployment_model.R</code>):</p>
+<p>On the app’s “Check new data” page, an uploaded CSV goes through these steps (<code>Shiny-App/validate_input.R</code>, <code>Scripts/R/model_preparation.R</code>, <code>Shiny-App/deployment_model.R</code>):</p>
 <ol type="1">
 <li><p><strong>Read every column as text</strong>, so a value of the wrong type (for example “yes” in a 0/1 column) is reported instead of silently becoming missing.</p></li>
 <li><p><strong>Validate</strong> with <code>validate_input()</code>:</p>
@@ -3370,7 +3382,7 @@ vertical-align: -.125em;
 </section>
 <section id="monitoring-measures-and-thresholds" class="level2">
 <h2 class="anchored" data-anchor-id="monitoring-measures-and-thresholds">11.2 Monitoring measures and thresholds</h2>
-<p>The thresholds are defined once, in <code>R/monitoring.R</code>:</p>
+<p>The thresholds are defined once, in <code>Shiny-App/monitoring.R</code>:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 16%">
@@ -3446,7 +3458,7 @@ vertical-align: -.125em;
 <section id="when-to-retrain-or-retire-the-model" class="level2">
 <h2 class="anchored" data-anchor-id="when-to-retrain-or-retire-the-model">11.3 When to retrain or retire the model</h2>
 <ul>
-<li><strong>Retrain</strong> (rerun notebooks 2.1–4 on new data) when Stats SA releases a new survey wave, or when any check is <strong>red</strong>.</li>
+<li><strong>Retrain</strong> (rerun notebooks 2.1–3.4 on new data) when Stats SA releases a new survey wave, or when any check is <strong>red</strong>.</li>
 <li><strong>Investigate</strong> when a check is <strong>amber</strong>: find out whether the data come from a different population or collection method before relying on the predictions.</li>
 <li><strong>Retire</strong> the model when: retraining does not bring the AUC back above 0.70; Stats SA changes the definitions of the variables (for example the education or internet questions), so new data no longer means what the model learned; the interaction’s confidence interval after retraining includes 1 in successive waves, so the complements finding no longer holds; or the app is found to be used to make decisions about individual people, which it was not designed for.</li>
 </ul>

@@ -16,6 +16,16 @@ execute:
   message: false
 ---
 
+## Run this if you need the packages
+
+```{r}
+#| label: Install Packages
+#| eval: false
+# Only needed if the packages are not installed yet: remove the # in front of
+# install.packages() and run this chunk once. It is skipped when rendering.
+# install.packages(c("tidyverse", "janitor", "scales"))
+```
+
 ## Loading the packages we need
 
 ```{r}

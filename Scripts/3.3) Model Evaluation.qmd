@@ -16,7 +16,36 @@ execute:
   message: false
 ---
 
+<<<<<<< HEAD
 # Initial Setup
+=======
+## Run this if you need the packages
+
+```{r}
+#| label: Install Packages
+#| eval: false
+# Only needed if the packages are not installed yet: remove the # in front of
+# install.packages() and run this chunk once. It is skipped when rendering.
+# install.packages(c("tidyverse", "survey", "rpart", "rpart.plot", "ranger", "pROC", "caret"))
+```
+
+## About this file
+
+This file covers the Milestone 3 rubric items "Model implementation and reproducibility" (tuning and resampling) and "Technical model evaluation and comparison". It continues from `3.1) Employment Model.qmd` and `3.2) Income Model.qmd`, which chose the candidate models, fitted them once with starting parameters and saved them to `Models/`.
+
+The file works in a fixed order, so that the test sets cannot influence any choice:
+
+| Section | Data used | What happens |
+|------------------------|------------------------|------------------------|
+| 2–3 | Training files only | Household-grouped cross-validation folds are built. |
+| 4–5 | Training files only | The tree and forest parameters are tuned, the baseline models are cross-validated and each employment model's classification threshold is chosen, all from out-of-fold predictions. |
+| 6 | Training files only | The tuned models are refitted on the full training files and saved. |
+| 7 | Test files, **used once** | Every model is scored on the test sets with the parameters and thresholds fixed in sections 4–6. |
+| 8 | Training files and fitted models | The education × internet interaction is tested and checked across the models (Milestone 1 success criteria). |
+| 9 | Results of sections 4–8 | The comparison matrix and the final model selection. |
+
+## Loading the packages we need
+>>>>>>> 869459107794040dad5aeaa087d4add7aced829d
 
 ```{r}
 #| label: Package Setup
@@ -158,12 +187,12 @@ regression_metrics <- function(actual, predicted, weight = rep(1, length(actual)
 
 # 2. Training data
 
-The training files are read through the same preparation functions as in the modelling notebooks (`R/model_preparation.R`), so the rows, columns and factor levels are identical to those the saved models were fitted on. The test files are **not** read until section 7.
+The training files are read through the same preparation functions as in the modelling notebooks (`Scripts/R/model_preparation.R`), so the rows, columns and factor levels are identical to those the saved models were fitted on. The test files are **not** read until section 7.
 
 ```{r}
 #| label: Read Training Data
 
-source("../R/model_preparation.R")
+source("R/model_preparation.R")
 
 model_train <- prepare_employment_data(file.path(analytical_directory, "model_train.csv"))
 income_train <- prepare_income_data(file.path(analytical_directory, "income_train.csv"))
@@ -280,11 +309,11 @@ tibble(
 
 ## 4.2 Decision tree tuning
 
-`Employment Model.qmd` fitted the tree with `maxdepth = 5`, `minbucket = 100` and `cp = 0.001` as starting values. Three parameters control the tree's size, and they are tuned together over a grid:
+`3.1) Employment Model.qmd` fitted the tree with `maxdepth = 5`, `minbucket = 100` and `cp = 0.001` as starting values. Three parameters control the tree's size, and they are tuned together over a grid:
 
 | Parameter | Values tried | Effect |
 |------------------------|------------------------|------------------------|
-| `maxdepth` | 3, 4, 5 | Maximum number of questions from the top of the tree to a prediction. Not above 5, because the tree was chosen for readability (`Employment Model.qmd`, section 5.1). |
+| `maxdepth` | 3, 4, 5 | Maximum number of questions from the top of the tree to a prediction. Not above 5, because the tree was chosen for readability (`3.1) Employment Model.qmd`, section 5.1). |
 | `minbucket` | 50, 100, 200 | Minimum number of people in a leaf. Not below 50, so no rule describes a very small, possibly identifiable group. |
 | `cp` | 0.0005, 0.001, 0.002, 0.005 | Minimum improvement a split must give to be kept (pruning). |
 
@@ -357,7 +386,7 @@ Every tree's AUC lies in a narrow band, and the best trees all use the maximum d
 
 ## 4.3 Random forest tuning
 
-The forest's main parameters are `mtry` (how many predictors each split may choose from) and `min.node.size` (the smallest leaf in each tree). `num.trees` is not tuned: more trees only make the predictions more stable. During tuning 300 trees are grown to save time, and the final forest in section 6 has 500, as in `Employment Model.qmd`.
+The forest's main parameters are `mtry` (how many predictors each split may choose from) and `min.node.size` (the smallest leaf in each tree). `num.trees` is not tuned: more trees only make the predictions more stable. During tuning 300 trees are grown to save time, and the final forest in section 6 has 500, as in `3.1) Employment Model.qmd`.
 
 | Parameter | Values tried | Effect |
 |------------------------|------------------------|------------------------|

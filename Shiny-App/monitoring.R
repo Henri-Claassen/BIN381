@@ -1,6 +1,11 @@
+# ---- Run this if you need the packages ----------------------------------------
+# Only needed if the packages are not installed yet: remove the # in front of
+# install.packages() and run this line once.
+# install.packages(c("tidyverse", "pROC"))
+
 # Milestone 3: accuracy measures and monitoring for the deployed employment model
 #
-# Used by Scripts/4) Deployment Preparation.qmd (which calculates the test-set
+# Used by Scripts/3.4) Deployment Preparation.qmd (which calculates the test-set
 # baseline every later check is compared with) and by the Shiny app (which runs
 # the checks on uploaded data and explains each measure to the user).
 #
@@ -89,52 +94,49 @@ traffic_light <- function(value, limits, higher_is_better = TRUE) {
 # uses the file's own numbers, plus the value restated in everyday units.
 # `metrics` and `baseline` come from compute_metrics().
 describe_metrics <- function(metrics, baseline) {
-  pct <- function(x) paste0(round(100 * x, 1), "%")
+  pct <- function(x) paste0(format(round(100 * x, 1), nsmall = 1), "%")
   num <- function(x) format(x, big.mark = ",")
   t <- monitoring_thresholds
   no_skill_brier <- round(metrics$actual_rate * (1 - metrics$actual_rate), 3)
-  # measure:  a plain name first, with the technical term in brackets
-  # in_short: the value restated in everyday units (people, per 100)
-  # meaning:  what the measure is and how to judge it
+  # measure:  a plain name, with the technical term in brackets
+  # in_short: the result in everyday words
+  # meaning:  the question the measure answers, in plain words (shown in HTML
+  #           tables, so <br> starts a new line)
   tribble(
     ~measure, ~value, ~test_set, ~status, ~in_short, ~meaning,
-    "Ranking accuracy (AUC)", round(metrics$auc, 3), round(baseline$auc, 3),
+    "Ranking score (AUC)", round(metrics$auc, 3), round(baseline$auc, 3),
       traffic_light(metrics$auc, t$auc),
       paste0("Right ", round(100 * metrics$auc), " times out of 100"),
-      paste0("Shown one employed and one unemployed person, how often the model gives the employed person the higher chance. ",
-             "50 out of 100 is a coin toss, 100 is perfect, and 70 or more is acceptable. The main measure of how good the model is."),
-    "Fair accuracy (balanced accuracy)", round(metrics$balanced_accuracy, 3), round(baseline$balanced_accuracy, 3),
+      paste0("Take one person who has a job and one who does not, and ask the model which of the two is more likely to be employed. ",
+             "This is how many times out of 100 it picks the right person.<br>",
+             "Guessing would be right 50 times out of 100, and 70 or more counts as acceptable."),
+    "Balanced accuracy", round(metrics$balanced_accuracy, 3), round(baseline$balanced_accuracy, 3),
       traffic_light(metrics$balanced_accuracy, t$balanced_accuracy),
-      paste0(pct(metrics$balanced_accuracy), " on average across both groups"),
-      paste0("The average of the next two rows, so employed and unemployed people count equally even though there are more employed people. ",
-             "50% is what guessing would score."),
-    "Employed people found (sensitivity)", round(metrics$sensitivity, 3), round(baseline$sensitivity, 3), "-",
-      paste0(pct(metrics$sensitivity), " of employed people found"),
-      paste0("Of the ", num(metrics$employed), " people who are employed, the share the model also counted as employed."),
-    "Unemployed people found (specificity)", round(metrics$specificity, 3), round(baseline$specificity, 3), "-",
-      paste0(pct(metrics$specificity), " of unemployed people found"),
-      paste0("Of the ", num(metrics$unemployed), " people who are unemployed, the share the model also counted as unemployed. ",
-             "This is the smaller group, and the one policy is most concerned with."),
-    "Correct \"employed\" predictions (precision)", round(metrics$precision, 3), round(baseline$precision, 3), "-",
-      paste0(pct(metrics$precision), " of \"employed\" predictions are right"),
-      paste0("Of the ", num(metrics$tp + metrics$fp), " people the model counted as employed, the share who really are."),
-    "Balance of the two above (F1 score)", round(metrics$f1, 3), round(baseline$f1, 3), "-",
+      pct(metrics$balanced_accuracy),
+      "When the model labels people \"employed\" or \"unemployed\", how often is it right, with both groups counting equally? Guessing gets 50%.",
+    "Employed people spotted (sensitivity)", round(metrics$sensitivity, 3), round(baseline$sensitivity, 3), "-",
+      paste0(pct(metrics$sensitivity), " of the ", num(metrics$employed), " employed"),
+      "Of the people who really have a job, how many does the model label as employed?",
+    "Unemployed people spotted (specificity)", round(metrics$specificity, 3), round(baseline$specificity, 3), "-",
+      paste0(pct(metrics$specificity), " of the ", num(metrics$unemployed), " unemployed"),
+      "Of the people who really have no job, how many does the model label as unemployed?",
+    "Correct \"employed\" labels (precision)", round(metrics$precision, 3), round(baseline$precision, 3), "-",
+      paste0(pct(metrics$precision), " correct"),
+      "When the model says someone is employed, how often is that true?",
+    "F1 score", round(metrics$f1, 3), round(baseline$f1, 3), "-",
       paste0(round(metrics$f1, 2), " out of 1"),
-      "Combines \"employed people found\" and \"correct employed predictions\" into one score from 0 to 1. It is only high when both are high.",
-    "Overall correct (accuracy)", round(metrics$accuracy, 3), round(baseline$accuracy, 3), "-",
-      paste0(pct(metrics$accuracy), " of people classified correctly"),
-      paste0("The share of all ", num(metrics$people), " people classified correctly. Misleading on its own: ",
-             pct(metrics$actual_rate), " of the people are employed, so saying \"employed\" for everyone would already score ",
-             pct(metrics$actual_rate), "."),
-    "Error of the predicted chances (Brier score)", round(metrics$brier, 3), round(baseline$brier, 3),
+      "One score for the two rows above. It is only high when the model both finds most employed people and is usually right when it says \"employed\".",
+    "Overall accuracy", round(metrics$accuracy, 3), round(baseline$accuracy, 3), "-",
+      paste0(pct(metrics$accuracy), " labelled correctly"),
+      paste0("How many people get the right label overall? Careful: simply saying \"employed\" for everyone would already score ", pct(metrics$actual_rate), "."),
+    "Prediction error (Brier score)", round(metrics$brier, 3), round(baseline$brier, 3),
       traffic_light(metrics$brier, t$brier, higher_is_better = FALSE),
-      paste0(round(metrics$brier, 3), " (0 is perfect, ", no_skill_brier, " is no skill)"),
-      paste0("How far the predicted chances are from what happened, on average (lower is better). ",
-             "Giving everyone the overall employment rate, without a model, would score ", no_skill_brier, "."),
-    "Predicted minus actual employment rate (calibration gap)", round(metrics$calibration_gap, 3), round(baseline$calibration_gap, 3),
+      paste0(round(metrics$brier, 3), " (lower is better)"),
+      paste0("How close are the model's predicted chances to what really happened? Lower is better. Without a model, just using the average, the score would be ", no_skill_brier, "."),
+    "Predicted vs actual employment (calibration)", round(metrics$calibration_gap, 3), round(baseline$calibration_gap, 3),
       traffic_light(abs(metrics$calibration_gap), t$calibration_gap, higher_is_better = FALSE),
       paste0("Predicted ", pct(metrics$mean_predicted), ", actual ", pct(metrics$actual_rate)),
-      "Whether the model's average predicted employment rate matches the real one. Close to 0 means its percentages can be taken at face value."
+      "Does the share of people the model expects to have a job match the real share? The closer the two numbers, the better."
   )
 }
 
@@ -188,9 +190,9 @@ drift_report <- function(prepared, reference) {
       psi = map_dbl(variable, \(v) psi(reference[[v]], new_data[[v]])),
       status = map_chr(psi, \(x) traffic_light(x, monitoring_thresholds$psi, higher_is_better = FALSE)),
       meaning = case_when(
-        status == "Green" ~ "The mix of people is about the same as in the training data.",
-        status == "Amber" ~ "The mix has shifted moderately: check whether the data come from a different population or collection method.",
-        TRUE ~ "The mix has changed a lot: the model may no longer describe these people well."
+        status == "Green" ~ "About the same mix as the data the model learned from.",
+        status == "Amber" ~ "The mix has shifted somewhat. Check whether the data come from a different group of people.",
+        TRUE ~ "The mix has changed a lot. The model may not fit these people well."
       )
     )
 }
@@ -221,10 +223,10 @@ subgroup_gap_status <- function(gap, baseline_gap) {
 # 6. Overall verdict ---------------------------------------------------------------
 overall_verdict <- function(statuses) {
   if (any(statuses == "Red")) {
-    "Action needed: at least one check failed. Retrain the model on recent data, or retire it if retraining does not restore its performance."
+    "Action needed. Retrain the model on recent data, or stop using it if retraining does not help."
   } else if (any(statuses == "Amber")) {
-    "Investigate: at least one check is borderline. Find out what changed before relying on the predictions."
+    "Investigate. At least one check is borderline: find out what changed before relying on the results."
   } else {
-    "No action needed: every check is OK. The model can keep being used as it is."
+    "No action needed. Every check passed, so the model can keep being used."
   }
 }

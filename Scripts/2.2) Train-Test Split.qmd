@@ -16,9 +16,19 @@ execute:
   message: false
 ---
 
+## Run this if you need the packages
+
+```{r}
+#| label: Install Packages
+#| eval: false
+# Only needed if the packages are not installed yet: remove the # in front of
+# install.packages() and run this chunk once. It is skipped when rendering.
+# install.packages(c("tidyverse"))
+```
+
 ## About this file
 
-This file covers the Milestone 2 rubric item "Modelling preparation & leakage control": defining the modelling target, designing a train/test split and preventing leakage. The target, the predictors and the columns excluded for leakage were already decided in `Data Preprocessing.qmd` (sections 10.4–10.6) and documented in `Cleaned Datasets Data Dictionary.md` (sections 11–13), so all that is left to do here is split `model_data.csv` and `income_data.csv` into training and test sets.
+This file covers the Milestone 2 rubric item "Modelling preparation & leakage control": defining the modelling target, designing a train/test split and preventing leakage. The target, the predictors and the columns excluded for leakage were already decided in `2.1) Data Preprocessing.qmd` (sections 10.4–10.6) and documented in `Cleaned Datasets Data Dictionary.md` (sections 11–13), so all that is left to do here is split `model_data.csv` and `income_data.csv` into training and test sets.
 
 `analytical_dataset.csv` is not split. It is the Power BI and reporting file, which the data dictionary describes as holding every working-age person for description rather than modelling.
 
@@ -41,7 +51,7 @@ analytical_directory <- "../Datasets/Analytical/"
 
 # 1. Reading the analytical datasets
 
-The split starts from the saved files rather than from objects left in memory by `Data Preprocessing.qmd`, so this file can be run on its own.
+The split starts from the saved files rather than from objects left in memory by `2.1) Data Preprocessing.qmd`, so this file can be run on its own.
 
 ```{r}
 #| label: Read Analytical Datasets
@@ -59,7 +69,7 @@ income_data <- read_csv(
   )
 ```
 
-A CSV does not store factor levels, so the reference levels set in `Data Preprocessing.qmd` were lost when the files were saved. They are re-applied here, as described in `Cleaned Datasets Data Dictionary.md`, section 2.5. The categorical columns in `income_data` are converted back to factors.
+A CSV does not store factor levels, so the reference levels set in `2.1) Data Preprocessing.qmd` were lost when the files were saved. They are re-applied here, as described in `Cleaned Datasets Data Dictionary.md`, section 2.5. The categorical columns in `income_data` are converted back to factors.
 
 ```{r}
 #| label: Re-apply Reference Levels
@@ -99,7 +109,7 @@ There are `r sum(model_data$employed == "Employed")` employed people (`r round(m
 
 # 3. Household-grouped train/test split
 
-Every row in both files is a person, and people in the same household share household-level predictors such as `any_home_internet`, `digital_access_score` and `has_fixed_internet` (section 10 of `Data Preprocessing.qmd`). A normal random split by row could put two members of the same household on opposite sides, one in training and one in testing. The model would then learn that household's digital-access profile during training and be tested on a near-copy of it, which makes the test results look better than they really are.
+Every row in both files is a person, and people in the same household share household-level predictors such as `any_home_internet`, `digital_access_score` and `has_fixed_internet` (section 10 of `2.1) Data Preprocessing.qmd`). A normal random split by row could put two members of the same household on opposite sides, one in training and one in testing. The model would then learn that household's digital-access profile during training and be tested on a near-copy of it, which makes the test results look better than they really are.
 
 To prevent this, the split is done by household instead of by person. 80% of the *distinct households* in each file are randomly chosen for training, and every person goes into the same set as the rest of their household.
 
@@ -183,7 +193,7 @@ The `model_data` training set has `r n_distinct(model_train$household_id)` house
 
 # 4. Checking the split for leakage
 
-It is not enough to say that leakage was prevented; it needs to be shown. The columns that leak the outcome (salary, salary-based and reason-not-attending columns) were already removed in section 10.4 of `Data Preprocessing.qmd`, so this section checks that the split itself does not introduce any new leakage:
+It is not enough to say that leakage was prevented; it needs to be shown. The columns that leak the outcome (salary, salary-based and reason-not-attending columns) were already removed in section 10.4 of `2.1) Data Preprocessing.qmd`, so this section checks that the split itself does not introduce any new leakage:
 
 ```{r}
 #| label: Leakage Check
@@ -209,7 +219,7 @@ tibble(
 
 No household appears on both sides of either split, and the split neither adds nor removes any columns. `person_weight` and `household_id` stay in place as design columns rather than predictors (sections 11.1 and 12 of the data dictionary), so Milestone 3 can still apply the survey weights and identify each row's household without using either one as a predictor.
 
-No further transformation is needed here. Encoding and the fixed centring of age were already done in `Data Preprocessing.qmd` before the split, and section 10.4 there explains why no scaling is needed. Those steps only use fixed rules or constants rather than values calculated from the data, so it makes no difference whether they happen before or after the split. Any future step that does calculate something from the data, such as filling in the 497 missing values in `matric_plus` or scaling a numeric predictor by its mean and standard deviation, belongs in Milestone 3. It should be fitted on `model_train` or `income_train` only, and then applied unchanged to the matching test set.
+No further transformation is needed here. Encoding and the fixed centring of age were already done in `2.1) Data Preprocessing.qmd` before the split, and section 10.4 there explains why no scaling is needed. Those steps only use fixed rules or constants rather than values calculated from the data, so it makes no difference whether they happen before or after the split. Any future step that does calculate something from the data, such as filling in the 497 missing values in `matric_plus` or scaling a numeric predictor by its mean and standard deviation, belongs in Milestone 3. It should be fitted on `model_train` or `income_train` only, and then applied unchanged to the matching test set.
 
 # 5. Saving the split datasets
 
