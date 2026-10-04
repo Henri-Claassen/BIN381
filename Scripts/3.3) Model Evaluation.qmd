@@ -16,9 +16,8 @@ execute:
   message: false
 ---
 
-<<<<<<< HEAD
 # Initial Setup
-=======
+
 ## Run this if you need the packages
 
 ```{r}
@@ -29,27 +28,10 @@ execute:
 # install.packages(c("tidyverse", "survey", "rpart", "rpart.plot", "ranger", "pROC", "caret"))
 ```
 
-## About this file
-
-This file covers the Milestone 3 rubric items "Model implementation and reproducibility" (tuning and resampling) and "Technical model evaluation and comparison". It continues from `3.1) Employment Model.qmd` and `3.2) Income Model.qmd`, which chose the candidate models, fitted them once with starting parameters and saved them to `Models/`.
-
-The file works in a fixed order, so that the test sets cannot influence any choice:
-
-| Section | Data used | What happens |
-|------------------------|------------------------|------------------------|
-| 2–3 | Training files only | Household-grouped cross-validation folds are built. |
-| 4–5 | Training files only | The tree and forest parameters are tuned, the baseline models are cross-validated and each employment model's classification threshold is chosen, all from out-of-fold predictions. |
-| 6 | Training files only | The tuned models are refitted on the full training files and saved. |
-| 7 | Test files, **used once** | Every model is scored on the test sets with the parameters and thresholds fixed in sections 4–6. |
-| 8 | Training files and fitted models | The education × internet interaction is tested and checked across the models (Milestone 1 success criteria). |
-| 9 | Results of sections 4–8 | The comparison matrix and the final model selection. |
-
 ## Loading the packages we need
->>>>>>> 869459107794040dad5aeaa087d4add7aced829d
 
 ```{r}
 #| label: Package Setup
-#install.packages(c("tidyverse","survey","rpart","rpart.plot","ranger","pROC"))
 
 library(tidyverse)  
 library(survey)     # survey-weighted regressions, likelihood-ratio test
@@ -77,7 +59,7 @@ model_directory <- "../Models/"
 | Employment | Survey-weighted logistic regression, decision tree, random forest, and a demographics-only baseline | Binary classification of employed |
 | Income | Survey-weighted linear regression, random forest, and a demographics-only baseline | Regression of log_salary |
 
-The **baseline models** are what we create in this file. The Milestone 2 success criteria required the models to be compared with a demographics only baseline (a model that knows a person's age, sex, population group, province and settlement type), but nothing about their education, digital access or household. If the full models do not predict better than the baseline wee create in this section, education and digital access add little predictive information beyond who and where a person is.
+The **baseline models** are what we create in this file. The Milestone 2 success criteria required the models to be compared with a demographics only baseline (a model that knows a person's age, sex, population group, province and settlement type), but nothing about their education, digital access or household. If the full models do not predict better than the baseline we create in this section, education and digital access add little predictive information beyond who and where a person is.
 
 ## 1.2 Metrics and why they were chosen
 

@@ -90,15 +90,14 @@ BIN381/
 │
 ├── Documentation/
 │   ├── Milestone Documentation/
-│   │   ├── Project Outline/              Lecturer's project outline and Milestone 2 brief
 │   │   ├── Milestone 1/                  Milestone 1 report and data dictionary
 │   │   ├── Milestone 2/
 │   │   │   ├── BIN381 Milestone 2.docx / .pdf        Data Preparation report
 │   │   │   ├── Cleaned Datasets Data Dictionary.md   Every source and engineered variable
 │   │   │   └── Data Selection and Analytical Grain.md  Task 1: dataset, record and column selection
-│   │   └── Milestone 3/
-│   │       ├── BIN381 Project Milestone 3 [2026].pdf  Milestone 3 brief
-│   │       └── Model Choices.docx                     Why each candidate model was chosen
+│   │   ├── Milestone 3/
+│   │   │   └── Milestone 3 Submit.docx                Milestone 3 write-up: model choices, tuning, evaluation
+│   │   └── Project Outline/              Lecturer's project outline and milestone briefs
 │   └── Rendered Documentation/           Rendered notebooks (code, results, verification),
 │                                         named after the notebook that produced them
 │
