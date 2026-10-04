@@ -1,7 +1,12 @@
+# ---- Run this if you need the packages ----------------------------------------
+# Only needed if the packages are not installed yet: remove the # in front of
+# install.packages() and run this line once.
+# install.packages(c("tidyverse"))
+
 # Milestone 3: shared model preparation
 #
-# Used by Scripts/Employment Model.qmd and Scripts/Income Model.qmd, and meant to
-# be reused by the evaluation notebook and the Shiny app. Every training file, test
+# Used by the notebooks Scripts/3.1) to 3.4) and by the Shiny app
+# (Shiny-App). Every training file, test
 # file and new record then goes through exactly the same preparation, so the
 # models never see data that was prepared differently from the data they were
 # trained on.
@@ -165,7 +170,7 @@ prepare_employment_data <- function(path) {
 
 # The preparation steps themselves, for data that has already been read in. The
 # Shiny app uses this directly: it reads and checks an uploaded file first
-# (R/validate_input.R) and then prepares it with exactly the same steps.
+# (Shiny-App/validate_input.R) and then prepares it with exactly the same steps.
 prepare_employment_frame <- function(data) {
   data |>
     apply_category_levels() |>

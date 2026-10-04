@@ -16,6 +16,16 @@ execute:
   message: false
 ---
 
+## Run this if you need the packages
+
+```{r}
+#| label: Install Packages
+#| eval: false
+# Only needed if the packages are not installed yet: remove the # in front of
+# install.packages() and run this chunk once. It is skipped when rendering.
+# install.packages(c("tidyverse", "survey", "rpart", "rpart.plot", "ranger"))
+```
+
 ## About this file
 
 This file covers the "Modelling strategy and technique selection" and "Model implementation and reproducibility" for the **employment question** (research areas B and C). It restates the analytical question, chooses the candidate models, explains why each one was chosen and fits them to the training data.
@@ -24,7 +34,7 @@ Tuning and evaluation are done in a separate notebook. This file therefore **doe
 
 ## How this notebook works
 
-1.  **Load the shared setup** with `source("../R/model_preparation.R")` (section 2.1). This gives the notebook the predictor lists, the model formulas and `prepare_employment_data()`. It has to be loaded in every notebook: rendering starts a new, empty R session, so nothing from an earlier run is still in memory.
+1.  **Load the shared setup** with `source("R/model_preparation.R")` (section 2.1). This gives the notebook the predictor lists, the model formulas and `prepare_employment_data()`. It has to be loaded in every notebook: rendering starts a new, empty R session, so nothing from an earlier run is still in memory.
 2.  **Prepare the training data** with `prepare_employment_data()`, which reads `model_train.csv` the same way in every notebook (section 2.1).
 3.  **Fit three models** on the same rows (sections 4–6). Each model is one function call that receives a formula, the training data and the model's parameters. Each parameter is explained in a comment next to it.
 4.  **Save** each fitted model to `Models/` and check that it reloads with identical predictions (section 7).
@@ -40,7 +50,7 @@ Tuning and evaluation are done in a separate notebook. This file therefore **doe
 
 ### Formulas: `+` and `*`
 
-A formula tells a model what to predict and from what: the outcome goes on the left of `~` and the predictors on the right, for example `employed ~ matric_plus + female`. The formulas are defined once, in `R/model_preparation.R`.
+A formula tells a model what to predict and from what: the outcome goes on the left of `~` and the predictors on the right, for example `employed ~ matric_plus + female`. The formulas are defined once, in `Scripts/R/model_preparation.R`.
 
 `matric_plus` and `any_home_internet` are both 0/1, so together they split people into four groups. Their employment rates in the training data are:
 
@@ -108,7 +118,7 @@ All results are associations, not causes: the data are one 2024 cross-section.
 
 ## 2.1 Reading the training data
 
-The data are read through `prepare_employment_data()` in `R/model_preparation.R`. The evaluation notebook and the Shiny app use the same function, so every file is prepared in exactly the same way. The function:
+The data are read through `prepare_employment_data()` in `Scripts/R/model_preparation.R`. The evaluation notebook and the Shiny app use the same function, so every file is prepared in exactly the same way. The function:
 
 1.  reads `household_id` as text (it is 18 digits long and would otherwise be rounded),
 2.  applies fixed category levels, with the reference levels from the Milestone 2 data dictionary,
@@ -118,7 +128,7 @@ The data are read through `prepare_employment_data()` in `R/model_preparation.R`
 ```{r}
 #| label: Read Training Data
 
-source("../R/model_preparation.R")
+source("R/model_preparation.R")
 
 # Raw file, only to count the rows before preparation
 model_train_raw <- read_csv(
@@ -481,7 +491,7 @@ tibble(
 **Preparing the test set.** Use the same function, so the test set gets the same rows, columns and factor levels:
 
 ``` r
-source("../R/model_preparation.R")
+source("R/model_preparation.R")
 model_test <- prepare_employment_data("../Datasets/Analytical/model_test.csv")
 ```
 

@@ -1,7 +1,10 @@
+# ---- Run this if you need the packages ----------------------------------------
+# No packages to install: this file only uses functions that come with R.
+
 # Milestone 3: the deployed ("slim") employment model
 #
-# Used by Scripts/4) Deployment Preparation.qmd (which creates the slim model) and
-# by the Shiny app in App/app.R (which uses it to predict).
+# Used by Scripts/3.4) Deployment Preparation.qmd (which creates the slim model) and
+# by the Shiny app in Shiny-App/app.R (which uses it to predict).
 #
 # Why a slim model instead of Models/employment_logistic.rds:
 # the saved svyglm object is about 7 MB because it stores a full copy of the
@@ -15,7 +18,7 @@
 #     survey design, used for confidence intervals),
 #   - the formula's terms (which columns to use and how to combine them), and
 #   - the category levels and contrasts (how each category becomes 0/1 columns).
-# Scripts/4) Deployment Preparation.qmd checks that the slim model gives exactly
+# Scripts/3.4) Deployment Preparation.qmd checks that the slim model gives exactly
 # the same predictions as the full model.
 
 # Keeps only what is needed to predict from a fitted logistic regression
@@ -52,7 +55,7 @@ predict_slim <- function(slim_model, data) {
 # Standard error of an average predicted probability, from its gradient: how the
 # average would change if each coefficient changed slightly (the delta method,
 # variance = gradient' x covariance x gradient). The gradients are calculated in
-# Scripts/4) Deployment Preparation.qmd, section 6. Passing the difference of two
+# Scripts/3.4) Deployment Preparation.qmd, section 6. Passing the difference of two
 # gradients gives the standard error of the difference between two averages.
 delta_method_se <- function(slim_model, gradient) {
   sqrt(as.numeric(t(gradient) %*% slim_model$covariance %*% gradient))

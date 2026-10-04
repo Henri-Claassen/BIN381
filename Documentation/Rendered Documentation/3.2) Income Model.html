@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Group 5">
-<meta name="dcterms.date" content="2026-09-29">
+<meta name="dcterms.date" content="2026-10-04">
 
 <title>Income Model: Model Selection and Implementation</title>
 <style>
@@ -2209,7 +2209,8 @@ vertical-align: -.125em;
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#about-this-file" id="toc-about-this-file" class="nav-link active" data-scroll-target="#about-this-file">About this file</a></li>
+  <li><a href="#run-this-if-you-need-the-packages" id="toc-run-this-if-you-need-the-packages" class="nav-link active" data-scroll-target="#run-this-if-you-need-the-packages">Run this if you need the packages</a></li>
+  <li><a href="#about-this-file" id="toc-about-this-file" class="nav-link" data-scroll-target="#about-this-file">About this file</a></li>
   <li><a href="#how-this-notebook-works" id="toc-how-this-notebook-works" class="nav-link" data-scroll-target="#how-this-notebook-works">How this notebook works</a></li>
   <li><a href="#loading-the-packages-we-need" id="toc-loading-the-packages-we-need" class="nav-link" data-scroll-target="#loading-the-packages-we-need">Loading the packages we need</a></li>
   <li><a href="#file-paths" id="toc-file-paths" class="nav-link" data-scroll-target="#file-paths">File paths</a></li>
@@ -2261,7 +2262,7 @@ vertical-align: -.125em;
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 29, 2026</p>
+      <p class="date">October 4, 2026</p>
     </div>
   </div>
   
@@ -2273,6 +2274,17 @@ vertical-align: -.125em;
 </header>
 
 
+<section id="run-this-if-you-need-the-packages" class="level2">
+<h2 class="anchored" data-anchor-id="run-this-if-you-need-the-packages">Run this if you need the packages</h2>
+<div class="cell">
+<details open class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Only needed if the packages are not installed yet: remove the # in front of</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages() and run this chunk once. It is skipped when rendering.</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c(&quot;tidyverse&quot;, &quot;survey&quot;, &quot;ranger&quot;))</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
 <section id="about-this-file" class="level2">
 <h2 class="anchored" data-anchor-id="about-this-file">About this file</h2>
 <p>This file covers model selection and implementation for the <strong>income question</strong> (research area D). It follows the same structure as <code>3.1) Employment Model.qmd</code>: it restates the question, chooses the candidate models, explains why each one was chosen and fits them to the training data.</p>
@@ -2282,7 +2294,7 @@ vertical-align: -.125em;
 <h2 class="anchored" data-anchor-id="how-this-notebook-works">How this notebook works</h2>
 <p>The steps are the same as in <code>3.1) Employment Model.qmd</code>:</p>
 <ol type="1">
-<li><strong>Load the shared setup</strong> with <code>source(&quot;../R/model_preparation.R&quot;)</code>, which gives the notebook the predictor lists, the formulas and <code>prepare_income_data()</code>.</li>
+<li><strong>Load the shared setup</strong> with <code>source(&quot;R/model_preparation.R&quot;)</code>, which gives the notebook the predictor lists, the formulas and <code>prepare_income_data()</code>.</li>
 <li><strong>Prepare the training data</strong> with <code>prepare_income_data()</code>, which reads <code>income_train.csv</code> the same way in every notebook (section 2.1).</li>
 <li><strong>Fit two models</strong> on the same rows (sections 4–5). Parameters that work as in the employment models are only briefly commented here; the differences are explained in full.</li>
 <li><strong>Save</strong> both models to <code>Models/</code> and check that they reload with identical predictions (section 6).</li>
@@ -2318,7 +2330,7 @@ vertical-align: -.125em;
 </tr>
 </tbody>
 </table>
-<p><strong>Formulas.</strong> The <code>+</code> and <code>*</code> work exactly as explained with the four-group tables in <code>3.1) Employment Model.qmd</code> (and in <code>R/model_preparation.R</code>), but the outcome is salary instead of employment:</p>
+<p><strong>Formulas.</strong> The <code>+</code> and <code>*</code> work exactly as explained with the four-group tables in <code>3.1) Employment Model.qmd</code> (and in <code>Scripts/R/model_preparation.R</code>), but the outcome is salary instead of employment:</p>
 <ul>
 <li><strong>With <code>+</code></strong>, the salary difference that goes with home internet is forced to be the same for people with and without matric.</li>
 <li><strong>With <code>*</code></strong>, the regression adds a fourth number for people with <strong>both</strong> matric and home internet. Above zero means the salary premium for matric is larger in connected households (complements); below zero means it is smaller (substitutes).</li>
@@ -2330,9 +2342,9 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse) <span class="co"># data handling (also loaded by the preparation script)</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)    <span class="co"># svyglm(): linear regression with survey weights and household clustering</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ranger)    <span class="co"># random forest</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse) <span class="co"># data handling (also loaded by the preparation script)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)    <span class="co"># svyglm(): linear regression with survey weights and household clustering</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ranger)    <span class="co"># random forest</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -2341,10 +2353,10 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>analytical_directory <span class="ot">&lt;-</span> <span class="st">&quot;../Datasets/Analytical/&quot;</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>model_directory <span class="ot">&lt;-</span> <span class="st">&quot;../Models/&quot;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(model_directory, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>) <span class="co"># created on the first run only</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>analytical_directory <span class="ot">&lt;-</span> <span class="st">&quot;../Datasets/Analytical/&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>model_directory <span class="ot">&lt;-</span> <span class="st">&quot;../Models/&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(model_directory, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>) <span class="co"># created on the first run only</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -2362,41 +2374,41 @@ vertical-align: -.125em;
 <h1>2. Data and predictors</h1>
 <section id="reading-the-training-data" class="level2">
 <h2 class="anchored" data-anchor-id="reading-the-training-data">2.1 Reading the training data</h2>
-<p>The data are read through <code>prepare_income_data()</code> in <code>R/model_preparation.R</code>, which the evaluation notebook and the Shiny app also use. It reads <code>household_id</code> as text, applies the fixed category levels and leaves out people with unknown education (<code>matric_plus</code> blank) or unknown household internet (<code>any_home_internet</code> blank). Milestone 2 left these missing values in <code>income_data.csv</code> to be handled here; they are left out rather than imputed, as in the employment data.</p>
+<p>The data are read through <code>prepare_income_data()</code> in <code>Scripts/R/model_preparation.R</code>, which the evaluation notebook and the Shiny app also use. It reads <code>household_id</code> as text, applies the fixed category levels and leaves out people with unknown education (<code>matric_plus</code> blank) or unknown household internet (<code>any_home_internet</code> blank). Milestone 2 left these missing values in <code>income_data.csv</code> to be handled here; they are left out rather than imputed, as in the employment data.</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../R/model_preparation.R&quot;</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Raw file, only to count the rows before preparation</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>income_train_raw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;income_train.csv&quot;</span>),</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">household_id =</span> <span class="fu">col_character</span>()),</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">show_col_types =</span> <span class="cn">FALSE</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>income_train <span class="ot">&lt;-</span> <span class="fu">prepare_income_data</span>(<span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;income_train.csv&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;R/model_preparation.R&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Raw file, only to count the rows before preparation</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>income_train_raw <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;income_train.csv&quot;</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">household_id =</span> <span class="fu">col_character</span>()),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">show_col_types =</span> <span class="cn">FALSE</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>income_train <span class="ot">&lt;-</span> <span class="fu">prepare_income_data</span>(<span class="fu">file.path</span>(analytical_directory, <span class="st">&quot;income_train.csv&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">check =</span> <span class="fu">c</span>(</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Rows in income_train.csv&quot;</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Rows removed: unknown education or unknown household internet&quot;</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Rows used for model fitting&quot;</span>,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Households used for model fitting&quot;</span>,</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Missing values left in the predictors or outcome&quot;</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(income_train_raw),</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(income_train_raw) <span class="sc">-</span> <span class="fu">nrow</span>(income_train),</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(income_train),</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">n_distinct</span>(income_train<span class="sc">$</span>household_id),</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(<span class="fu">select</span>(income_train, <span class="sc">-</span>household_id, <span class="sc">-</span>person_weight)))</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">check =</span> <span class="fu">c</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Rows in income_train.csv&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Rows removed: unknown education or unknown household internet&quot;</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Rows used for model fitting&quot;</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Households used for model fitting&quot;</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Missing values left in the predictors or outcome&quot;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(income_train_raw),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(income_train_raw) <span class="sc">-</span> <span class="fu">nrow</span>(income_train),</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(income_train),</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">n_distinct</span>(income_train<span class="sc">$</span>household_id),</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(<span class="fu">select</span>(income_train, <span class="sc">-</span>household_id, <span class="sc">-</span>person_weight)))</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -2440,14 +2452,14 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(income_train, <span class="fu">aes</span>(<span class="at">x =</span> log_salary)) <span class="sc">+</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">50</span>, <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Distribution of log monthly salary (training data)&quot;</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;log(salary in rand)&quot;</span>,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;People&quot;</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(income_train, <span class="fu">aes</span>(<span class="at">x =</span> log_salary)) <span class="sc">+</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">50</span>, <span class="at">fill =</span> <span class="st">&quot;steelblue&quot;</span>, <span class="at">colour =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Distribution of log monthly salary (training data)&quot;</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;log(salary in rand)&quot;</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;People&quot;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -2502,8 +2514,8 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>income_train <span class="sc">|&gt;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(matric_plus, any_home_internet, <span class="at">name =</span> <span class="st">&quot;people&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>income_train <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(matric_plus, any_home_internet, <span class="at">name =</span> <span class="st">&quot;people&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -2627,20 +2639,20 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Survey design, as in the employment model: households as clusters, person_weight as the survey weight</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>income_design <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">ids =</span> <span class="sc">~</span>household_id,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">weights =</span> <span class="sc">~</span>person_weight,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> income_train</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>income_linear <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  income_regression_formula, <span class="co"># log_salary ~ matric_plus * any_home_internet + the 6 controls (R/model_preparation.R)</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">design =</span> income_design,</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">gaussian</span>()        <span class="co"># ordinary linear regression: the outcome is a number, not yes/no</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>income_regression_formula <span class="co"># prints the formula in full</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Survey design, as in the employment model: households as clusters, person_weight as the survey weight</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>income_design <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">ids =</span> <span class="sc">~</span>household_id,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">weights =</span> <span class="sc">~</span>person_weight,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> income_train</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>income_linear <span class="ot">&lt;-</span> <span class="fu">svyglm</span>(</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  income_regression_formula, <span class="co"># log_salary ~ matric_plus * any_home_internet + the 6 controls (R/model_preparation.R)</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">design =</span> income_design,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">gaussian</span>()        <span class="co"># ordinary linear regression: the outcome is a number, not yes/no</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>income_regression_formula <span class="co"># prints the formula in full</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>log_salary ~ matric_plus * any_home_internet + age_centred + 
@@ -2655,20 +2667,20 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>coefficient_table <span class="ot">&lt;-</span> <span class="fu">summary</span>(income_linear)<span class="sc">$</span>coefficients</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>confidence_limits <span class="ot">&lt;-</span> <span class="fu">confint</span>(income_linear) <span class="co"># Wald intervals, using the clustered standard errors</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">term =</span> <span class="fu">rownames</span>(coefficient_table),</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate =</span> coefficient_table[, <span class="st">&quot;Estimate&quot;</span>],</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># exp(b) - 1 turns a log-scale coefficient into a percentage difference in salary</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">percent_difference =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(coefficient_table[, <span class="st">&quot;Estimate&quot;</span>]) <span class="sc">-</span> <span class="dv">1</span>),</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_lower_percent =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(confidence_limits[, <span class="dv">1</span>]) <span class="sc">-</span> <span class="dv">1</span>),</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_upper_percent =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(confidence_limits[, <span class="dv">2</span>]) <span class="sc">-</span> <span class="dv">1</span>),</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">p_value =</span> coefficient_table[, <span class="st">&quot;Pr(&gt;|t|)&quot;</span>]</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(estimate<span class="sc">:</span>ci_upper_percent, \(x) <span class="fu">round</span>(x, <span class="dv">3</span>)),</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">p_value =</span> <span class="fu">format.pval</span>(p_value, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">eps =</span> <span class="fl">0.0001</span>)) <span class="co"># very small p-values show as &quot;&lt;1e-04&quot;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>coefficient_table <span class="ot">&lt;-</span> <span class="fu">summary</span>(income_linear)<span class="sc">$</span>coefficients</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>confidence_limits <span class="ot">&lt;-</span> <span class="fu">confint</span>(income_linear) <span class="co"># Wald intervals, using the clustered standard errors</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">term =</span> <span class="fu">rownames</span>(coefficient_table),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate =</span> coefficient_table[, <span class="st">&quot;Estimate&quot;</span>],</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># exp(b) - 1 turns a log-scale coefficient into a percentage difference in salary</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">percent_difference =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(coefficient_table[, <span class="st">&quot;Estimate&quot;</span>]) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_lower_percent =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(confidence_limits[, <span class="dv">1</span>]) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">ci_upper_percent =</span> <span class="dv">100</span> <span class="sc">*</span> (<span class="fu">exp</span>(confidence_limits[, <span class="dv">2</span>]) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">p_value =</span> coefficient_table[, <span class="st">&quot;Pr(&gt;|t|)&quot;</span>]</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(estimate<span class="sc">:</span>ci_upper_percent, \(x) <span class="fu">round</span>(x, <span class="dv">3</span>)),</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">p_value =</span> <span class="fu">format.pval</span>(p_value, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">eps =</span> <span class="fl">0.0001</span>)) <span class="co"># very small p-values show as &quot;&lt;1e-04&quot;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -2869,14 +2881,14 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">check =</span> <span class="fu">c</span>(<span class="st">&quot;Rows used in the fit&quot;</span>, <span class="st">&quot;Coefficients estimated&quot;</span>, <span class="st">&quot;Coefficients not estimated (NA)&quot;</span>),</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nobs</span>(income_linear),</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">length</span>(<span class="fu">coef</span>(income_linear)),</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(<span class="fu">coef</span>(income_linear)))</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">check =</span> <span class="fu">c</span>(<span class="st">&quot;Rows used in the fit&quot;</span>, <span class="st">&quot;Coefficients estimated&quot;</span>, <span class="st">&quot;Coefficients not estimated (NA)&quot;</span>),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nobs</span>(income_linear),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">length</span>(<span class="fu">coef</span>(income_linear)),</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(<span class="fu">coef</span>(income_linear)))</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -2966,18 +2978,18 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Works like the employment forest; only the settings that differ are explained in full</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>income_forest <span class="ot">&lt;-</span> <span class="fu">ranger</span>(</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  income_tree_formula,                 <span class="co"># log_salary ~ the same 8 predictors joined with +</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> income_train,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">num.trees =</span> <span class="dv">500</span>,                     <span class="co"># as in the employment forest</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="dv">2</span>,                            <span class="co"># predictors each split may choose from: one third of 8, the standard for regression</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">min.node.size =</span> <span class="dv">5</span>,                   <span class="co"># smallest group a tree may end in: the standard for regression forests</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">respect.unordered.factors =</span> <span class="st">&quot;order&quot;</span>, <span class="co"># categories sorted by average salary (not share employed) before splitting</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">importance =</span> <span class="st">&quot;permutation&quot;</span>,          <span class="co"># as in the employment forest</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">67</span>                            <span class="co"># as in the employment forest</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># No probability = TRUE: with a numeric outcome the forest averages the trees&#39; predicted log_salary</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Works like the employment forest; only the settings that differ are explained in full</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>income_forest <span class="ot">&lt;-</span> <span class="fu">ranger</span>(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  income_tree_formula,                 <span class="co"># log_salary ~ the same 8 predictors joined with +</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> income_train,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">num.trees =</span> <span class="dv">500</span>,                     <span class="co"># as in the employment forest</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="dv">2</span>,                            <span class="co"># predictors each split may choose from: one third of 8, the standard for regression</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">min.node.size =</span> <span class="dv">5</span>,                   <span class="co"># smallest group a tree may end in: the standard for regression forests</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">respect.unordered.factors =</span> <span class="st">&quot;order&quot;</span>, <span class="co"># categories sorted by average salary (not share employed) before splitting</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">importance =</span> <span class="st">&quot;permutation&quot;</span>,          <span class="co"># as in the employment forest</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">67</span>                            <span class="co"># as in the employment forest</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co"># No probability = TRUE: with a numeric outcome the forest averages the trees&#39; predicted log_salary</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -2986,12 +2998,12 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">predictor =</span> <span class="fu">names</span>(<span class="fu">importance</span>(income_forest)),</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">permutation_importance =</span> <span class="fu">importance</span>(income_forest)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(permutation_importance)) <span class="sc">|&gt;</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">permutation_importance =</span> <span class="fu">signif</span>(permutation_importance, <span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">predictor =</span> <span class="fu">names</span>(<span class="fu">importance</span>(income_forest)),</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">permutation_importance =</span> <span class="fu">importance</span>(income_forest)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(permutation_importance)) <span class="sc">|&gt;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">permutation_importance =</span> <span class="fu">signif</span>(permutation_importance, <span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -3048,13 +3060,13 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(income_linear, <span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_linear.rds&quot;</span>))</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(income_forest, <span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_forest.rds&quot;</span>))</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="fu">c</span>(<span class="st">&quot;income_linear.rds&quot;</span>, <span class="st">&quot;income_forest.rds&quot;</span>),</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">size_mb =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(<span class="fu">file.path</span>(model_directory, file)) <span class="sc">/</span> <span class="dv">1024</span><span class="sc">^</span><span class="dv">2</span>, <span class="dv">1</span>)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(income_linear, <span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_linear.rds&quot;</span>))</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(income_forest, <span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_forest.rds&quot;</span>))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="fu">c</span>(<span class="st">&quot;income_linear.rds&quot;</span>, <span class="st">&quot;income_forest.rds&quot;</span>),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">size_mb =</span> <span class="fu">round</span>(<span class="fu">file.size</span>(<span class="fu">file.path</span>(model_directory, file)) <span class="sc">/</span> <span class="dv">1024</span><span class="sc">^</span><span class="dv">2</span>, <span class="dv">1</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -3083,21 +3095,21 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>check_rows <span class="ot">&lt;-</span> <span class="fu">head</span>(income_train, <span class="dv">20</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="fu">c</span>(<span class="st">&quot;Linear regression&quot;</span>, <span class="st">&quot;Random forest&quot;</span>),</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">predictions_identical =</span> <span class="fu">c</span>(</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">identical</span>(</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.numeric</span>(<span class="fu">predict</span>(income_linear, check_rows)),</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.numeric</span>(<span class="fu">predict</span>(<span class="fu">readRDS</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_linear.rds&quot;</span>)), check_rows))</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">identical</span>(</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">predict</span>(income_forest, check_rows)<span class="sc">$</span>predictions,</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">predict</span>(<span class="fu">readRDS</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_forest.rds&quot;</span>)), check_rows)<span class="sc">$</span>predictions</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>check_rows <span class="ot">&lt;-</span> <span class="fu">head</span>(income_train, <span class="dv">20</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="fu">c</span>(<span class="st">&quot;Linear regression&quot;</span>, <span class="st">&quot;Random forest&quot;</span>),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">predictions_identical =</span> <span class="fu">c</span>(</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">identical</span>(</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.numeric</span>(<span class="fu">predict</span>(income_linear, check_rows)),</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.numeric</span>(<span class="fu">predict</span>(<span class="fu">readRDS</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_linear.rds&quot;</span>)), check_rows))</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">identical</span>(</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">predict</span>(income_forest, check_rows)<span class="sc">$</span>predictions,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">predict</span>(<span class="fu">readRDS</span>(<span class="fu">file.path</span>(model_directory, <span class="st">&quot;income_forest.rds&quot;</span>)), check_rows)<span class="sc">$</span>predictions</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="kable-table">
@@ -3125,14 +3137,14 @@ vertical-align: -.125em;
 <section id="handover-to-tuning-and-evaluation" class="level2">
 <h2 class="anchored" data-anchor-id="handover-to-tuning-and-evaluation">Handover to tuning and evaluation</h2>
 <p><strong>Preparing the test set</strong> with the same function:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../R/model_preparation.R&quot;</span>)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>income_test <span class="ot">&lt;-</span> <span class="fu">prepare_income_data</span>(<span class="st">&quot;../Datasets/Analytical/income_test.csv&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;R/model_preparation.R&quot;</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>income_test <span class="ot">&lt;-</span> <span class="fu">prepare_income_data</span>(<span class="st">&quot;../Datasets/Analytical/income_test.csv&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><strong>Getting predicted <code>log_salary</code></strong> from each saved model:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>income_linear <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;../Models/income_linear.rds&quot;</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>income_forest <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;../Models/income_forest.rds&quot;</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>pred_linear <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">predict</span>(income_linear, income_test))</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>pred_forest <span class="ot">&lt;-</span> <span class="fu">predict</span>(income_forest, income_test)<span class="sc">$</span>predictions</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>income_linear <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;../Models/income_linear.rds&quot;</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>income_forest <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;../Models/income_forest.rds&quot;</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>pred_linear <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">predict</span>(income_linear, income_test))</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>pred_forest <span class="ot">&lt;-</span> <span class="fu">predict</span>(income_forest, income_test)<span class="sc">$</span>predictions</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><strong>What is left to tune:</strong></p>
 <table class="caption-top table">
 <thead>

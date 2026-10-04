@@ -16,9 +16,19 @@ execute:
   message: false
 ---
 
+## Run this if you need the packages
+
+```{r}
+#| label: Install Packages
+#| eval: false
+# Only needed if the packages are not installed yet: remove the # in front of
+# install.packages() and run this chunk once. It is skipped when rendering.
+# install.packages(c("tidyverse", "survey", "pROC"))
+```
+
 ## About this file
 
-This file covers the Milestone 3 deployment task (Task 4). It documents the deployment strategy and the choice of deployment tool, and it builds `App/app_data.rds`: the one file the Shiny app in `App/app.R` loads. It also documents how new data is validated and how the deployed model is monitored.
+This file covers the Milestone 3 deployment task (Task 4). It documents the deployment strategy and the choice of deployment tool, and it builds `Shiny-App/app_data.rds`: the one file the Shiny app in `Shiny-App/app.R` loads. It also documents how new data is validated and how the deployed model is monitored.
 
 The deployed model is the **survey-weighted logistic regression** for employment, selected in `3.3) Model Evaluation.qmd` (section 9.3).
 
@@ -31,7 +41,7 @@ The deployed model is the **survey-weighted logistic regression** for employment
     - the province scenario figures (section 7);
     - the test-set baseline and training-data mix that monitoring compares new data with (section 8);
     - the key results and subgroup table for the Overview and About pages (section 9).
-4.  **Save** everything to `App/app_data.rds` (section 10).
+4.  **Save** everything to `Shiny-App/app_data.rds` (section 10).
 
 Rerun this notebook whenever the deployed model is retrained, then restart the app.
 
@@ -42,8 +52,8 @@ Rerun this notebook whenever the deployed model is retrained, then restart the a
 | **Intended users** | Policy analysts at National Treasury (the Milestone 1 stakeholder), and the analysts who maintain the model. |
 | **Decisions supported** | How to divide limited funding between digital-access subsidies and education programmes: whether the two reinforce each other (complements) and in which provinces more home internet access is associated with the largest employment gains. |
 | **Inputs** | \(1\) Filter choices: province, settlement type, age band and sex. (2) A scenario target: the share of households with home internet. (3) New survey data as a CSV file in the documented format, for checking and scoring. |
-| **Outputs** | Predicted employment rates for groups of people, with 95% confidence intervals; province scenarios; accuracy measures with plain-language explanations; a data validation report; monitoring checks with a green / amber / red status. **No output is ever a prediction for an individual person.** |
-| **Operational workflow** | The notebooks 2.1–3.3 and this one are run in order to (re)build the models and `App/app_data.rds`. Users open the app (`shiny::runApp("App")`). When a new survey wave arrives, an analyst uploads it on the "Check and predict new data" page; the app validates it, predicts, and runs the monitoring checks. A red check triggers retraining: the notebooks are rerun on the new data. |
+| **Outputs** | Predicted employment rates for groups of people, with 95% confidence intervals; province scenarios; accuracy measures with plain-language explanations; a data validation report; monitoring checks marked OK (green), Investigate (amber) or Action needed (red). **No output is ever a prediction for an individual person.** |
+| **Operational workflow** | The notebooks 2.1–3.3 and this one are run in order to (re)build the models and `Shiny-App/app_data.rds`. Users open the app (`shiny::runApp("Shiny-App")`). When a new survey wave arrives, an analyst uploads it on the "Check new data" page; the app validates it, predicts, and runs the monitoring checks. An "Action needed" (red) check triggers retraining: the notebooks are rerun on the new data. |
 
 **Why group-level only.** The evaluation found that the model's classifications are unreliable for individuals in some groups (section 7.6 of the evaluation: specificity of 0.04 for White and 0.20 for Indian/Asian people). Treasury's decisions are also about groups and provinces, not people. The app therefore shows predicted employment **rates** for groups, and accuracy measures for whole files, but never labels a person as employed or unemployed.
 
@@ -57,22 +67,22 @@ Rerun this notebook whenever the deployed model is retrained, then restart the a
 | `flexdashboard` / Quarto dashboard | Dashboard produced from an R Markdown or Quarto file | Simple to build | Static unless combined with Shiny; cannot validate and score uploaded data |
 | Power BI with R visuals | R scripts inside Power BI | The team already uses Power BI | R visuals are static images, uploads cannot be validated or scored, and publishing R visuals needs a Power BI service licence |
 
-**Recommendation: Shiny.** It is the only option that gives Treasury analysts an interactive interface **and** runs the validation, prediction and monitoring code in the same R environment the model was built in. It runs locally with `shiny::runApp("App")`. Because the app contains only the slim model and aggregated tables (section 3), it could also be hosted on shinyapps.io without publishing any survey microdata.
+**Recommendation: Shiny.** It is the only option that gives Treasury analysts an interactive interface **and** runs the validation, prediction and monitoring code in the same R environment the model was built in. It runs locally with `shiny::runApp("Shiny-App")`. Because the app contains only the slim model and aggregated tables (section 3), it could also be hosted on shinyapps.io without publishing any survey microdata.
 
 # 3. What the app loads, and why not the saved model
 
 The app does **not** load `Models/employment_logistic.rds`. That file is about 7 MB because the fitted `svyglm` object stores a full copy of the training data (22,671 people, including every `household_id`) inside it, plus working matrices from the fit. A deployed app should never carry survey microdata: if it were hosted, the data would be published with it, which the Milestone 1 ethics section (disclosure risk, usage terms) rules out.
 
-Instead, this notebook saves `App/app_data.rds`, which holds only:
+Instead, this notebook saves `Shiny-App/app_data.rds`, which holds only:
 
 | Item | What it contains | Used on app page |
 |----|----|----|
-| `slim_model` | Coefficients, their covariance matrix, the formula terms and category levels: all that is needed to predict (section 5) | Check and predict new data |
-| `threshold` | The classification threshold (0.639) chosen in the evaluation | Check and predict new data |
+| `slim_model` | Coefficients, their covariance matrix, the formula terms and category levels: all that is needed to predict (section 5) | Check new data |
+| `threshold` | The classification threshold (0.639) chosen in the evaluation | Check new data |
 | `group_cells`, `group_gradients` | Predicted employment rates of the four matric × internet groups for every filter combination, with what is needed for their confidence intervals. Combinations with fewer than 50 people are suppressed (section 6) | Education × internet |
 | `provinces` | Province totals for the scenario calculation (section 7) | Province scenarios |
-| `baseline`, `baseline_subgroups`, `baseline_subgroup_gap` | Test-set accuracy measures the monitoring checks compare with (section 8) | Check and predict new data, About the model |
-| `reference_shares` | The share of training people in each category of the drift variables (section 8) | Check and predict new data |
+| `baseline`, `baseline_subgroups`, `baseline_subgroup_gap` | Test-set accuracy measures the monitoring checks compare with (section 8) | Check new data, About the model |
+| `reference_shares` | The share of training people in each category of the drift variables (section 8) | Check new data |
 | `key_results`, `subgroups` | The interaction result, the income result and the subgroup performance table (section 9) | Overview, About the model |
 | `built` | When the file was built and from which data | About the model |
 
@@ -93,11 +103,11 @@ library(pROC)      # AUC (through R/monitoring.R)
 
 analytical_directory <- "../Datasets/Analytical/"
 model_directory <- "../Models/"
-app_directory <- "../App/"
+app_directory <- "../Shiny-App/"
 
-source("../R/model_preparation.R") # predictor lists, formulas, prepare_employment_data()
-source("../R/deployment_model.R")  # slim model functions
-source("../R/monitoring.R")        # accuracy measures, drift and thresholds
+source("R/model_preparation.R") # predictor lists, formulas, prepare_employment_data()
+source("../Shiny-App/deployment_model.R")  # slim model functions
+source("../Shiny-App/monitoring.R")        # accuracy measures, drift and thresholds
 ```
 
 ```{r}
@@ -126,7 +136,7 @@ tibble(
 
 # 5. The slim model
 
-`make_slim_model()` (in `R/deployment_model.R`) keeps only the coefficients, their covariance matrix, the formula terms and the category levels. The check below confirms that it predicts **exactly** like the full model on the whole population:
+`make_slim_model()` (in `Shiny-App/deployment_model.R`) keeps only the coefficients, their covariance matrix, the formula terms and the category levels. The check below confirms that it predicts **exactly** like the full model on the whole population:
 
 ```{r}
 #| label: Slim Model
@@ -292,7 +302,7 @@ provinces |>
 
 ## 8.1 Test-set accuracy
 
-Every monitoring check compares new data with the deployed model's performance on the test set. The measures are calculated with `compute_metrics()` in `R/monitoring.R`, which uses the same definitions as the evaluation, so the values must match section 9.1 of `3.3) Model Evaluation.qmd` (AUC 0.765, balanced accuracy 0.693, Brier score 0.183):
+Every monitoring check compares new data with the deployed model's performance on the test set. The measures are calculated with `compute_metrics()` in `Shiny-App/monitoring.R`, which uses the same definitions as the evaluation, so the values must match section 9.1 of `3.3) Model Evaluation.qmd` (AUC 0.765, balanced accuracy 0.693, Brier score 0.183):
 
 ```{r}
 #| label: Test Baseline
@@ -346,7 +356,7 @@ round(baseline_subgroup_gap, 3)
 
 ## 8.3 The training mix
 
-Drift is measured with the population stability index (PSI, `R/monitoring.R`), which compares the share of people in each category of new data with the training data. The training shares are stored here:
+Drift is measured with the population stability index (PSI, `Shiny-App/monitoring.R`), which compares the share of people in each category of new data with the training data. The training shares are stored here:
 
 ```{r}
 #| label: Reference Shares
@@ -388,7 +398,7 @@ tibble(result = names(key_results),
        value = map_chr(key_results, \(x) format(if (x == round(x)) x else signif(x, 4), big.mark = ",", scientific = FALSE)))
 ```
 
-# 10. Saving `App/app_data.rds`
+# 10. Saving `Shiny-App/app_data.rds`
 
 ```{r}
 #| label: Save App Data
@@ -414,7 +424,7 @@ app_data <- list(
 saveRDS(app_data, file.path(app_directory, "app_data.rds"))
 
 tibble(
-  file = "App/app_data.rds",
+  file = "Shiny-App/app_data.rds",
   size_kb = round(file.size(file.path(app_directory, "app_data.rds")) / 1024, 1),
   contains_household_ids = any(str_detect(capture.output(str(app_data, list.len = 200)), "household_id"))
 )
@@ -426,7 +436,7 @@ tibble(
 
 ## 11.1 How new data is validated and scored
 
-On the app's "Check and predict new data" page, an uploaded CSV goes through these steps (`R/validate_input.R`, `R/model_preparation.R`, `R/deployment_model.R`):
+On the app's "Check new data" page, an uploaded CSV goes through these steps (`Shiny-App/validate_input.R`, `Scripts/R/model_preparation.R`, `Shiny-App/deployment_model.R`):
 
 1.  **Read every column as text**, so a value of the wrong type (for example "yes" in a 0/1 column) is reported instead of silently becoming missing.
 
@@ -449,7 +459,7 @@ On the app's "Check and predict new data" page, an uploaded CSV goes through the
 
 ## 11.2 Monitoring measures and thresholds
 
-The thresholds are defined once, in `R/monitoring.R`:
+The thresholds are defined once, in `Shiny-App/monitoring.R`:
 
 | Check | What it measures | Test-set value | Green | Amber | Red |
 |----|----|----|----|----|----|
@@ -464,6 +474,6 @@ The drift checks need no outcome, so they run on every upload; the accuracy chec
 
 ## 11.3 When to retrain or retire the model
 
-- **Retrain** (rerun notebooks 2.1–4 on new data) when Stats SA releases a new survey wave, or when any check is **red**.
+- **Retrain** (rerun notebooks 2.1–3.4 on new data) when Stats SA releases a new survey wave, or when any check is **red**.
 - **Investigate** when a check is **amber**: find out whether the data come from a different population or collection method before relying on the predictions.
 - **Retire** the model when: retraining does not bring the AUC back above 0.70; Stats SA changes the definitions of the variables (for example the education or internet questions), so new data no longer means what the model learned; the interaction's confidence interval after retraining includes 1 in successive waves, so the complements finding no longer holds; or the app is found to be used to make decisions about individual people, which it was not designed for.

@@ -2,7 +2,7 @@
 
 **BIN381 Group 5 – Milestone 2 (Data Preparation)**
 
-This dictionary describes the files produced by `Scripts/Data Preprocessing.qmd`:
+This dictionary describes the files produced by `Scripts/2.1) Data Preprocessing.qmd`:
 
 - the four cleaned files in `Datasets/Cleaned/` (section 8.2), one per selected source dataset, described in 4–9 below, and
 - the three analytical files in `Datasets/Analytical/` (section 10.6), built after the cleaned datasets are integrated (section 9) and the engineered features are added (section 10), described in 10–13 below.
@@ -620,7 +620,7 @@ Every column of `analytical_dataset.csv` that is not in `model_data.csv` has a d
 
 ## 14. Training and test files
 
-`Scripts/Train-Test Split.qmd` splits `model_data.csv` and `income_data.csv` into training and test sets and writes four files to `Datasets/Analytical/`. The source files are not changed.
+`Scripts/2.2) Train-Test Split.qmd` splits `model_data.csv` and `income_data.csv` into training and test sets and writes four files to `Datasets/Analytical/`. The source files are not changed.
 
 | File | Split from | Rows | Households | Columns |
 |---|---|---|---|---|
