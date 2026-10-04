@@ -20,24 +20,22 @@ execute:
 
 ```{r}
 #| label: Install Packages
-#| eval: false
-# Only needed if the packages are not installed yet: remove the # in front of
-# install.packages() and run this chunk once. It is skipped when rendering.
+# Only needed if the packages are not installed yet: 
 # install.packages(c("tidyverse", "survey", "rpart", "rpart.plot", "ranger"))
 ```
 
 ## About this file
 
-This file covers the "Modelling strategy and technique selection" and "Model implementation and reproducibility" for the **employment question** (research areas B and C). It restates the analytical question, chooses the candidate models, explains why each one was chosen and fits them to the training data.
+This file covers the "Modelling strategy and technique selection" and "Model implementation and reproducibility" for the **employment question** (research areas B and C). This notebook chooses the candidate models, explains why each one was chosen and fits them to the training data.
 
 Tuning and evaluation are done in a separate notebook. This file therefore **does not use the test set**, does not tune any parameters and does not calculate performance metrics. It fits each model once with documented starting parameters and saves it to `Models/`, so the evaluation notebook can load the models, tune them with household-grouped cross-validation and test them. The income question (research area D) is modelled in `3.2) Income Model.qmd`. The reasoning behind each model is also written up in `Milestone 3 Submit.docx` (in `Documentation/Milestone Documentation/Milestone 3/`).
 
 ## How this notebook works
 
-1.  **Load the shared setup** with `source("R/model_preparation.R")` (section 2.1). This gives the notebook the predictor lists, the model formulas and `prepare_employment_data()`. It has to be loaded in every notebook: rendering starts a new, empty R session, so nothing from an earlier run is still in memory.
-2.  **Prepare the training data** with `prepare_employment_data()`, which reads `model_train.csv` the same way in every notebook (section 2.1).
-3.  **Fit three models** on the same rows (sections 4–6). Each model is one function call that receives a formula, the training data and the model's parameters. Each parameter is explained in a comment next to it.
-4.  **Save** each fitted model to `Models/` and check that it reloads with identical predictions (section 7).
+1.  **Load the shared setup** with `source("R/model_preparation.R")`. This gives the notebook the predictor lists, the model formulas and `prepare_employment_data()`. It has to be loaded in every notebook, it basically just makes reusable code so that you do not have to run the same set of code over and over in each notebook you can just call the predictor lists and model formulas from inside that R Script.
+2.  **Prepare the training data** with `prepare_employment_data()`, which reads `model_train.csv` the same way in every notebook.
+3.  **Fit three models** each model is one function call that receives a formula, the training data and the model's parameters. Each parameter is explained in a comment next to it.
+4.  **Save** each fitted model to is saved to `Models/` and check that it reloads with identical predictions.
 5.  `3.3) Model Evaluation.qmd` then tunes the saved models and tests them on the test set.
 
 **What "fitting" means for each model:**
@@ -50,7 +48,7 @@ Tuning and evaluation are done in a separate notebook. This file therefore **doe
 
 ### Formulas: `+` and `*`
 
-A formula tells a model what to predict and from what: the outcome goes on the left of `~` and the predictors on the right, for example `employed ~ matric_plus + female`. The formulas are defined once, in `Scripts/R/model_preparation.R`.
+A formula tells a model what to predict and from what: the outcome goes on the left of `~` and the predictors on the right, for example `employed ~ matric_plus + female`. The formulas are defined once, in `Scripts/R/model_preparation.R`. This means we predict employed, based on the columns matric_plus and female.
 
 `matric_plus` and `any_home_internet` are both 0/1, so together they split people into four groups. Their employment rates in the training data are:
 
@@ -106,13 +104,11 @@ dir.create(model_directory, showWarnings = FALSE) # created on the first run onl
 
 # 1. Analytical question and modelling task
 
-The Milestone 1 analytics goal is to *"model employment status based on education level, digital access/connectivity, and the interaction between the two"*, controlling for demographic, geographic and household factors. National Treasury needs to know whether education and household internet access **reinforce** each other (the combination is associated with more employment than either one alone) or **substitute** for each other (one makes up for the lack of the other).
+The Milestone 1 analytics goal is to model employment status based on education level and connectivity. The National Treasury needs to know whether education and household internet access **reinforce** each other (the combination is associated with more employment than either one alone) or **substitute** for each other (one makes up for the lack of the other).
 
 - **Modelling task:** binary **classification**. The target `employed` has two classes, Employed and Unemployed, for people in the labour force.
 - **Population:** working-age people (15–64) in the labour force, from `model_train.csv`.
-- **What the models must deliver:** an estimate of the education × internet interaction that can be read as an odds ratio (Milestone 1 technical success criteria 1 and 2), predicted employment probabilities for the deployed Shiny app, and a second, tree-based model to check the findings (success criterion 4).
-
-All results are associations, not causes: the data are one 2024 cross-section.
+- **What the models must deliver:** an estimate of the education × internet interaction that can be read as an odds ratio, predicted employment probabilities for the deployed Shiny app, and a second, tree-based model to check the findings.
 
 # 2. Data and predictors
 
@@ -197,7 +193,7 @@ model_train |>
   round(2)
 ```
 
-The highest correlation is between `household_size` and `n_children_under15` (about 0.8). That is high but not near 1, and both are controls rather than the effects of interest, so both are kept. The education and internet columns are not affected.
+The highest correlation is between `household_size` and `n_children_under15` (about 0.8). Both are controls rather than the effects of interest, so both are kept. The education and internet columns are not affected.
 
 Each combination of matric and internet access must also contain enough people to estimate the interaction reliably:
 
@@ -222,13 +218,13 @@ Three models are fitted. They are chosen to answer the question in different way
 | **2. Decision tree** | `rpart::rpart()` | Interpretable tree-based check | Finds interactions itself, without being told about them. If it splits on internet access differently for people with and without matric, that supports the regression's interaction. Its rules are easy to explain to non-technical stakeholders. |
 | **3. Random forest** | `ranger::ranger()` | Predictive benchmark | Captures non-linear effects and interactions that the regression's form rules out. Shows how much predictive power the simpler models give up, and whether education and internet remain important once everything else is allowed to interact freely. |
 
-Milestone 1 set the requirement to check findings *"across at least two modelling approaches, such as logistic regression and a tree-based method"*. Models 2 and 3 are both tree-based but play different roles: the tree is readable, and the forest is accurate but hard to read.
+Models 2 and 3 are both tree-based but play different roles: the tree is readable, and the forest is accurate but hard to read.
 
 Models considered but not used:
 
 - **Penalised logistic regression (lasso/ridge):** useful when there are many predictors. With 15 chosen predictors and more than 20,000 rows, a standard logistic regression is stable, and penalisation would shrink the interaction coefficient that the question is about.
 - **k-nearest neighbours, support vector machines, neural networks:** they give no interpretable effect sizes, and k-NN and SVMs need scaled numeric inputs, which the categorical predictors here do not suit.
-- **Clustering:** the question has a known target (`employed`), so a supervised model is the right tool.
+- **Clustering:** the question has a known target (`employed`), so a supervised model is more appropriate.
 
 All three models are fitted to the same training rows with the same predictors, so the evaluation notebook can compare them fairly.
 
@@ -242,8 +238,8 @@ Logistic regression models the log-odds of being employed as a linear combinatio
 |----|----|
 | Binary outcome | `employed` has two levels, with Unemployed as the reference, so the model predicts the probability of being **Employed**. |
 | Independent observations | People in the same household are not independent: they share every household-level predictor. The survey design treats **households as clusters**, so the standard errors (and the p-value of the interaction) allow for this. The Stats SA primary sampling unit is not in `model_data.csv`, so the household is the finest cluster available. |
-| Log-odds linear in the numeric predictors | Age has a curved relationship with employment (low for the young, highest in mid-career), so `age_centred_squared` is included next to `age_centred` (Milestone 2, section 10.4). |
-| No strong multicollinearity | Overlapping predictors were removed in section 2.2, and the remaining correlations are acceptable. |
+| Log-odds linear in the numeric predictors | Age has a curved relationship with employment (low for the young, highest in mid-career), so `age_centred_squared` is included next to `age_centred`. |
+| No strong multicollinearity | Overlapping predictors were removed in preprocessing, and the remaining correlations are acceptable. |
 | Enough cases for each parameter | About 8,000 unemployed people for fewer than 35 coefficients, far above the usual minimum of 10–20 events per coefficient. |
 | Representative estimates | Stats SA gives each person a `person_weight` because some groups were sampled more heavily than others. Weighting the model makes the odds ratios describe the South African labour force rather than the sample. |
 
@@ -278,7 +274,7 @@ employment_regression_formula # prints the formula in full
 
 ## 4.3 Fitted coefficients
 
-The table converts each coefficient into an odds ratio with a 95% confidence interval. This is the fitted model itself; interpreting it against the business objectives is part of evaluation.
+The table converts each coefficient into an odds ratio with a 95% confidence interval. This is the fitted model itself interpreting it against the business objectives is part of evaluation.
 
 ```{r}
 #| label: Logistic Odds Ratios
@@ -340,14 +336,14 @@ Starting parameters (to be tuned in the evaluation notebook):
 set.seed(67) # Same seed as the train/test split, for reproducibility
 
 employment_tree <- rpart(
-  employment_tree_formula, # employed ~ the same 15 predictors joined with +; the tree finds interactions itself
+  employment_tree_formula,
   data = model_train,
-  method = "class",        # classification tree: predicts a class (and its probability), not a number
+  method = "class",       
   control = rpart.control(
-    maxdepth = 5,          # at most 5 questions from the top of the tree to a prediction, so it stays readable
-    minbucket = 100,       # every final group (leaf) contains at least 100 people
-    cp = 0.001,            # a split is only kept if it improves the fit by at least 0.1%
-    xval = 0               # rpart's own cross-validation off: it splits by person, not by household (see 5.1)
+    maxdepth = 5,         
+    minbucket = 100,      
+    cp = 0.001,            
+    xval = 0               
   )
 )
 ```
@@ -413,15 +409,15 @@ Survey weights are not used, for the same reason as the tree: in `ranger`, weigh
 
 # household_id and person_weight are not in the formula, so they are not used
 employment_forest <- ranger(
-  employment_tree_formula,             # same formula as the tree
+  employment_tree_formula,             
   data = model_train,
-  num.trees = 500,                     # number of trees grown; the forest averages their predictions
-  mtry = 3,                            # predictors each split may choose from, picked at random (about √15)
-  min.node.size = 10,                  # smallest group of people a tree may end in
-  probability = TRUE,                  # predict the probability of Employed, not only a class
-  respect.unordered.factors = "order", # sort category levels by their share employed before splitting
-  importance = "permutation",          # measure each predictor's importance by shuffling its values
-  seed = 67                            # fixes the random resamples, so the same forest is grown every run
+  num.trees = 500,                     
+  mtry = 3,                            
+  min.node.size = 10,                  
+  probability = TRUE,                  
+  respect.unordered.factors = "order", 
+  importance = "permutation",          
+  seed = 67                            
 )
 ```
 
@@ -506,15 +502,6 @@ p_logistic <- as.numeric(predict(employment_logistic, model_test, type = "respon
 p_tree     <- predict(employment_tree, model_test, type = "prob")[, "Employed"]
 p_forest   <- predict(employment_forest, model_test)$predictions[, "Employed"]
 ```
-
-**What is left to tune.** The values above are starting points, not tuned values:
-
-| Model | Parameters to tune |
-|----|----|
-| Logistic regression | None (only the classification threshold) |
-| Decision tree | `cp` (pruning), `maxdepth`, `minbucket` |
-| Random forest | `mtry`, `min.node.size` (`num.trees` only needs to be large enough) |
-| All models | The classification threshold. With 65% employed, a cut-off of 0.5 will rarely predict Unemployed. |
 
 Points to keep the tuning free of leakage:
 
