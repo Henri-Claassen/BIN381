@@ -1,0 +1,1201 @@
+household_id,person_weight,employed,matric_plus,any_home_internet,has_computer,smartphone_access,age_centred,age_centred_squared,female,population_group,province,settlement_type,household_size,n_children_under15,elderly_in_household,female_x_children,other_member_matric
+DUMMY0001,709.22,Employed,0,1,0,1 or more per member,12,144,1,Black African,Western Cape,Metro urban,5,0,0,0,Yes
+DUMMY0002,532.44,Employed,1,1,0,1 or more per member,-4,16,1,Black African,Northern Cape,Metro urban,2,0,0,0,No
+DUMMY0003,950.46,Unemployed,0,1,0,Fewer than 1 per member,-9,81,1,Black African,KwaZulu-Natal,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0004,1763.46,Employed,1,1,0,1 or more per member,-10,100,1,Black African,KwaZulu-Natal,Traditional,4,0,0,0,Yes
+DUMMY0005,1245.34,Employed,1,0,0,None,4,16,0,Coloured,Northern Cape,Traditional,3,1,0,0,Yes
+DUMMY0006,1844.53,Employed,1,1,0,None,-6,36,0,Black African,KwaZulu-Natal,Metro urban,7,0,0,0,No
+DUMMY0007,575.87,Employed,0,1,0,1 or more per member,-4,16,0,Black African,Eastern Cape,Non-metro urban,3,1,1,0,No
+DUMMY0008,1533.62,Unemployed,0,1,1,Fewer than 1 per member,-19,361,1,Black African,Gauteng,Metro urban,4,0,0,0,No
+DUMMY0009,1521.55,Employed,1,0,0,Fewer than 1 per member,-12,144,1,Black African,Free State,Traditional,2,1,0,1,No other working-age member
+DUMMY0010,1437.15,Employed,0,1,0,1 or more per member,11,121,0,Black African,Eastern Cape,Metro urban,3,2,1,0,No other working-age member
+DUMMY0011,1131.44,Employed,1,1,0,Fewer than 1 per member,-12,144,1,White,Eastern Cape,Non-metro urban,4,0,0,0,No
+DUMMY0012,1596.98,Employed,1,1,0,Fewer than 1 per member,11,121,0,Black African,Limpopo,Non-metro urban,5,2,0,0,Yes
+DUMMY0013,1913.98,Employed,1,1,0,Fewer than 1 per member,-13,169,1,Coloured,Eastern Cape,Metro urban,2,1,1,1,No other working-age member
+DUMMY0014,1675.26,Unemployed,0,0,0,Fewer than 1 per member,-18,324,0,White,Eastern Cape,Metro urban,2,1,1,0,No other working-age member
+DUMMY0015,1293.98,Unemployed,1,0,0,Fewer than 1 per member,-10,100,0,Coloured,Gauteng,Traditional,4,1,0,0,Yes
+DUMMY0016,1943.82,Employed,1,1,0,1 or more per member,-5,25,0,Black African,Western Cape,Traditional,5,0,0,0,Yes
+DUMMY0017,440.95,Employed,0,1,1,1 or more per member,4,16,1,Black African,KwaZulu-Natal,Metro urban,4,0,0,0,Yes
+DUMMY0018,1919.95,Unemployed,1,1,0,1 or more per member,-11,121,1,Black African,Western Cape,Metro urban,7,0,0,0,Yes
+DUMMY0019,1307.63,Employed,0,1,1,Fewer than 1 per member,3,9,1,Black African,Western Cape,Non-metro urban,5,1,0,1,Yes
+DUMMY0020,458.12,Employed,0,1,0,Fewer than 1 per member,-11,121,1,Black African,Gauteng,Metro urban,5,0,0,0,Yes
+DUMMY0021,931.85,Employed,0,1,0,Fewer than 1 per member,1,1,0,Black African,Eastern Cape,Metro urban,5,1,0,0,No
+DUMMY0022,1724.5,Employed,1,1,0,Fewer than 1 per member,2,4,0,Black African,Limpopo,Metro urban,4,2,0,0,Yes
+DUMMY0023,457.63,Employed,0,1,0,1 or more per member,-9,81,0,Black African,Gauteng,Metro urban,5,1,1,0,Yes
+DUMMY0024,1767.91,Unemployed,1,1,0,Fewer than 1 per member,-9,81,0,Black African,KwaZulu-Natal,Traditional,4,0,0,0,Yes
+DUMMY0025,1702.86,Unemployed,0,0,0,None,3,9,1,Black African,Free State,Metro urban,6,0,0,0,Yes
+DUMMY0026,545.87,Unemployed,1,1,0,1 or more per member,-8,64,1,Black African,Western Cape,Non-metro urban,4,1,1,1,No
+DUMMY0027,943.42,Employed,1,1,1,Fewer than 1 per member,0,0,1,Coloured,KwaZulu-Natal,Traditional,4,2,0,2,Yes
+DUMMY0028,1845.05,Employed,0,1,0,None,-13,169,1,Black African,Free State,Metro urban,1,0,0,0,No other working-age member
+DUMMY0029,485.36,Employed,1,1,1,Fewer than 1 per member,-7,49,0,Black African,Gauteng,Traditional,2,1,1,0,No other working-age member
+DUMMY0030,1918.03,Employed,1,1,1,None,14,196,0,White,Gauteng,Metro urban,7,3,0,0,No
+DUMMY0031,1414.65,Unemployed,1,1,0,1 or more per member,-21,441,0,Black African,North West,Metro urban,5,2,0,0,No
+DUMMY0032,1837.81,Employed,0,1,0,Fewer than 1 per member,-12,144,1,Coloured,Eastern Cape,Traditional,5,1,0,1,Yes
+DUMMY0033,1505.07,Employed,0,1,1,Fewer than 1 per member,7,49,1,Black African,Limpopo,Non-metro urban,7,2,0,2,No
+DUMMY0034,910.31,Employed,0,1,0,1 or more per member,-12,144,1,Black African,Western Cape,Non-metro urban,3,2,0,2,No other working-age member
+DUMMY0035,932.27,Employed,0,0,0,Fewer than 1 per member,7,49,0,Black African,Gauteng,Metro urban,4,2,0,0,No
+DUMMY0036,1168.69,Employed,0,0,0,1 or more per member,2,4,0,Coloured,Eastern Cape,Metro urban,3,2,0,0,No other working-age member
+DUMMY0037,1759.75,Employed,1,1,0,None,-6,36,0,Black African,Northern Cape,Non-metro urban,2,1,0,0,No other working-age member
+DUMMY0038,1580.47,Employed,0,1,0,Fewer than 1 per member,0,0,1,Black African,Gauteng,Traditional,5,1,0,1,Yes
+DUMMY0039,962.28,Employed,0,1,0,1 or more per member,6,36,0,Black African,KwaZulu-Natal,Metro urban,4,0,1,0,No
+DUMMY0040,782.29,Employed,0,1,0,Fewer than 1 per member,3,9,1,Black African,Limpopo,Non-metro urban,3,2,0,2,No other working-age member
+DUMMY0041,943.46,Unemployed,0,1,0,None,-4,16,1,Black African,Gauteng,Metro urban,3,0,0,0,Yes
+DUMMY0042,1337.28,Employed,1,1,0,1 or more per member,-16,256,1,Black African,KwaZulu-Natal,Non-metro urban,3,0,1,0,Yes
+DUMMY0043,1489.23,Employed,1,1,0,Fewer than 1 per member,0,0,0,Black African,KwaZulu-Natal,Metro urban,4,1,0,0,Yes
+DUMMY0044,1469.56,Employed,0,0,0,Fewer than 1 per member,3,9,1,Black African,North West,Non-metro urban,5,2,0,2,Yes
+DUMMY0045,1527.38,Employed,1,1,0,Fewer than 1 per member,-8,64,0,Black African,Gauteng,Traditional,4,2,0,0,Yes
+DUMMY0046,564.37,Employed,1,1,1,Fewer than 1 per member,-13,169,1,Black African,Gauteng,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY0047,1983.81,Employed,1,0,0,1 or more per member,18,324,0,Coloured,Gauteng,Metro urban,1,0,0,0,No other working-age member
+DUMMY0048,1634.1,Employed,1,1,0,Fewer than 1 per member,-13,169,1,Black African,Eastern Cape,Non-metro urban,4,2,0,2,Yes
+DUMMY0049,833.94,Employed,0,0,0,None,-4,16,0,Indian/Asian,Mpumalanga,Metro urban,7,2,0,0,Yes
+DUMMY0050,1233.37,Unemployed,0,1,1,1 or more per member,-15,225,1,Black African,Free State,Metro urban,4,3,0,3,No other working-age member
+DUMMY0051,1331.92,Employed,0,1,0,1 or more per member,15,225,0,Coloured,North West,Non-metro urban,4,1,0,0,No
+DUMMY0052,1243.37,Employed,0,1,0,1 or more per member,14,196,1,Black African,KwaZulu-Natal,Metro urban,5,0,1,0,Yes
+DUMMY0053,1518.39,Employed,1,1,0,Fewer than 1 per member,16,256,0,Black African,Eastern Cape,Non-metro urban,4,0,1,0,Yes
+DUMMY0054,1472.15,Employed,1,1,0,Fewer than 1 per member,-21,441,1,Black African,Northern Cape,Non-metro urban,9,1,0,1,No
+DUMMY0055,574.82,Employed,1,1,0,Fewer than 1 per member,-3,9,1,Black African,Gauteng,Metro urban,3,0,0,0,Yes
+DUMMY0056,1499.02,Employed,1,1,0,Fewer than 1 per member,5,25,0,Black African,Western Cape,Metro urban,4,0,1,0,Yes
+DUMMY0057,444.25,Unemployed,0,1,1,Fewer than 1 per member,7,49,1,Black African,Mpumalanga,Traditional,2,1,0,1,No other working-age member
+DUMMY0058,1918.93,Unemployed,1,1,0,Fewer than 1 per member,-7,49,1,White,KwaZulu-Natal,Traditional,5,1,0,1,Yes
+DUMMY0059,887.83,Unemployed,1,1,0,Fewer than 1 per member,15,225,1,Black African,Western Cape,Metro urban,5,3,0,3,Yes
+DUMMY0060,1724.57,Unemployed,0,0,0,1 or more per member,-13,169,1,Black African,Gauteng,Traditional,4,1,1,1,Yes
+DUMMY0061,1985.99,Employed,1,1,0,Fewer than 1 per member,-8,64,1,Black African,Western Cape,Non-metro urban,1,0,1,0,No other working-age member
+DUMMY0062,1290.33,Employed,0,1,0,1 or more per member,-17,289,0,Black African,Western Cape,Traditional,5,2,0,0,No
+DUMMY0063,874.64,Unemployed,0,1,0,Fewer than 1 per member,0,0,1,Black African,KwaZulu-Natal,Traditional,6,0,0,0,Yes
+DUMMY0064,1401.59,Employed,0,0,0,1 or more per member,4,16,0,Black African,Mpumalanga,Traditional,5,1,1,0,Yes
+DUMMY0065,1262.37,Employed,1,1,0,Fewer than 1 per member,-1,1,1,Black African,Gauteng,Metro urban,1,0,0,0,No other working-age member
+DUMMY0066,1429.85,Employed,0,1,1,1 or more per member,-11,121,1,White,Gauteng,Metro urban,5,1,0,1,Yes
+DUMMY0067,1740.71,Employed,1,1,0,Fewer than 1 per member,5,25,0,Black African,Gauteng,Traditional,4,0,0,0,No
+DUMMY0068,1988.72,Employed,1,1,1,Fewer than 1 per member,3,9,1,Coloured,Northern Cape,Traditional,7,1,0,1,Yes
+DUMMY0069,1297.41,Unemployed,1,1,1,Fewer than 1 per member,-3,9,0,Black African,Limpopo,Non-metro urban,2,0,0,0,No
+DUMMY0070,1734.1,Unemployed,0,1,0,Fewer than 1 per member,6,36,1,Black African,North West,Traditional,6,1,0,1,No
+DUMMY0071,1698.63,Employed,0,1,0,None,-21,441,1,Black African,North West,Metro urban,2,0,0,0,Yes
+DUMMY0072,1090.65,Employed,0,1,0,Fewer than 1 per member,1,1,0,White,North West,Metro urban,1,0,1,0,No other working-age member
+DUMMY0073,810.54,Unemployed,1,1,0,Fewer than 1 per member,14,196,1,Black African,Gauteng,Metro urban,2,0,0,0,Yes
+DUMMY0074,867.53,Employed,0,1,1,1 or more per member,-19,361,1,Black African,Mpumalanga,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0075,1530.15,Unemployed,1,1,0,Fewer than 1 per member,-6,36,1,Coloured,North West,Non-metro urban,4,0,0,0,Yes
+DUMMY0076,1191.18,Employed,1,0,0,None,11,121,0,White,Free State,Farms,2,1,0,0,No other working-age member
+DUMMY0077,573.52,Employed,0,1,0,Fewer than 1 per member,14,196,0,Black African,Gauteng,Non-metro urban,6,3,0,0,Yes
+DUMMY0078,1538.29,Employed,0,1,1,1 or more per member,-2,4,0,Black African,Gauteng,Metro urban,1,0,0,0,No other working-age member
+DUMMY0079,1690.45,Unemployed,0,1,1,Fewer than 1 per member,-8,64,1,Black African,Gauteng,Non-metro urban,4,0,1,0,No
+DUMMY0080,1534.28,Employed,1,1,0,1 or more per member,-18,324,0,Coloured,Mpumalanga,Metro urban,1,0,0,0,No other working-age member
+DUMMY0081,695.75,Unemployed,0,1,0,1 or more per member,-6,36,1,Black African,Gauteng,Traditional,5,0,0,0,No
+DUMMY0082,480.55,Employed,1,1,0,Fewer than 1 per member,21,441,0,Black African,KwaZulu-Natal,Metro urban,3,1,0,0,Yes
+DUMMY0083,1541.52,Unemployed,0,1,0,None,-21,441,1,Black African,North West,Metro urban,4,1,1,1,No
+DUMMY0084,1663.76,Employed,0,1,1,None,19,361,0,Black African,Northern Cape,Metro urban,2,1,0,0,No other working-age member
+DUMMY0085,1581.69,Employed,0,1,0,Fewer than 1 per member,-10,100,1,Black African,KwaZulu-Natal,Metro urban,1,0,0,0,No other working-age member
+DUMMY0086,897.45,Employed,1,0,0,None,18,324,1,Black African,Gauteng,Non-metro urban,5,1,0,1,Yes
+DUMMY0087,911.29,Employed,1,1,0,1 or more per member,9,81,0,Black African,Eastern Cape,Non-metro urban,4,0,0,0,No
+DUMMY0088,1589.06,Employed,1,1,0,Fewer than 1 per member,24,576,0,Black African,Mpumalanga,Metro urban,2,1,0,0,No other working-age member
+DUMMY0089,1826.46,Employed,1,1,0,None,-14,196,0,Black African,Western Cape,Metro urban,2,1,1,0,No other working-age member
+DUMMY0090,647.62,Employed,1,1,0,1 or more per member,-6,36,0,Black African,KwaZulu-Natal,Metro urban,2,1,0,0,No other working-age member
+DUMMY0091,995.61,Unemployed,1,0,0,1 or more per member,18,324,1,Black African,Mpumalanga,Traditional,5,1,1,1,Yes
+DUMMY0092,1071.25,Employed,1,1,1,1 or more per member,8,64,1,Black African,Gauteng,Metro urban,5,2,0,2,Yes
+DUMMY0093,1949.21,Employed,1,1,0,Fewer than 1 per member,9,81,0,White,Eastern Cape,Metro urban,2,0,0,0,Yes
+DUMMY0094,578.51,Employed,0,1,1,1 or more per member,-7,49,1,Black African,Mpumalanga,Traditional,2,1,1,1,No other working-age member
+DUMMY0095,486.26,Employed,0,1,1,1 or more per member,-4,16,1,Black African,KwaZulu-Natal,Traditional,2,1,0,1,No other working-age member
+DUMMY0096,1970.32,Employed,1,1,0,Fewer than 1 per member,-3,9,0,Black African,KwaZulu-Natal,Traditional,3,2,0,0,No other working-age member
+DUMMY0097,750.34,Unemployed,1,1,1,1 or more per member,-17,289,0,Black African,Eastern Cape,Non-metro urban,3,0,1,0,No
+DUMMY0098,885.91,Employed,0,1,1,1 or more per member,3,9,0,Black African,Western Cape,Non-metro urban,4,2,0,0,Yes
+DUMMY0099,1517.71,Employed,0,1,0,Fewer than 1 per member,10,100,1,Black African,Free State,Metro urban,5,1,0,1,Yes
+DUMMY0100,1340.75,Employed,1,0,0,Fewer than 1 per member,-4,16,0,Black African,Gauteng,Metro urban,3,0,0,0,Yes
+DUMMY0101,1620.6,Employed,0,0,0,Fewer than 1 per member,-11,121,0,Black African,KwaZulu-Natal,Traditional,3,1,0,0,Yes
+DUMMY0102,1820.89,Employed,0,1,1,Fewer than 1 per member,-25,625,1,Black African,North West,Metro urban,5,1,0,1,No
+DUMMY0103,1410.93,Unemployed,1,1,0,1 or more per member,-3,9,0,White,Gauteng,Metro urban,5,0,1,0,No
+DUMMY0104,1141.39,Employed,0,1,0,Fewer than 1 per member,-8,64,0,Black African,Mpumalanga,Traditional,4,3,0,0,No other working-age member
+DUMMY0105,1571.1,Unemployed,0,1,0,Fewer than 1 per member,-15,225,1,Black African,North West,Traditional,5,0,1,0,Yes
+DUMMY0106,711.83,Unemployed,0,1,1,Fewer than 1 per member,-15,225,0,Black African,Limpopo,Traditional,2,0,0,0,Yes
+DUMMY0107,1676.69,Employed,0,0,0,1 or more per member,13,169,0,Black African,Eastern Cape,Non-metro urban,5,1,0,0,Yes
+DUMMY0108,784.19,Unemployed,0,1,1,Fewer than 1 per member,8,64,1,Black African,KwaZulu-Natal,Traditional,3,1,0,1,No
+DUMMY0109,476.02,Employed,0,1,0,Fewer than 1 per member,-7,49,0,Black African,KwaZulu-Natal,Traditional,1,0,0,0,No other working-age member
+DUMMY0110,1414.94,Employed,1,1,1,1 or more per member,13,169,1,White,Limpopo,Traditional,4,1,0,1,Yes
+DUMMY0111,1942.03,Employed,0,1,0,1 or more per member,-4,16,0,Black African,North West,Metro urban,3,1,0,0,Yes
+DUMMY0112,895.84,Employed,1,1,0,Fewer than 1 per member,-22,484,1,Black African,Western Cape,Non-metro urban,7,2,0,2,No
+DUMMY0113,876.11,Unemployed,1,0,0,1 or more per member,-15,225,1,Black African,Gauteng,Traditional,4,1,0,1,No
+DUMMY0114,912.69,Employed,0,1,0,Fewer than 1 per member,3,9,1,Black African,Free State,Traditional,2,0,1,0,No
+DUMMY0115,1562.8,Employed,0,1,0,Fewer than 1 per member,-10,100,0,Black African,Mpumalanga,Metro urban,6,0,1,0,No
+DUMMY0116,1004.81,Employed,1,1,0,Fewer than 1 per member,-7,49,0,Coloured,Free State,Non-metro urban,3,2,0,0,No other working-age member
+DUMMY0117,917.79,Unemployed,1,0,0,Fewer than 1 per member,-2,4,1,Black African,Free State,Metro urban,4,0,0,0,Yes
+DUMMY0118,1837.33,Unemployed,0,1,0,Fewer than 1 per member,-6,36,1,Black African,KwaZulu-Natal,Metro urban,3,2,0,2,No other working-age member
+DUMMY0119,1719.67,Unemployed,0,1,0,Fewer than 1 per member,-14,196,0,Black African,Eastern Cape,Traditional,4,0,0,0,No
+DUMMY0120,1878.14,Employed,1,0,1,1 or more per member,-23,529,0,Black African,Mpumalanga,Non-metro urban,3,2,0,0,No other working-age member
+DUMMY0121,964.39,Employed,1,1,0,Fewer than 1 per member,3,9,0,Black African,KwaZulu-Natal,Non-metro urban,5,1,0,0,No
+DUMMY0122,1079.39,Employed,0,0,1,Fewer than 1 per member,-13,169,1,Black African,Gauteng,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY0123,1140.36,Employed,1,1,0,None,3,9,1,Black African,Gauteng,Metro urban,4,3,0,3,No other working-age member
+DUMMY0124,645.44,Unemployed,0,0,0,1 or more per member,13,169,0,Black African,KwaZulu-Natal,Metro urban,2,1,0,0,No other working-age member
+DUMMY0125,1648.47,Employed,1,1,0,1 or more per member,3,9,1,Black African,Limpopo,Traditional,2,1,0,1,No other working-age member
+DUMMY0126,1648.97,Unemployed,1,1,1,Fewer than 1 per member,-10,100,1,Black African,Limpopo,Traditional,2,1,0,1,No other working-age member
+DUMMY0127,1975.32,Employed,1,0,0,Fewer than 1 per member,4,16,1,Black African,Limpopo,Non-metro urban,1,0,1,0,No other working-age member
+DUMMY0128,459.23,Employed,1,1,1,None,-5,25,0,Black African,Limpopo,Metro urban,4,1,0,0,No
+DUMMY0129,968.24,Unemployed,1,1,0,1 or more per member,-12,144,1,Black African,Limpopo,Non-metro urban,2,0,1,0,Yes
+DUMMY0130,1445.79,Employed,0,1,0,Fewer than 1 per member,-2,4,0,Black African,North West,Metro urban,4,2,1,0,Yes
+DUMMY0131,1698.24,Employed,1,1,0,Fewer than 1 per member,4,16,0,Black African,North West,Metro urban,1,0,0,0,No other working-age member
+DUMMY0132,1223.56,Employed,1,1,0,Fewer than 1 per member,8,64,0,Coloured,Northern Cape,Non-metro urban,3,2,0,0,No other working-age member
+DUMMY0133,696.47,Employed,1,1,1,Fewer than 1 per member,-7,49,0,Black African,Mpumalanga,Traditional,1,0,0,0,No other working-age member
+DUMMY0134,1897.06,Employed,1,0,0,Fewer than 1 per member,-11,121,0,Black African,KwaZulu-Natal,Traditional,1,0,0,0,No other working-age member
+DUMMY0135,1643.77,Unemployed,1,1,0,Fewer than 1 per member,-20,400,0,Coloured,Mpumalanga,Non-metro urban,4,1,1,0,No
+DUMMY0136,527.84,Unemployed,0,1,0,Fewer than 1 per member,-11,121,1,Black African,KwaZulu-Natal,Traditional,4,0,0,0,No
+DUMMY0137,865.72,Employed,1,1,0,Fewer than 1 per member,-14,196,0,Black African,Gauteng,Non-metro urban,4,1,0,0,No
+DUMMY0138,1004.36,Employed,0,1,0,Fewer than 1 per member,-3,9,1,White,Gauteng,Metro urban,4,3,0,3,No other working-age member
+DUMMY0139,1723.98,Unemployed,1,1,0,Fewer than 1 per member,-4,16,1,Black African,KwaZulu-Natal,Metro urban,2,0,0,0,Yes
+DUMMY0140,599.22,Employed,0,0,0,Fewer than 1 per member,-4,16,0,Black African,Gauteng,Non-metro urban,4,0,0,0,Yes
+DUMMY0141,1600.83,Unemployed,1,0,0,Fewer than 1 per member,10,100,0,Black African,Mpumalanga,Traditional,4,1,0,0,No
+DUMMY0142,1540.87,Employed,1,1,1,1 or more per member,-7,49,0,Coloured,Mpumalanga,Non-metro urban,2,1,0,0,No other working-age member
+DUMMY0143,1781.68,Employed,1,1,0,1 or more per member,-5,25,0,Black African,KwaZulu-Natal,Farms,2,1,0,0,No other working-age member
+DUMMY0144,1120.05,Employed,0,0,0,1 or more per member,8,64,1,Black African,Gauteng,Metro urban,5,0,0,0,Yes
+DUMMY0145,999.97,Employed,1,1,1,None,-18,324,0,Black African,Gauteng,Non-metro urban,5,2,0,0,Yes
+DUMMY0146,904.34,Employed,0,1,0,1 or more per member,-15,225,0,Black African,Eastern Cape,Non-metro urban,2,1,0,0,No other working-age member
+DUMMY0147,1078.45,Unemployed,1,1,0,None,-8,64,0,Black African,Mpumalanga,Traditional,2,1,1,0,No other working-age member
+DUMMY0148,836.06,Employed,1,1,0,Fewer than 1 per member,12,144,0,Black African,Mpumalanga,Metro urban,2,0,0,0,Yes
+DUMMY0149,888.84,Employed,0,1,0,None,6,36,0,Black African,Gauteng,Metro urban,4,1,0,0,Yes
+DUMMY0150,1538.79,Employed,1,1,0,1 or more per member,-8,64,0,Coloured,North West,Metro urban,2,1,0,0,No other working-age member
+DUMMY0151,710.31,Unemployed,1,1,0,Fewer than 1 per member,-15,225,0,White,Western Cape,Metro urban,2,0,0,0,No
+DUMMY0152,1809.85,Unemployed,0,0,0,Fewer than 1 per member,-13,169,1,Black African,Free State,Metro urban,4,0,0,0,No
+DUMMY0153,653.36,Employed,0,1,0,1 or more per member,24,576,1,Black African,Eastern Cape,Non-metro urban,3,2,0,2,No other working-age member
+DUMMY0154,1416.27,Employed,1,1,1,Fewer than 1 per member,-2,4,1,Coloured,Mpumalanga,Metro urban,3,0,0,0,Yes
+DUMMY0155,634.18,Unemployed,1,1,0,Fewer than 1 per member,12,144,0,Coloured,KwaZulu-Natal,Traditional,1,0,1,0,No other working-age member
+DUMMY0156,437.69,Employed,0,0,0,None,8,64,1,Black African,Mpumalanga,Traditional,2,1,1,1,No other working-age member
+DUMMY0157,1758.56,Employed,1,1,1,Fewer than 1 per member,4,16,0,Coloured,Limpopo,Traditional,2,0,0,0,Yes
+DUMMY0158,1544.06,Unemployed,1,1,0,Fewer than 1 per member,11,121,1,Black African,KwaZulu-Natal,Non-metro urban,5,2,0,2,Yes
+DUMMY0159,481.69,Unemployed,1,1,0,None,-19,361,0,Black African,KwaZulu-Natal,Traditional,7,2,0,0,No
+DUMMY0160,1875.54,Unemployed,0,0,0,Fewer than 1 per member,-8,64,0,Black African,KwaZulu-Natal,Non-metro urban,3,1,0,0,Yes
+DUMMY0161,672.42,Unemployed,1,1,0,None,-12,144,0,Black African,Gauteng,Non-metro urban,3,0,0,0,Yes
+DUMMY0162,1655.31,Unemployed,0,0,0,None,-4,16,0,Black African,Free State,Traditional,3,1,0,0,Yes
+DUMMY0163,984.91,Employed,1,1,1,Fewer than 1 per member,23,529,1,Black African,North West,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY0164,809.17,Employed,0,1,0,1 or more per member,-12,144,0,Coloured,KwaZulu-Natal,Metro urban,6,1,0,0,No
+DUMMY0165,1644.99,Employed,0,0,0,1 or more per member,-11,121,1,Black African,KwaZulu-Natal,Traditional,3,2,0,2,No other working-age member
+DUMMY0166,560.76,Unemployed,1,1,1,Fewer than 1 per member,4,16,1,Black African,Mpumalanga,Traditional,2,1,0,1,No other working-age member
+DUMMY0167,454.75,Employed,1,1,1,Fewer than 1 per member,-12,144,0,Black African,KwaZulu-Natal,Non-metro urban,6,2,0,0,Yes
+DUMMY0168,519.1,Employed,1,1,1,Fewer than 1 per member,4,16,1,Coloured,Limpopo,Metro urban,5,0,0,0,Yes
+DUMMY0169,1683.63,Unemployed,0,1,1,1 or more per member,-3,9,0,Black African,Mpumalanga,Metro urban,4,0,0,0,No
+DUMMY0170,1831.06,Employed,0,1,0,1 or more per member,-11,121,0,Black African,Western Cape,Traditional,4,0,0,0,No
+DUMMY0171,1078.65,Unemployed,0,1,0,Fewer than 1 per member,-23,529,0,Black African,Eastern Cape,Traditional,3,0,0,0,No
+DUMMY0172,1158.89,Employed,1,1,0,Fewer than 1 per member,7,49,1,Black African,Western Cape,Metro urban,7,1,0,1,No
+DUMMY0173,1379.95,Unemployed,0,0,0,1 or more per member,-4,16,0,Black African,North West,Metro urban,8,0,0,0,Yes
+DUMMY0174,950.3,Employed,0,1,0,Fewer than 1 per member,-20,400,0,Indian/Asian,KwaZulu-Natal,Metro urban,2,1,0,0,No other working-age member
+DUMMY0175,840.47,Employed,1,1,1,Fewer than 1 per member,-12,144,1,Black African,Gauteng,Metro urban,4,1,0,1,Yes
+DUMMY0176,1550.38,Employed,0,1,0,Fewer than 1 per member,0,0,1,Black African,Mpumalanga,Traditional,7,0,0,0,No
+DUMMY0177,999.75,Unemployed,0,1,0,Fewer than 1 per member,-23,529,1,Black African,Limpopo,Non-metro urban,5,0,0,0,Yes
+DUMMY0178,1001.07,Employed,1,1,0,1 or more per member,20,400,1,Indian/Asian,Eastern Cape,Metro urban,4,0,0,0,Yes
+DUMMY0179,1557.66,Employed,1,1,0,1 or more per member,22,484,1,Black African,KwaZulu-Natal,Farms,2,1,0,1,No other working-age member
+DUMMY0180,1371.68,Employed,1,1,1,Fewer than 1 per member,1,1,0,Black African,Limpopo,Metro urban,3,1,0,0,Yes
+DUMMY0181,1396.73,Unemployed,0,1,1,Fewer than 1 per member,-6,36,0,Black African,Gauteng,Traditional,5,3,1,0,Yes
+DUMMY0182,1984.19,Employed,1,1,0,Fewer than 1 per member,-13,169,1,Coloured,Gauteng,Metro urban,1,0,0,0,No other working-age member
+DUMMY0183,946.27,Employed,1,0,0,1 or more per member,24,576,1,White,Western Cape,Metro urban,3,2,0,2,No other working-age member
+DUMMY0184,1098.66,Employed,1,0,1,Fewer than 1 per member,7,49,0,Black African,Eastern Cape,Metro urban,4,0,0,0,Yes
+DUMMY0185,545.65,Employed,1,1,0,Fewer than 1 per member,0,0,1,Black African,Gauteng,Metro urban,3,1,0,1,No
+DUMMY0186,403.93,Employed,1,1,0,Fewer than 1 per member,-14,196,1,Black African,Gauteng,Metro urban,1,0,1,0,No other working-age member
+DUMMY0187,1719.45,Unemployed,0,1,0,Fewer than 1 per member,-17,289,1,Black African,Northern Cape,Traditional,6,0,0,0,No
+DUMMY0188,1171.32,Unemployed,1,1,0,Fewer than 1 per member,-10,100,1,Black African,KwaZulu-Natal,Metro urban,4,0,0,0,No
+DUMMY0189,1373.9,Unemployed,0,1,0,None,-14,196,1,Black African,Gauteng,Metro urban,4,1,0,1,No
+DUMMY0190,617.06,Employed,1,1,1,Fewer than 1 per member,0,0,1,Black African,North West,Traditional,2,1,0,1,No other working-age member
+DUMMY0191,419.35,Unemployed,0,1,0,Fewer than 1 per member,1,1,1,Black African,KwaZulu-Natal,Traditional,5,1,0,1,Yes
+DUMMY0192,1858.07,Employed,0,0,0,1 or more per member,-9,81,1,White,Gauteng,Traditional,2,1,0,1,No other working-age member
+DUMMY0193,462.12,Unemployed,0,0,0,Fewer than 1 per member,-13,169,0,Black African,Gauteng,Non-metro urban,4,0,0,0,No
+DUMMY0194,477.04,Employed,1,1,1,Fewer than 1 per member,17,289,1,Black African,KwaZulu-Natal,Metro urban,6,0,0,0,No
+DUMMY0195,718.43,Employed,1,1,0,Fewer than 1 per member,4,16,1,Coloured,Free State,Metro urban,2,0,0,0,Yes
+DUMMY0196,1841.11,Unemployed,1,1,0,None,-4,16,0,Black African,KwaZulu-Natal,Non-metro urban,3,0,0,0,Yes
+DUMMY0197,1182.87,Unemployed,1,0,0,1 or more per member,-13,169,0,Black African,KwaZulu-Natal,Metro urban,2,1,1,0,No other working-age member
+DUMMY0198,654.07,Employed,1,0,0,1 or more per member,4,16,1,Coloured,North West,Traditional,3,2,0,2,No other working-age member
+DUMMY0199,466.74,Employed,1,1,0,None,10,100,0,Black African,Mpumalanga,Traditional,4,1,0,0,No
+DUMMY0200,1358.8,Employed,0,1,0,None,-6,36,0,Coloured,Western Cape,Traditional,5,0,0,0,No
+DUMMY0201,1310.71,Employed,0,1,0,Fewer than 1 per member,-24,576,1,White,KwaZulu-Natal,Metro urban,2,1,0,1,No other working-age member
+DUMMY0202,1290.59,Employed,1,1,1,Fewer than 1 per member,10,100,1,Coloured,Limpopo,Non-metro urban,4,2,0,2,Yes
+DUMMY0203,1303.77,Employed,1,1,0,Fewer than 1 per member,2,4,1,Black African,Northern Cape,Metro urban,4,0,1,0,Yes
+DUMMY0204,980.52,Unemployed,0,0,0,Fewer than 1 per member,20,400,0,Coloured,KwaZulu-Natal,Traditional,3,1,0,0,No
+DUMMY0205,1691.51,Unemployed,0,0,0,Fewer than 1 per member,1,1,1,Black African,Free State,Metro urban,4,0,0,0,No
+DUMMY0206,1056.59,Employed,0,1,0,1 or more per member,11,121,1,Black African,Free State,Non-metro urban,6,1,0,1,No
+DUMMY0207,1541.74,Employed,1,1,0,None,-9,81,1,Black African,Eastern Cape,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY0208,1959.46,Unemployed,1,0,0,Fewer than 1 per member,20,400,0,Black African,Eastern Cape,Farms,2,0,0,0,Yes
+DUMMY0209,1433.01,Employed,0,0,0,Fewer than 1 per member,-17,289,0,White,Western Cape,Metro urban,3,0,0,0,Yes
+DUMMY0210,1581.03,Unemployed,1,0,0,Fewer than 1 per member,-1,1,1,Black African,Mpumalanga,Metro urban,2,1,1,1,No other working-age member
+DUMMY0211,1396.31,Employed,0,1,1,1 or more per member,8,64,1,Black African,KwaZulu-Natal,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY0212,1830.54,Unemployed,1,0,0,1 or more per member,-6,36,0,Black African,Mpumalanga,Metro urban,3,0,0,0,Yes
+DUMMY0213,1897.98,Unemployed,0,1,0,Fewer than 1 per member,-10,100,0,Black African,KwaZulu-Natal,Non-metro urban,7,0,0,0,No
+DUMMY0214,843.69,Unemployed,1,0,0,Fewer than 1 per member,-11,121,0,Black African,KwaZulu-Natal,Traditional,4,0,1,0,No
+DUMMY0215,1508.84,Employed,1,1,0,1 or more per member,20,400,1,Black African,North West,Non-metro urban,5,2,0,2,Yes
+DUMMY0216,1009.19,Employed,1,1,1,1 or more per member,-2,4,1,Black African,KwaZulu-Natal,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0217,1469.06,Employed,1,1,1,Fewer than 1 per member,-14,196,1,Black African,Western Cape,Traditional,3,0,0,0,Yes
+DUMMY0218,519.24,Employed,1,1,1,Fewer than 1 per member,-8,64,0,Black African,Limpopo,Metro urban,3,2,0,0,No other working-age member
+DUMMY0219,455.86,Employed,0,1,0,1 or more per member,-8,64,1,Black African,Limpopo,Farms,6,3,0,3,No
+DUMMY0220,1404.75,Employed,0,1,1,Fewer than 1 per member,-1,1,1,Black African,Gauteng,Non-metro urban,2,0,0,0,Yes
+DUMMY0221,1591.78,Employed,1,0,0,Fewer than 1 per member,-8,64,0,Black African,KwaZulu-Natal,Metro urban,5,1,0,0,Yes
+DUMMY0222,1297.73,Employed,1,1,1,1 or more per member,13,169,0,Black African,KwaZulu-Natal,Metro urban,4,2,0,0,Yes
+DUMMY0223,964.35,Employed,1,1,1,Fewer than 1 per member,-10,100,1,Black African,Limpopo,Non-metro urban,3,0,0,0,No
+DUMMY0224,670.72,Employed,0,1,0,Fewer than 1 per member,9,81,0,Black African,Gauteng,Traditional,2,1,0,0,No other working-age member
+DUMMY0225,861.17,Employed,1,1,0,Fewer than 1 per member,0,0,0,White,Gauteng,Metro urban,3,0,1,0,Yes
+DUMMY0226,1029.24,Unemployed,1,1,0,None,-24,576,0,Coloured,Limpopo,Non-metro urban,4,1,0,0,Yes
+DUMMY0227,688.94,Employed,1,1,0,1 or more per member,14,196,0,Black African,KwaZulu-Natal,Farms,2,1,1,0,No other working-age member
+DUMMY0228,566.98,Employed,0,1,0,1 or more per member,-9,81,1,Black African,Western Cape,Non-metro urban,5,2,0,2,No
+DUMMY0229,1393.03,Unemployed,1,0,0,Fewer than 1 per member,-14,196,1,Black African,Gauteng,Metro urban,4,3,0,3,No other working-age member
+DUMMY0230,1069.26,Unemployed,0,1,1,None,-15,225,0,Coloured,Gauteng,Metro urban,3,2,0,0,No other working-age member
+DUMMY0231,1944.6,Employed,1,1,0,1 or more per member,2,4,0,Black African,Western Cape,Metro urban,3,0,0,0,No
+DUMMY0232,1645.7,Employed,1,1,1,1 or more per member,-9,81,1,Black African,Eastern Cape,Metro urban,5,1,0,1,Yes
+DUMMY0233,1698,Unemployed,1,1,0,Fewer than 1 per member,-5,25,1,Black African,North West,Traditional,4,1,0,1,Yes
+DUMMY0234,1153.73,Employed,1,1,0,Fewer than 1 per member,0,0,1,Coloured,North West,Metro urban,2,1,0,1,No other working-age member
+DUMMY0235,1091.75,Unemployed,0,1,0,None,-22,484,1,Black African,Eastern Cape,Traditional,5,2,0,2,No
+DUMMY0236,1306.04,Employed,1,1,0,Fewer than 1 per member,5,25,0,Coloured,Western Cape,Traditional,5,0,0,0,Yes
+DUMMY0237,1613.17,Employed,1,1,1,Fewer than 1 per member,15,225,1,Black African,Gauteng,Traditional,5,1,0,1,No
+DUMMY0238,938.26,Employed,0,0,0,None,-7,49,0,Indian/Asian,Western Cape,Metro urban,4,0,0,0,Yes
+DUMMY0239,1390.06,Unemployed,0,1,0,Fewer than 1 per member,-6,36,1,Black African,North West,Traditional,4,1,0,1,Yes
+DUMMY0240,1779.98,Unemployed,0,1,0,1 or more per member,-22,484,1,Black African,Gauteng,Traditional,3,2,0,2,No other working-age member
+DUMMY0241,1418.24,Unemployed,0,0,0,1 or more per member,19,361,1,Black African,Mpumalanga,Metro urban,3,1,0,1,Yes
+DUMMY0242,1237.98,Employed,1,1,1,Fewer than 1 per member,-4,16,1,Coloured,Eastern Cape,Metro urban,4,3,0,3,No other working-age member
+DUMMY0243,559.04,Employed,1,0,0,Fewer than 1 per member,17,289,0,Black African,North West,Metro urban,6,1,0,0,Yes
+DUMMY0244,1675.16,Unemployed,0,1,0,Fewer than 1 per member,-23,529,0,Black African,Gauteng,Traditional,1,0,1,0,No other working-age member
+DUMMY0245,1014.78,Employed,0,1,0,Fewer than 1 per member,5,25,1,Black African,Gauteng,Traditional,2,1,0,1,No other working-age member
+DUMMY0246,791.08,Employed,0,1,1,Fewer than 1 per member,4,16,0,Black African,KwaZulu-Natal,Metro urban,2,1,1,0,No other working-age member
+DUMMY0247,1743.46,Unemployed,1,1,0,1 or more per member,-23,529,0,Coloured,Gauteng,Metro urban,1,0,1,0,No other working-age member
+DUMMY0248,1928.53,Employed,1,1,0,1 or more per member,-3,9,0,Black African,Free State,Metro urban,9,2,0,0,No
+DUMMY0249,1967.77,Employed,1,1,0,Fewer than 1 per member,-15,225,0,Black African,Northern Cape,Traditional,3,0,0,0,No
+DUMMY0250,571.96,Unemployed,0,0,0,1 or more per member,-8,64,0,Black African,Eastern Cape,Metro urban,4,0,0,0,Yes
+DUMMY0251,684.97,Unemployed,1,1,0,Fewer than 1 per member,6,36,0,Coloured,Western Cape,Metro urban,1,0,0,0,No other working-age member
+DUMMY0252,1389.36,Unemployed,1,0,0,Fewer than 1 per member,3,9,1,Coloured,Gauteng,Traditional,3,0,0,0,Yes
+DUMMY0253,1318.78,Employed,1,1,1,None,-6,36,0,Black African,Mpumalanga,Metro urban,3,0,0,0,No
+DUMMY0254,773.19,Unemployed,0,1,0,Fewer than 1 per member,8,64,1,Black African,KwaZulu-Natal,Non-metro urban,6,2,0,2,Yes
+DUMMY0255,1166.7,Employed,0,1,1,1 or more per member,-3,9,1,Black African,Gauteng,Metro urban,4,1,1,1,Yes
+DUMMY0256,1112.66,Employed,0,1,0,1 or more per member,-7,49,0,Black African,KwaZulu-Natal,Non-metro urban,4,1,0,0,Yes
+DUMMY0257,1860.89,Unemployed,0,1,0,Fewer than 1 per member,5,25,1,Black African,North West,Traditional,6,1,1,1,Yes
+DUMMY0258,1873.31,Unemployed,0,1,0,Fewer than 1 per member,-23,529,0,Black African,Mpumalanga,Non-metro urban,5,1,0,0,No
+DUMMY0259,1090.71,Unemployed,1,1,1,Fewer than 1 per member,-23,529,1,Black African,KwaZulu-Natal,Metro urban,4,0,0,0,Yes
+DUMMY0260,1218.77,Employed,1,1,0,1 or more per member,10,100,0,Black African,Limpopo,Metro urban,5,3,0,0,No
+DUMMY0261,888.8,Unemployed,1,1,1,Fewer than 1 per member,3,9,1,White,Gauteng,Traditional,4,1,1,1,Yes
+DUMMY0262,1159.28,Employed,0,1,1,Fewer than 1 per member,10,100,0,Black African,KwaZulu-Natal,Metro urban,6,0,0,0,No
+DUMMY0263,967.66,Employed,0,1,1,1 or more per member,17,289,0,Black African,Gauteng,Non-metro urban,5,0,0,0,Yes
+DUMMY0264,1458.01,Employed,0,1,1,Fewer than 1 per member,-15,225,0,Black African,Limpopo,Traditional,1,0,0,0,No other working-age member
+DUMMY0265,410.22,Employed,0,1,0,Fewer than 1 per member,9,81,0,Black African,Gauteng,Metro urban,2,1,1,0,No other working-age member
+DUMMY0266,1657.72,Unemployed,1,0,0,Fewer than 1 per member,-7,49,0,Black African,Western Cape,Metro urban,6,0,0,0,Yes
+DUMMY0267,1848.43,Employed,1,1,1,Fewer than 1 per member,1,1,1,Black African,Mpumalanga,Traditional,5,0,0,0,Yes
+DUMMY0268,636.29,Employed,1,1,0,Fewer than 1 per member,10,100,1,Black African,Limpopo,Metro urban,2,1,1,1,No other working-age member
+DUMMY0269,1869.01,Unemployed,0,1,0,Fewer than 1 per member,5,25,1,Black African,Eastern Cape,Metro urban,4,3,1,3,No other working-age member
+DUMMY0270,889.23,Unemployed,1,1,0,Fewer than 1 per member,5,25,1,Black African,Limpopo,Metro urban,4,0,0,0,No
+DUMMY0271,735.03,Employed,0,1,0,Fewer than 1 per member,-2,4,0,Black African,Eastern Cape,Farms,4,0,0,0,Yes
+DUMMY0272,1986.72,Employed,1,1,1,1 or more per member,1,1,1,Black African,Gauteng,Non-metro urban,5,2,0,2,Yes
+DUMMY0273,1750.31,Employed,0,0,1,None,-6,36,0,Indian/Asian,KwaZulu-Natal,Metro urban,3,0,0,0,No
+DUMMY0274,777.73,Employed,1,1,0,Fewer than 1 per member,-8,64,1,Black African,Limpopo,Metro urban,2,1,0,1,No other working-age member
+DUMMY0275,1712.32,Employed,1,1,0,1 or more per member,7,49,0,Black African,Northern Cape,Metro urban,2,0,0,0,No
+DUMMY0276,1776.75,Employed,1,1,0,Fewer than 1 per member,7,49,0,Black African,KwaZulu-Natal,Metro urban,3,2,0,0,No other working-age member
+DUMMY0277,494.8,Employed,1,1,0,None,-20,400,0,Black African,Gauteng,Traditional,5,0,1,0,No
+DUMMY0278,812.24,Employed,1,1,1,None,6,36,0,Black African,Limpopo,Traditional,3,1,0,0,Yes
+DUMMY0279,430.49,Employed,0,1,1,1 or more per member,9,81,0,Black African,Northern Cape,Metro urban,3,1,0,0,No
+DUMMY0280,1734.64,Employed,1,1,0,None,-15,225,1,Coloured,Western Cape,Traditional,3,1,0,1,Yes
+DUMMY0281,1524.46,Employed,1,1,0,Fewer than 1 per member,11,121,0,Black African,Mpumalanga,Metro urban,4,0,1,0,Yes
+DUMMY0282,1384.89,Employed,1,0,0,1 or more per member,7,49,0,Black African,Eastern Cape,Metro urban,1,0,0,0,No other working-age member
+DUMMY0283,513.7,Unemployed,0,1,0,Fewer than 1 per member,-4,16,1,Black African,Free State,Metro urban,3,2,1,2,No other working-age member
+DUMMY0284,983.73,Employed,0,1,1,1 or more per member,7,49,0,Black African,Mpumalanga,Traditional,2,1,0,0,No other working-age member
+DUMMY0285,1523.3,Employed,0,0,0,Fewer than 1 per member,-25,625,0,Black African,Eastern Cape,Non-metro urban,2,0,0,0,Yes
+DUMMY0286,1704.84,Unemployed,1,1,0,Fewer than 1 per member,-5,25,1,Black African,KwaZulu-Natal,Metro urban,4,1,0,1,Yes
+DUMMY0287,689.56,Employed,1,1,0,Fewer than 1 per member,-11,121,0,Black African,Western Cape,Metro urban,1,0,0,0,No other working-age member
+DUMMY0288,586.9,Employed,1,0,0,1 or more per member,-7,49,1,Indian/Asian,Gauteng,Traditional,6,3,0,3,Yes
+DUMMY0289,560.06,Employed,0,1,1,1 or more per member,-25,625,0,Black African,Western Cape,Metro urban,3,2,1,0,No other working-age member
+DUMMY0290,1410.52,Employed,1,1,1,Fewer than 1 per member,7,49,1,Black African,Free State,Non-metro urban,7,3,0,3,No
+DUMMY0291,1854.29,Employed,1,1,0,Fewer than 1 per member,-14,196,0,Black African,Western Cape,Non-metro urban,4,1,0,0,No
+DUMMY0292,1028.32,Unemployed,0,1,1,Fewer than 1 per member,-25,625,1,Black African,North West,Metro urban,3,1,0,1,Yes
+DUMMY0293,1361.63,Unemployed,1,0,0,1 or more per member,11,121,0,Black African,Western Cape,Non-metro urban,3,2,0,0,No other working-age member
+DUMMY0294,770.89,Unemployed,1,1,0,Fewer than 1 per member,-24,576,0,Coloured,Gauteng,Metro urban,4,1,0,0,Yes
+DUMMY0295,931.27,Employed,1,1,0,Fewer than 1 per member,-16,256,0,White,Gauteng,Metro urban,2,1,1,0,No other working-age member
+DUMMY0296,490.13,Unemployed,0,1,0,1 or more per member,6,36,1,Black African,Gauteng,Non-metro urban,6,1,0,1,No
+DUMMY0297,886.39,Employed,1,1,1,1 or more per member,10,100,0,Black African,Mpumalanga,Metro urban,1,0,1,0,No other working-age member
+DUMMY0298,858.43,Employed,1,1,1,Fewer than 1 per member,2,4,1,Coloured,Limpopo,Traditional,6,0,1,0,Yes
+DUMMY0299,1401.57,Employed,1,1,0,1 or more per member,-11,121,1,White,KwaZulu-Natal,Metro urban,3,2,0,2,No other working-age member
+DUMMY0300,1176.73,Employed,1,1,0,Fewer than 1 per member,3,9,0,Black African,KwaZulu-Natal,Metro urban,4,0,0,0,Yes
+DUMMY0301,1544.57,Employed,1,0,0,1 or more per member,-5,25,1,Black African,Gauteng,Metro urban,4,0,0,0,Yes
+DUMMY0302,1407.59,Employed,1,0,0,Fewer than 1 per member,4,16,0,Black African,Gauteng,Metro urban,2,1,0,0,No other working-age member
+DUMMY0303,1697.56,Employed,0,1,0,Fewer than 1 per member,13,169,0,White,Eastern Cape,Metro urban,6,1,0,0,No
+DUMMY0304,1174.26,Unemployed,1,1,0,1 or more per member,-5,25,0,Coloured,Free State,Metro urban,2,1,0,0,No other working-age member
+DUMMY0305,1507.56,Unemployed,0,1,0,Fewer than 1 per member,-23,529,0,Black African,KwaZulu-Natal,Traditional,4,0,0,0,Yes
+DUMMY0306,1323.39,Unemployed,0,1,0,1 or more per member,-15,225,0,Black African,Mpumalanga,Traditional,5,2,0,0,Yes
+DUMMY0307,501.91,Employed,0,1,1,Fewer than 1 per member,5,25,1,Black African,Northern Cape,Non-metro urban,6,0,0,0,No
+DUMMY0308,711.17,Employed,0,1,1,1 or more per member,-14,196,1,Black African,Gauteng,Traditional,5,0,0,0,No
+DUMMY0309,503.31,Employed,0,1,0,1 or more per member,7,49,1,Black African,Northern Cape,Metro urban,3,1,0,1,No
+DUMMY0310,1916.57,Employed,1,1,0,None,-22,484,0,Black African,Free State,Non-metro urban,4,2,0,0,Yes
+DUMMY0311,733.95,Unemployed,1,1,0,Fewer than 1 per member,-23,529,0,Black African,Western Cape,Metro urban,3,0,0,0,Yes
+DUMMY0312,833.29,Employed,0,1,1,1 or more per member,6,36,1,Black African,Eastern Cape,Non-metro urban,6,3,0,3,Yes
+DUMMY0313,1911.55,Employed,0,1,0,Fewer than 1 per member,-6,36,0,Black African,Eastern Cape,Non-metro urban,4,2,1,0,Yes
+DUMMY0314,711.48,Unemployed,1,1,0,None,-24,576,1,Black African,Western Cape,Traditional,3,0,0,0,No
+DUMMY0315,1560.59,Employed,0,1,0,1 or more per member,-11,121,0,Black African,KwaZulu-Natal,Farms,3,2,0,0,No other working-age member
+DUMMY0316,1814.41,Unemployed,1,1,0,Fewer than 1 per member,-25,625,0,Black African,KwaZulu-Natal,Metro urban,1,0,0,0,No other working-age member
+DUMMY0317,1763.89,Employed,1,1,0,Fewer than 1 per member,-5,25,1,Black African,Mpumalanga,Metro urban,3,1,0,1,Yes
+DUMMY0318,400.56,Unemployed,1,1,0,1 or more per member,-5,25,0,Black African,Gauteng,Metro urban,3,0,0,0,Yes
+DUMMY0319,1219.46,Unemployed,1,1,0,1 or more per member,8,64,1,Black African,Gauteng,Non-metro urban,2,0,1,0,No
+DUMMY0320,1449.93,Employed,1,1,1,None,11,121,1,Black African,Gauteng,Farms,5,3,0,3,No
+DUMMY0321,1722.61,Unemployed,0,1,0,Fewer than 1 per member,16,256,1,Black African,Gauteng,Metro urban,3,0,0,0,No
+DUMMY0322,1288.72,Employed,1,1,1,1 or more per member,1,1,1,Black African,Eastern Cape,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY0323,641.39,Unemployed,0,1,0,Fewer than 1 per member,-11,121,1,White,Mpumalanga,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0324,812.13,Employed,0,1,1,Fewer than 1 per member,17,289,1,Black African,Free State,Non-metro urban,3,0,0,0,Yes
+DUMMY0325,1269.2,Unemployed,1,1,0,1 or more per member,-13,169,1,Black African,KwaZulu-Natal,Metro urban,3,1,0,1,Yes
+DUMMY0326,545.06,Unemployed,1,0,0,1 or more per member,11,121,1,Black African,Gauteng,Traditional,4,2,1,2,Yes
+DUMMY0327,1859.85,Employed,1,1,1,1 or more per member,-25,625,1,Black African,KwaZulu-Natal,Non-metro urban,5,3,0,3,Yes
+DUMMY0328,1742.54,Employed,0,1,1,1 or more per member,13,169,0,Black African,Mpumalanga,Metro urban,5,1,0,0,Yes
+DUMMY0329,583.04,Employed,1,0,0,1 or more per member,2,4,1,Black African,Limpopo,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0330,1509.3,Employed,0,0,0,1 or more per member,5,25,0,Black African,Eastern Cape,Metro urban,3,0,0,0,No
+DUMMY0331,1910.65,Employed,1,1,1,Fewer than 1 per member,-4,16,0,Black African,Gauteng,Metro urban,2,1,0,0,No other working-age member
+DUMMY0332,1400.98,Unemployed,1,0,1,Fewer than 1 per member,10,100,1,Black African,Gauteng,Metro urban,1,0,0,0,No other working-age member
+DUMMY0333,1375.12,Unemployed,0,1,1,None,5,25,1,Black African,KwaZulu-Natal,Metro urban,3,1,0,1,No
+DUMMY0334,1980.41,Unemployed,1,0,0,Fewer than 1 per member,-24,576,0,White,KwaZulu-Natal,Metro urban,6,2,0,0,No
+DUMMY0335,1718.99,Employed,1,1,1,Fewer than 1 per member,-14,196,0,Black African,KwaZulu-Natal,Traditional,2,1,0,0,No other working-age member
+DUMMY0336,1345.76,Employed,0,1,0,Fewer than 1 per member,-16,256,1,Black African,Free State,Metro urban,4,0,1,0,Yes
+DUMMY0337,1042.96,Employed,0,1,1,Fewer than 1 per member,-7,49,1,Black African,Western Cape,Farms,2,1,0,1,No other working-age member
+DUMMY0338,1911.1,Employed,1,1,1,Fewer than 1 per member,4,16,0,Black African,Gauteng,Metro urban,3,1,0,0,Yes
+DUMMY0339,1560.77,Employed,1,0,0,1 or more per member,1,1,0,Black African,Free State,Traditional,7,0,0,0,Yes
+DUMMY0340,1673.42,Employed,1,0,0,Fewer than 1 per member,8,64,0,Black African,Northern Cape,Metro urban,3,0,0,0,Yes
+DUMMY0341,1376.66,Employed,0,1,0,1 or more per member,3,9,1,White,Gauteng,Metro urban,5,3,0,3,No
+DUMMY0342,580.72,Unemployed,1,1,0,Fewer than 1 per member,4,16,0,Black African,Eastern Cape,Metro urban,2,0,1,0,No
+DUMMY0343,769.68,Employed,0,1,0,1 or more per member,-11,121,0,White,Limpopo,Metro urban,2,1,0,0,No other working-age member
+DUMMY0344,767.46,Unemployed,1,1,0,1 or more per member,-15,225,1,Black African,Gauteng,Traditional,4,0,0,0,Yes
+DUMMY0345,800.88,Employed,1,1,0,1 or more per member,-18,324,1,Black African,Western Cape,Traditional,4,1,1,1,Yes
+DUMMY0346,1134.22,Employed,1,1,0,Fewer than 1 per member,-11,121,0,Black African,KwaZulu-Natal,Traditional,8,2,0,0,Yes
+DUMMY0347,1259.88,Unemployed,1,1,0,Fewer than 1 per member,1,1,0,Black African,KwaZulu-Natal,Metro urban,3,0,0,0,No
+DUMMY0348,1657.48,Employed,0,1,1,Fewer than 1 per member,-2,4,0,Black African,Limpopo,Traditional,5,0,0,0,No
+DUMMY0349,1578.82,Employed,0,1,0,Fewer than 1 per member,-1,1,1,Black African,Gauteng,Metro urban,2,0,0,0,No
+DUMMY0350,1023,Unemployed,1,1,0,Fewer than 1 per member,-13,169,0,Black African,Gauteng,Traditional,6,2,0,0,Yes
+DUMMY0351,1768.63,Employed,1,1,0,Fewer than 1 per member,4,16,0,Black African,Limpopo,Metro urban,4,0,0,0,No
+DUMMY0352,1540.36,Employed,0,1,0,Fewer than 1 per member,19,361,0,White,Gauteng,Traditional,4,1,0,0,No
+DUMMY0353,1230.34,Unemployed,1,1,1,1 or more per member,-6,36,1,Black African,KwaZulu-Natal,Metro urban,5,0,0,0,Yes
+DUMMY0354,742.87,Employed,1,1,0,Fewer than 1 per member,-10,100,0,Black African,Eastern Cape,Metro urban,1,0,0,0,No other working-age member
+DUMMY0355,1121.01,Employed,1,1,0,Fewer than 1 per member,10,100,0,Black African,Gauteng,Metro urban,2,1,0,0,No other working-age member
+DUMMY0356,985.39,Unemployed,1,0,0,Fewer than 1 per member,-17,289,0,Black African,Eastern Cape,Metro urban,4,3,0,0,No other working-age member
+DUMMY0357,1167.83,Employed,1,1,1,Fewer than 1 per member,15,225,0,Black African,Gauteng,Non-metro urban,8,2,1,0,Yes
+DUMMY0358,682.49,Employed,1,0,0,1 or more per member,-7,49,1,White,Limpopo,Metro urban,4,3,0,3,No other working-age member
+DUMMY0359,1276.41,Employed,1,1,0,None,3,9,1,Black African,KwaZulu-Natal,Traditional,2,1,0,1,No other working-age member
+DUMMY0360,1079.03,Employed,1,1,1,1 or more per member,9,81,1,Black African,Gauteng,Metro urban,3,1,0,1,Yes
+DUMMY0361,1233.31,Unemployed,1,1,0,Fewer than 1 per member,-9,81,1,Black African,Free State,Non-metro urban,5,1,0,1,No
+DUMMY0362,510.08,Unemployed,1,1,1,Fewer than 1 per member,-11,121,0,Black African,Gauteng,Traditional,3,1,0,0,Yes
+DUMMY0363,1315.94,Unemployed,0,0,0,Fewer than 1 per member,-19,361,1,Black African,Gauteng,Farms,3,0,0,0,Yes
+DUMMY0364,1060.67,Unemployed,0,1,0,Fewer than 1 per member,-6,36,1,Black African,Mpumalanga,Metro urban,2,1,1,1,No other working-age member
+DUMMY0365,1328.62,Employed,1,1,1,Fewer than 1 per member,7,49,0,Black African,Western Cape,Traditional,3,0,0,0,No
+DUMMY0366,1998.68,Unemployed,0,1,0,Fewer than 1 per member,-10,100,0,Black African,Gauteng,Metro urban,5,0,0,0,No
+DUMMY0367,1155,Unemployed,0,0,0,Fewer than 1 per member,-22,484,0,Black African,KwaZulu-Natal,Metro urban,3,0,0,0,Yes
+DUMMY0368,949.58,Employed,0,1,1,Fewer than 1 per member,22,484,0,Coloured,Western Cape,Farms,2,1,0,0,No other working-age member
+DUMMY0369,571.05,Employed,1,1,0,Fewer than 1 per member,8,64,1,Black African,Eastern Cape,Metro urban,6,3,0,3,Yes
+DUMMY0370,446.49,Employed,0,1,0,Fewer than 1 per member,-22,484,1,Black African,Gauteng,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0371,1219.37,Employed,1,1,1,Fewer than 1 per member,5,25,1,Black African,Northern Cape,Non-metro urban,6,0,0,0,No
+DUMMY0372,1704.86,Unemployed,0,1,0,Fewer than 1 per member,-1,1,0,White,Eastern Cape,Traditional,3,0,0,0,No
+DUMMY0373,1351.45,Employed,1,1,1,1 or more per member,24,576,0,Coloured,Gauteng,Traditional,3,0,0,0,Yes
+DUMMY0374,821.29,Unemployed,1,1,0,None,-3,9,1,Black African,Gauteng,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY0375,1922.68,Employed,1,1,0,Fewer than 1 per member,11,121,0,Coloured,Free State,Traditional,5,0,0,0,No
+DUMMY0376,917.87,Unemployed,1,1,0,1 or more per member,-12,144,0,Coloured,Free State,Traditional,6,2,0,0,No
+DUMMY0377,1153.82,Employed,0,1,1,1 or more per member,14,196,1,White,KwaZulu-Natal,Metro urban,3,0,0,0,Yes
+DUMMY0378,1941.62,Unemployed,0,1,1,Fewer than 1 per member,-11,121,0,Black African,Western Cape,Metro urban,5,2,1,0,No
+DUMMY0379,729.22,Employed,0,1,1,Fewer than 1 per member,-8,64,1,Black African,Gauteng,Metro urban,5,0,0,0,Yes
+DUMMY0380,697.59,Employed,1,1,1,1 or more per member,-13,169,0,Black African,Eastern Cape,Metro urban,2,1,0,0,No other working-age member
+DUMMY0381,417.34,Employed,0,1,0,Fewer than 1 per member,10,100,0,Black African,Limpopo,Metro urban,3,2,0,0,No other working-age member
+DUMMY0382,1779.3,Unemployed,0,1,1,Fewer than 1 per member,-21,441,0,Black African,Gauteng,Metro urban,3,1,1,0,No
+DUMMY0383,1189.49,Employed,0,1,0,Fewer than 1 per member,0,0,1,Black African,Gauteng,Metro urban,6,0,1,0,Yes
+DUMMY0384,532.01,Unemployed,1,1,1,Fewer than 1 per member,-1,1,0,Black African,Free State,Traditional,3,2,0,0,No other working-age member
+DUMMY0385,413.5,Employed,1,1,1,None,22,484,0,White,Limpopo,Traditional,1,0,0,0,No other working-age member
+DUMMY0386,1271.69,Employed,1,0,0,Fewer than 1 per member,10,100,1,Black African,Northern Cape,Metro urban,6,0,0,0,No
+DUMMY0387,660.88,Employed,1,1,0,Fewer than 1 per member,14,196,1,Black African,Gauteng,Metro urban,6,1,0,1,Yes
+DUMMY0388,1705.86,Employed,1,1,0,None,-8,64,1,Black African,Eastern Cape,Metro urban,2,1,0,1,No other working-age member
+DUMMY0389,438.78,Employed,0,1,1,Fewer than 1 per member,-7,49,1,Coloured,Free State,Metro urban,4,3,0,3,No other working-age member
+DUMMY0390,918.24,Employed,0,1,0,Fewer than 1 per member,3,9,0,Black African,Gauteng,Non-metro urban,4,1,0,0,Yes
+DUMMY0391,1003.37,Unemployed,1,0,0,Fewer than 1 per member,18,324,1,Black African,Western Cape,Metro urban,5,1,0,1,Yes
+DUMMY0392,991.24,Employed,1,1,1,None,10,100,0,Black African,Western Cape,Non-metro urban,3,1,0,0,No
+DUMMY0393,1712.89,Employed,1,1,0,1 or more per member,2,4,1,Black African,Free State,Metro urban,7,1,0,1,No
+DUMMY0394,1565.45,Employed,0,1,0,None,-6,36,0,Black African,Limpopo,Metro urban,1,0,0,0,No other working-age member
+DUMMY0395,1661.88,Employed,1,1,0,Fewer than 1 per member,-14,196,0,Black African,KwaZulu-Natal,Non-metro urban,5,1,1,0,Yes
+DUMMY0396,1367.98,Unemployed,0,1,1,1 or more per member,5,25,1,Black African,Gauteng,Metro urban,8,1,0,1,Yes
+DUMMY0397,664.02,Unemployed,1,1,0,Fewer than 1 per member,-11,121,0,Black African,KwaZulu-Natal,Non-metro urban,8,1,0,0,Yes
+DUMMY0398,1197.8,Unemployed,1,1,1,1 or more per member,-23,529,0,Coloured,KwaZulu-Natal,Traditional,1,0,0,0,No other working-age member
+DUMMY0399,1395.78,Employed,1,0,0,1 or more per member,-4,16,0,Black African,Eastern Cape,Traditional,5,0,0,0,Yes
+DUMMY0400,831.78,Unemployed,0,0,0,Fewer than 1 per member,-15,225,1,Black African,Free State,Metro urban,3,1,1,1,Yes
+DUMMY0401,781.09,Employed,1,1,0,Fewer than 1 per member,-5,25,0,Black African,KwaZulu-Natal,Farms,1,0,0,0,No other working-age member
+DUMMY0402,1351.83,Employed,1,1,1,Fewer than 1 per member,1,1,0,Black African,Gauteng,Traditional,6,1,1,0,Yes
+DUMMY0403,1608.45,Employed,1,1,0,1 or more per member,11,121,1,Black African,KwaZulu-Natal,Non-metro urban,3,1,0,1,Yes
+DUMMY0404,1806.49,Unemployed,0,1,0,Fewer than 1 per member,-6,36,1,Black African,Limpopo,Non-metro urban,3,0,0,0,Yes
+DUMMY0405,907.51,Employed,1,1,0,Fewer than 1 per member,-4,16,0,Black African,Eastern Cape,Metro urban,5,1,0,0,Yes
+DUMMY0406,1057.66,Employed,1,1,0,Fewer than 1 per member,-6,36,0,Black African,Gauteng,Metro urban,6,2,0,0,No
+DUMMY0407,1554.02,Unemployed,0,1,0,Fewer than 1 per member,-15,225,1,Black African,Northern Cape,Metro urban,3,0,0,0,Yes
+DUMMY0408,1998.62,Unemployed,0,1,0,Fewer than 1 per member,3,9,1,Black African,Eastern Cape,Metro urban,4,1,0,1,No
+DUMMY0409,696.44,Employed,1,0,0,Fewer than 1 per member,-3,9,1,Black African,Gauteng,Farms,4,2,0,2,No
+DUMMY0410,1257.91,Employed,0,1,0,None,11,121,0,Black African,Gauteng,Traditional,5,2,0,0,Yes
+DUMMY0411,1296.55,Employed,0,1,0,1 or more per member,17,289,0,Black African,North West,Non-metro urban,3,2,0,0,No other working-age member
+DUMMY0412,999.14,Employed,1,1,0,1 or more per member,-1,1,0,Black African,Mpumalanga,Non-metro urban,3,1,1,0,No
+DUMMY0413,713.4,Employed,1,1,0,1 or more per member,3,9,1,Coloured,Gauteng,Non-metro urban,4,3,0,3,No other working-age member
+DUMMY0414,1281.33,Employed,0,1,0,1 or more per member,7,49,0,Black African,Western Cape,Non-metro urban,3,0,0,0,No
+DUMMY0415,918.31,Unemployed,0,1,0,Fewer than 1 per member,-13,169,1,Black African,Mpumalanga,Metro urban,3,0,1,0,Yes
+DUMMY0416,1978.53,Employed,1,1,0,Fewer than 1 per member,-10,100,1,Coloured,Gauteng,Metro urban,2,1,0,1,No other working-age member
+DUMMY0417,1714.62,Employed,1,1,0,Fewer than 1 per member,1,1,1,Black African,North West,Metro urban,3,1,0,1,Yes
+DUMMY0418,1097.8,Unemployed,0,1,0,1 or more per member,-10,100,1,Black African,Gauteng,Traditional,2,1,1,1,No other working-age member
+DUMMY0419,1887.14,Unemployed,1,1,0,Fewer than 1 per member,23,529,1,Black African,Gauteng,Non-metro urban,4,1,0,1,Yes
+DUMMY0420,1985.69,Unemployed,1,1,0,Fewer than 1 per member,0,0,0,Black African,Eastern Cape,Traditional,4,1,0,0,No
+DUMMY0421,1252.72,Unemployed,0,1,0,Fewer than 1 per member,-13,169,1,Black African,Gauteng,Traditional,6,1,0,1,Yes
+DUMMY0422,1373.42,Employed,1,1,1,1 or more per member,-11,121,0,Black African,Western Cape,Metro urban,5,1,0,0,No
+DUMMY0423,1567.59,Unemployed,1,1,0,1 or more per member,-21,441,1,Coloured,North West,Non-metro urban,3,0,0,0,Yes
+DUMMY0424,1192.44,Employed,0,1,0,None,3,9,0,Black African,Gauteng,Non-metro urban,5,0,1,0,No
+DUMMY0425,1647.27,Unemployed,0,1,1,1 or more per member,-7,49,0,Black African,Eastern Cape,Metro urban,2,1,0,0,No other working-age member
+DUMMY0426,1166.18,Unemployed,1,1,0,Fewer than 1 per member,-15,225,0,Black African,Gauteng,Non-metro urban,4,0,1,0,No
+DUMMY0427,777.69,Employed,1,0,0,1 or more per member,3,9,1,Black African,Northern Cape,Traditional,5,1,0,1,Yes
+DUMMY0428,1491.93,Unemployed,0,1,1,Fewer than 1 per member,-5,25,0,Black African,Eastern Cape,Traditional,3,0,0,0,No
+DUMMY0429,551.95,Employed,1,1,0,1 or more per member,4,16,0,White,Mpumalanga,Metro urban,2,1,0,0,No other working-age member
+DUMMY0430,1819.32,Employed,1,1,1,1 or more per member,8,64,0,Black African,Mpumalanga,Metro urban,3,0,1,0,No
+DUMMY0431,1453,Unemployed,1,1,1,Fewer than 1 per member,-19,361,0,Black African,Western Cape,Non-metro urban,4,0,0,0,Yes
+DUMMY0432,1150.82,Employed,0,0,0,1 or more per member,2,4,1,Black African,KwaZulu-Natal,Non-metro urban,3,0,0,0,No
+DUMMY0433,1244.5,Employed,1,1,1,Fewer than 1 per member,5,25,0,Black African,Western Cape,Metro urban,5,4,1,0,No other working-age member
+DUMMY0434,1688.39,Employed,0,1,0,1 or more per member,3,9,1,Black African,Eastern Cape,Metro urban,3,0,0,0,Yes
+DUMMY0435,1263.16,Unemployed,1,1,0,1 or more per member,-25,625,0,Black African,Northern Cape,Traditional,4,0,0,0,No
+DUMMY0436,693.41,Employed,1,1,0,Fewer than 1 per member,-4,16,0,Black African,Limpopo,Metro urban,2,1,1,0,No other working-age member
+DUMMY0437,1010.47,Unemployed,0,1,0,None,-21,441,1,Black African,Limpopo,Non-metro urban,7,2,1,2,No
+DUMMY0438,1872.61,Unemployed,0,1,0,None,1,1,0,Black African,Eastern Cape,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0439,514.09,Employed,1,1,0,Fewer than 1 per member,17,289,0,Black African,Limpopo,Non-metro urban,3,1,0,0,Yes
+DUMMY0440,904.22,Employed,1,1,0,1 or more per member,-7,49,0,Black African,Gauteng,Non-metro urban,3,0,0,0,Yes
+DUMMY0441,1883.98,Employed,1,1,0,Fewer than 1 per member,4,16,0,Black African,North West,Metro urban,5,1,0,0,Yes
+DUMMY0442,1361.12,Employed,1,1,0,1 or more per member,-8,64,1,Black African,Gauteng,Non-metro urban,3,0,0,0,Yes
+DUMMY0443,1005.44,Unemployed,0,1,0,Fewer than 1 per member,-9,81,1,Black African,Western Cape,Traditional,6,1,0,1,No
+DUMMY0444,1048.35,Unemployed,0,1,1,Fewer than 1 per member,-7,49,0,Coloured,Gauteng,Traditional,3,1,0,0,No
+DUMMY0445,1720.59,Unemployed,0,1,0,Fewer than 1 per member,-15,225,1,Coloured,Mpumalanga,Traditional,3,2,1,2,No other working-age member
+DUMMY0446,410.89,Employed,1,1,1,None,13,169,0,Black African,Mpumalanga,Metro urban,5,1,0,0,Yes
+DUMMY0447,775.28,Employed,0,1,0,Fewer than 1 per member,-6,36,0,Black African,Gauteng,Non-metro urban,4,0,0,0,Yes
+DUMMY0448,632.06,Unemployed,1,0,0,None,2,4,1,Black African,Gauteng,Traditional,3,1,1,1,Yes
+DUMMY0449,1546.9,Unemployed,1,1,0,Fewer than 1 per member,2,4,1,Black African,Gauteng,Metro urban,2,1,0,1,No other working-age member
+DUMMY0450,1008.33,Employed,0,1,0,Fewer than 1 per member,-7,49,1,Black African,KwaZulu-Natal,Metro urban,2,1,1,1,No other working-age member
+DUMMY0451,1039.94,Unemployed,0,1,0,Fewer than 1 per member,-23,529,1,Black African,Mpumalanga,Metro urban,6,0,0,0,Yes
+DUMMY0452,1103.76,Employed,0,0,0,Fewer than 1 per member,-3,9,1,Black African,Gauteng,Metro urban,3,1,0,1,No
+DUMMY0453,1607.72,Employed,1,1,0,None,-9,81,1,Black African,Gauteng,Metro urban,5,0,0,0,No
+DUMMY0454,1368.43,Employed,1,1,0,1 or more per member,10,100,0,Black African,Mpumalanga,Metro urban,5,0,0,0,No
+DUMMY0455,1652.91,Employed,1,1,0,Fewer than 1 per member,-6,36,0,Coloured,Gauteng,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0456,531.9,Employed,0,1,1,Fewer than 1 per member,-5,25,0,Coloured,Limpopo,Non-metro urban,3,0,1,0,Yes
+DUMMY0457,1425.65,Employed,1,0,0,Fewer than 1 per member,14,196,1,Black African,Limpopo,Metro urban,4,1,0,1,Yes
+DUMMY0458,1309.93,Unemployed,1,1,0,Fewer than 1 per member,6,36,0,Black African,Mpumalanga,Non-metro urban,4,2,0,0,Yes
+DUMMY0459,901.19,Employed,1,1,1,Fewer than 1 per member,7,49,1,Black African,Limpopo,Metro urban,4,1,0,1,Yes
+DUMMY0460,1979,Unemployed,1,1,0,Fewer than 1 per member,-22,484,1,Black African,Gauteng,Metro urban,2,1,1,1,No other working-age member
+DUMMY0461,975.88,Employed,0,1,0,Fewer than 1 per member,-4,16,0,Coloured,Gauteng,Traditional,5,1,0,0,No
+DUMMY0462,1904.11,Unemployed,1,1,1,Fewer than 1 per member,-25,625,0,Black African,Mpumalanga,Metro urban,4,1,0,0,Yes
+DUMMY0463,973.86,Employed,1,1,0,Fewer than 1 per member,14,196,0,Black African,Gauteng,Traditional,3,1,0,0,No
+DUMMY0464,1937.58,Employed,1,1,1,Fewer than 1 per member,-13,169,1,Black African,Gauteng,Farms,2,1,0,1,No other working-age member
+DUMMY0465,921.76,Employed,1,1,1,1 or more per member,10,100,0,Black African,Gauteng,Non-metro urban,2,1,0,0,No other working-age member
+DUMMY0466,743.7,Employed,0,1,0,1 or more per member,3,9,1,Indian/Asian,KwaZulu-Natal,Traditional,2,1,1,1,No other working-age member
+DUMMY0467,1119.97,Employed,1,1,1,1 or more per member,5,25,0,White,Gauteng,Non-metro urban,3,0,0,0,No
+DUMMY0468,1929.03,Unemployed,1,1,0,1 or more per member,-9,81,1,Black African,Gauteng,Traditional,2,1,0,1,No other working-age member
+DUMMY0469,1151.73,Unemployed,1,0,0,Fewer than 1 per member,-9,81,0,Black African,North West,Metro urban,7,1,0,0,No
+DUMMY0470,1777.86,Employed,1,1,0,Fewer than 1 per member,-1,1,1,Black African,Gauteng,Traditional,1,0,0,0,No other working-age member
+DUMMY0471,1584.23,Employed,1,1,0,Fewer than 1 per member,7,49,0,Black African,KwaZulu-Natal,Traditional,2,0,0,0,Yes
+DUMMY0472,609.46,Unemployed,0,1,0,1 or more per member,3,9,1,Black African,Mpumalanga,Metro urban,5,1,0,1,No
+DUMMY0473,1329.06,Unemployed,1,1,0,None,-9,81,0,Black African,Limpopo,Traditional,2,1,0,0,No other working-age member
+DUMMY0474,1127.78,Employed,0,1,1,1 or more per member,3,9,1,Black African,KwaZulu-Natal,Metro urban,3,1,0,1,Yes
+DUMMY0475,837.07,Employed,0,0,0,Fewer than 1 per member,7,49,0,Black African,North West,Metro urban,3,2,0,0,No other working-age member
+DUMMY0476,956.48,Unemployed,0,1,0,Fewer than 1 per member,-21,441,0,Black African,Gauteng,Metro urban,3,2,0,0,No other working-age member
+DUMMY0477,1519.25,Employed,1,1,1,1 or more per member,11,121,0,Black African,Western Cape,Metro urban,1,0,1,0,No other working-age member
+DUMMY0478,1472.71,Unemployed,1,0,0,Fewer than 1 per member,-12,144,1,Black African,Western Cape,Metro urban,5,0,1,0,Yes
+DUMMY0479,1510.17,Employed,0,1,0,None,16,256,0,Black African,Western Cape,Metro urban,2,1,0,0,No other working-age member
+DUMMY0480,1612.48,Employed,1,1,0,1 or more per member,-16,256,0,Coloured,Northern Cape,Farms,5,0,0,0,Yes
+DUMMY0481,992.53,Unemployed,1,0,0,Fewer than 1 per member,9,81,1,Black African,Gauteng,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0482,1784.87,Unemployed,0,1,0,1 or more per member,-3,9,1,Black African,Gauteng,Traditional,2,0,0,0,Yes
+DUMMY0483,1408.77,Employed,1,1,0,Fewer than 1 per member,-2,4,0,Black African,Gauteng,Non-metro urban,5,0,0,0,Yes
+DUMMY0484,444.31,Unemployed,0,1,0,Fewer than 1 per member,4,16,0,Black African,Mpumalanga,Metro urban,4,1,1,0,No
+DUMMY0485,1210.52,Unemployed,0,1,0,1 or more per member,-21,441,1,Black African,Western Cape,Non-metro urban,5,0,0,0,No
+DUMMY0486,905.62,Employed,0,1,0,Fewer than 1 per member,-21,441,1,Black African,Gauteng,Traditional,5,0,0,0,No
+DUMMY0487,1066.36,Employed,0,1,1,1 or more per member,14,196,1,Black African,Eastern Cape,Non-metro urban,2,1,1,1,No other working-age member
+DUMMY0488,1508.41,Employed,0,1,0,Fewer than 1 per member,-3,9,0,Black African,Free State,Metro urban,3,1,0,0,Yes
+DUMMY0489,937.79,Employed,1,0,0,Fewer than 1 per member,3,9,0,Black African,KwaZulu-Natal,Metro urban,4,0,0,0,Yes
+DUMMY0490,962.78,Employed,1,1,0,Fewer than 1 per member,10,100,0,Black African,Mpumalanga,Metro urban,3,0,0,0,Yes
+DUMMY0491,658.18,Unemployed,0,1,0,Fewer than 1 per member,2,4,0,Black African,KwaZulu-Natal,Non-metro urban,3,1,0,0,Yes
+DUMMY0492,1885.56,Unemployed,0,1,0,Fewer than 1 per member,5,25,0,Black African,Free State,Non-metro urban,1,0,1,0,No other working-age member
+DUMMY0493,965.61,Employed,1,1,0,1 or more per member,3,9,0,Black African,Gauteng,Metro urban,4,3,0,0,No other working-age member
+DUMMY0494,1713.32,Employed,1,1,0,1 or more per member,10,100,1,Black African,Gauteng,Metro urban,2,0,0,0,Yes
+DUMMY0495,839.46,Unemployed,1,1,0,Fewer than 1 per member,-9,81,0,Black African,KwaZulu-Natal,Metro urban,6,1,0,0,Yes
+DUMMY0496,1739.35,Employed,0,1,0,1 or more per member,4,16,0,Black African,Limpopo,Non-metro urban,2,1,1,0,No other working-age member
+DUMMY0497,754.72,Unemployed,0,0,0,Fewer than 1 per member,-23,529,1,Black African,Northern Cape,Metro urban,1,0,0,0,No other working-age member
+DUMMY0498,1735.22,Unemployed,0,1,1,Fewer than 1 per member,-21,441,1,Black African,Northern Cape,Metro urban,7,0,0,0,Yes
+DUMMY0499,1194.64,Employed,0,1,0,Fewer than 1 per member,-15,225,1,Black African,Mpumalanga,Farms,3,2,0,2,No other working-age member
+DUMMY0500,728.46,Employed,0,1,0,Fewer than 1 per member,19,361,0,Black African,Gauteng,Non-metro urban,3,0,1,0,No
+DUMMY0501,1215.49,Employed,1,1,0,Fewer than 1 per member,-2,4,0,Black African,Western Cape,Traditional,4,3,0,0,No other working-age member
+DUMMY0502,1836.35,Employed,1,1,0,None,11,121,0,Black African,Eastern Cape,Non-metro urban,4,1,0,0,Yes
+DUMMY0503,1649.16,Employed,1,1,0,1 or more per member,8,64,0,Black African,Western Cape,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0504,1383.75,Unemployed,1,0,0,Fewer than 1 per member,-12,144,1,Black African,KwaZulu-Natal,Metro urban,3,1,1,1,Yes
+DUMMY0505,1276.35,Unemployed,1,1,0,Fewer than 1 per member,-4,16,0,Black African,Limpopo,Metro urban,4,2,0,0,Yes
+DUMMY0506,417.45,Unemployed,0,1,0,Fewer than 1 per member,-9,81,1,Black African,Northern Cape,Metro urban,6,1,0,1,Yes
+DUMMY0507,1626.2,Employed,1,1,0,1 or more per member,3,9,0,Black African,Mpumalanga,Farms,5,0,0,0,No
+DUMMY0508,748.43,Employed,1,1,0,Fewer than 1 per member,14,196,1,Black African,Eastern Cape,Metro urban,3,0,0,0,No
+DUMMY0509,890.65,Employed,0,1,0,Fewer than 1 per member,18,324,1,Black African,Limpopo,Metro urban,3,1,0,1,Yes
+DUMMY0510,971.43,Employed,0,0,0,Fewer than 1 per member,14,196,1,Black African,North West,Non-metro urban,6,0,0,0,Yes
+DUMMY0511,454.28,Employed,1,1,1,1 or more per member,-8,64,0,Black African,Mpumalanga,Metro urban,4,0,1,0,Yes
+DUMMY0512,1574.95,Employed,1,1,0,Fewer than 1 per member,-4,16,0,Black African,KwaZulu-Natal,Traditional,3,0,1,0,No
+DUMMY0513,1679.64,Unemployed,1,0,0,1 or more per member,-3,9,1,Black African,Western Cape,Non-metro urban,3,0,0,0,No
+DUMMY0514,1190.91,Employed,1,1,0,Fewer than 1 per member,-2,4,0,Black African,Northern Cape,Metro urban,1,0,1,0,No other working-age member
+DUMMY0515,453.67,Employed,1,1,0,Fewer than 1 per member,24,576,0,Black African,North West,Farms,4,2,0,0,Yes
+DUMMY0516,765.22,Employed,1,1,1,Fewer than 1 per member,4,16,1,Black African,North West,Traditional,3,0,1,0,No
+DUMMY0517,1746.28,Employed,1,1,0,Fewer than 1 per member,-2,4,0,Black African,Western Cape,Metro urban,4,2,1,0,Yes
+DUMMY0518,1056.08,Employed,0,1,1,Fewer than 1 per member,-17,289,0,Coloured,Eastern Cape,Metro urban,4,1,1,0,Yes
+DUMMY0519,977.59,Unemployed,0,1,0,None,-14,196,0,Black African,KwaZulu-Natal,Non-metro urban,3,0,1,0,Yes
+DUMMY0520,1903.55,Employed,1,1,0,Fewer than 1 per member,8,64,1,Black African,Limpopo,Metro urban,3,2,0,2,No other working-age member
+DUMMY0521,1819.27,Employed,1,1,1,Fewer than 1 per member,8,64,0,Black African,Mpumalanga,Metro urban,1,0,1,0,No other working-age member
+DUMMY0522,1957.49,Employed,0,0,1,1 or more per member,15,225,1,Black African,Northern Cape,Metro urban,3,1,0,1,Yes
+DUMMY0523,1561.62,Employed,0,0,0,Fewer than 1 per member,7,49,1,Black African,Gauteng,Traditional,6,1,0,1,Yes
+DUMMY0524,1955.34,Unemployed,0,1,0,Fewer than 1 per member,-21,441,0,Black African,KwaZulu-Natal,Metro urban,3,2,0,0,No other working-age member
+DUMMY0525,649.19,Employed,0,1,1,Fewer than 1 per member,-11,121,1,Black African,Northern Cape,Non-metro urban,2,0,0,0,Yes
+DUMMY0526,1141.36,Unemployed,1,1,0,1 or more per member,13,169,0,Coloured,KwaZulu-Natal,Non-metro urban,4,0,0,0,No
+DUMMY0527,1175.27,Unemployed,0,1,0,None,2,4,1,Black African,KwaZulu-Natal,Metro urban,3,0,0,0,No
+DUMMY0528,1262.53,Employed,0,1,0,Fewer than 1 per member,-13,169,0,Black African,Western Cape,Traditional,5,1,1,0,Yes
+DUMMY0529,705.24,Employed,1,1,1,Fewer than 1 per member,-4,16,0,Black African,KwaZulu-Natal,Metro urban,3,2,0,0,No other working-age member
+DUMMY0530,1637.43,Employed,0,1,1,Fewer than 1 per member,3,9,1,Black African,Mpumalanga,Metro urban,8,0,1,0,Yes
+DUMMY0531,410.32,Unemployed,1,1,0,Fewer than 1 per member,-6,36,1,Black African,KwaZulu-Natal,Non-metro urban,4,0,0,0,Yes
+DUMMY0532,1840.88,Employed,0,1,1,Fewer than 1 per member,-13,169,1,Coloured,Gauteng,Metro urban,2,1,0,1,No other working-age member
+DUMMY0533,1802.24,Employed,1,1,1,Fewer than 1 per member,-5,25,0,Black African,Gauteng,Metro urban,3,0,0,0,No
+DUMMY0534,1148.03,Employed,1,1,0,1 or more per member,-12,144,1,Black African,KwaZulu-Natal,Non-metro urban,4,1,0,1,Yes
+DUMMY0535,1124.07,Employed,0,1,0,1 or more per member,15,225,0,Black African,KwaZulu-Natal,Traditional,4,2,1,0,No
+DUMMY0536,1152.69,Unemployed,1,0,0,Fewer than 1 per member,-11,121,0,Black African,Eastern Cape,Metro urban,4,1,0,0,No
+DUMMY0537,1339.3,Unemployed,1,1,0,Fewer than 1 per member,-24,576,0,Black African,Free State,Metro urban,3,1,0,0,Yes
+DUMMY0538,503.09,Employed,1,0,0,Fewer than 1 per member,-4,16,0,Black African,Gauteng,Traditional,2,0,0,0,No
+DUMMY0539,489.78,Unemployed,0,1,0,Fewer than 1 per member,-8,64,0,Black African,Limpopo,Non-metro urban,4,0,0,0,Yes
+DUMMY0540,1772.5,Unemployed,1,0,0,Fewer than 1 per member,-13,169,1,Coloured,Mpumalanga,Metro urban,3,1,0,1,Yes
+DUMMY0541,1435.95,Unemployed,1,1,0,Fewer than 1 per member,6,36,0,Black African,Mpumalanga,Non-metro urban,4,1,0,0,No
+DUMMY0542,818.28,Employed,0,0,0,Fewer than 1 per member,12,144,0,Black African,Gauteng,Farms,2,0,0,0,Yes
+DUMMY0543,757.45,Employed,1,0,0,1 or more per member,-3,9,0,Black African,Limpopo,Non-metro urban,5,0,0,0,No
+DUMMY0544,447.32,Unemployed,0,1,0,Fewer than 1 per member,-22,484,1,Black African,KwaZulu-Natal,Non-metro urban,3,0,0,0,No
+DUMMY0545,1114.59,Employed,1,1,0,Fewer than 1 per member,1,1,1,Black African,Limpopo,Metro urban,3,2,0,2,No other working-age member
+DUMMY0546,437.51,Employed,1,1,0,Fewer than 1 per member,-7,49,1,Black African,KwaZulu-Natal,Metro urban,4,1,0,1,No
+DUMMY0547,590.03,Unemployed,1,1,0,Fewer than 1 per member,-23,529,0,Black African,Gauteng,Metro urban,4,0,0,0,No
+DUMMY0548,1739.71,Employed,1,1,0,1 or more per member,-6,36,0,Black African,Gauteng,Metro urban,2,1,0,0,No other working-age member
+DUMMY0549,1367.25,Employed,1,1,0,Fewer than 1 per member,10,100,1,Black African,Gauteng,Metro urban,4,2,0,2,Yes
+DUMMY0550,844.67,Employed,1,0,0,1 or more per member,-10,100,1,Black African,Gauteng,Metro urban,2,1,0,1,No other working-age member
+DUMMY0551,1164.04,Unemployed,0,0,0,Fewer than 1 per member,-20,400,0,Black African,Gauteng,Metro urban,3,2,0,0,No other working-age member
+DUMMY0552,1264.67,Employed,0,1,1,1 or more per member,-11,121,0,Black African,Mpumalanga,Metro urban,3,0,0,0,No
+DUMMY0553,1267.57,Employed,0,1,0,1 or more per member,14,196,1,White,Western Cape,Metro urban,3,2,1,2,No other working-age member
+DUMMY0554,1126.18,Employed,0,0,0,1 or more per member,-11,121,0,Black African,KwaZulu-Natal,Metro urban,5,0,0,0,Yes
+DUMMY0555,1995.65,Employed,1,0,0,Fewer than 1 per member,-10,100,0,Black African,KwaZulu-Natal,Metro urban,5,1,1,0,No
+DUMMY0556,868.43,Employed,0,1,0,1 or more per member,3,9,1,Black African,Limpopo,Traditional,4,0,0,0,Yes
+DUMMY0557,1280.52,Employed,1,1,1,1 or more per member,4,16,1,White,Limpopo,Traditional,4,0,0,0,Yes
+DUMMY0558,528.13,Unemployed,1,1,0,None,-24,576,0,Black African,Northern Cape,Non-metro urban,4,1,1,0,No
+DUMMY0559,857.58,Employed,1,1,0,Fewer than 1 per member,-13,169,1,Black African,Western Cape,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0560,1082.1,Employed,0,0,0,None,-2,4,1,Black African,Gauteng,Farms,4,1,0,1,Yes
+DUMMY0561,1193.84,Unemployed,1,0,0,Fewer than 1 per member,11,121,1,Black African,KwaZulu-Natal,Traditional,3,1,0,1,No
+DUMMY0562,1689.45,Employed,0,1,0,1 or more per member,-20,400,0,Black African,Western Cape,Non-metro urban,5,1,0,0,Yes
+DUMMY0563,499.81,Unemployed,0,1,0,Fewer than 1 per member,-22,484,1,Black African,Mpumalanga,Metro urban,3,0,1,0,Yes
+DUMMY0564,1861.19,Employed,1,1,0,Fewer than 1 per member,-5,25,0,Black African,Mpumalanga,Metro urban,3,0,1,0,No
+DUMMY0565,1227.09,Employed,1,1,0,Fewer than 1 per member,-13,169,0,Black African,Gauteng,Non-metro urban,4,0,0,0,Yes
+DUMMY0566,1385.59,Employed,1,1,1,Fewer than 1 per member,-4,16,0,Indian/Asian,Limpopo,Metro urban,7,3,1,0,Yes
+DUMMY0567,728.34,Employed,1,1,1,1 or more per member,-4,16,0,Black African,Mpumalanga,Traditional,4,0,0,0,No
+DUMMY0568,1513.92,Employed,1,1,1,Fewer than 1 per member,10,100,0,Black African,Gauteng,Metro urban,5,0,0,0,No
+DUMMY0569,1100.24,Employed,0,1,1,1 or more per member,13,169,0,Black African,Free State,Metro urban,4,3,0,0,No other working-age member
+DUMMY0570,1670.86,Employed,1,1,0,1 or more per member,-11,121,1,Black African,KwaZulu-Natal,Traditional,2,0,0,0,Yes
+DUMMY0571,1738.41,Employed,1,1,0,Fewer than 1 per member,1,1,0,Black African,Gauteng,Non-metro urban,5,0,0,0,No
+DUMMY0572,1187.7,Employed,1,1,0,1 or more per member,12,144,1,Black African,Limpopo,Metro urban,3,1,0,1,No
+DUMMY0573,1075.15,Employed,0,0,0,1 or more per member,-8,64,1,Coloured,Gauteng,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY0574,1237.54,Unemployed,1,1,1,Fewer than 1 per member,-13,169,1,Coloured,Free State,Metro urban,6,3,0,3,Yes
+DUMMY0575,1425.44,Unemployed,1,1,1,1 or more per member,-6,36,1,Black African,Gauteng,Metro urban,1,0,0,0,No other working-age member
+DUMMY0576,1912.82,Employed,1,0,0,Fewer than 1 per member,-12,144,0,Black African,Western Cape,Metro urban,2,1,0,0,No other working-age member
+DUMMY0577,1301,Unemployed,0,1,1,Fewer than 1 per member,-25,625,0,Coloured,Gauteng,Metro urban,3,1,0,0,No
+DUMMY0578,854.55,Employed,0,0,0,Fewer than 1 per member,3,9,1,Black African,Mpumalanga,Traditional,3,0,0,0,No
+DUMMY0579,1978.41,Employed,1,1,1,Fewer than 1 per member,-1,1,0,Black African,Western Cape,Non-metro urban,3,0,0,0,Yes
+DUMMY0580,1330.4,Unemployed,1,1,0,None,13,169,0,Black African,KwaZulu-Natal,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0581,1853.14,Unemployed,1,0,0,Fewer than 1 per member,-20,400,1,Black African,Gauteng,Metro urban,5,1,0,1,Yes
+DUMMY0582,863.33,Employed,0,1,0,None,9,81,1,Black African,Gauteng,Non-metro urban,7,0,0,0,Yes
+DUMMY0583,1429.3,Employed,1,1,0,Fewer than 1 per member,-11,121,0,Black African,Northern Cape,Metro urban,6,2,1,0,Yes
+DUMMY0584,898.63,Employed,1,1,0,Fewer than 1 per member,-13,169,0,Coloured,Gauteng,Metro urban,2,1,0,0,No other working-age member
+DUMMY0585,571.78,Unemployed,1,0,0,Fewer than 1 per member,-23,529,0,Black African,Mpumalanga,Non-metro urban,3,0,0,0,No
+DUMMY0586,1287.84,Unemployed,1,1,0,Fewer than 1 per member,-12,144,1,Black African,KwaZulu-Natal,Traditional,3,2,0,2,No other working-age member
+DUMMY0587,1958.01,Employed,1,1,1,1 or more per member,13,169,1,Coloured,KwaZulu-Natal,Non-metro urban,1,0,1,0,No other working-age member
+DUMMY0588,550.78,Employed,1,1,0,None,13,169,0,Black African,Gauteng,Non-metro urban,2,1,0,0,No other working-age member
+DUMMY0589,1784.71,Employed,0,1,0,1 or more per member,-3,9,0,White,KwaZulu-Natal,Traditional,6,1,1,0,No
+DUMMY0590,1458.68,Employed,0,0,0,Fewer than 1 per member,-2,4,1,Black African,Limpopo,Metro urban,4,1,0,1,Yes
+DUMMY0591,1151.72,Employed,1,0,0,1 or more per member,-18,324,1,Black African,Mpumalanga,Metro urban,4,1,0,1,Yes
+DUMMY0592,709.05,Employed,1,1,1,1 or more per member,-13,169,0,Coloured,Gauteng,Non-metro urban,4,0,0,0,No
+DUMMY0593,1063.63,Unemployed,0,1,0,Fewer than 1 per member,0,0,0,Black African,KwaZulu-Natal,Non-metro urban,3,0,1,0,Yes
+DUMMY0594,1510.88,Employed,1,0,1,Fewer than 1 per member,0,0,0,Coloured,Limpopo,Metro urban,4,2,0,0,Yes
+DUMMY0595,681.64,Unemployed,0,1,0,1 or more per member,-1,1,0,Black African,KwaZulu-Natal,Non-metro urban,5,3,1,0,No
+DUMMY0596,1812.51,Employed,1,1,0,Fewer than 1 per member,-15,225,1,White,Western Cape,Traditional,3,0,0,0,Yes
+DUMMY0597,1275.63,Unemployed,0,0,0,Fewer than 1 per member,0,0,0,Black African,Gauteng,Non-metro urban,3,2,0,0,No other working-age member
+DUMMY0598,932.17,Unemployed,1,1,0,1 or more per member,23,529,0,Black African,KwaZulu-Natal,Non-metro urban,2,1,0,0,No other working-age member
+DUMMY0599,1829.63,Employed,1,1,0,1 or more per member,3,9,1,Black African,Limpopo,Non-metro urban,8,0,0,0,No
+DUMMY0600,883.32,Employed,1,1,0,Fewer than 1 per member,18,324,1,Coloured,Gauteng,Traditional,5,1,0,1,No
+DUMMY0601,706.64,Employed,0,1,0,Fewer than 1 per member,4,16,0,Black African,KwaZulu-Natal,Metro urban,3,0,0,0,No
+DUMMY0602,1577.14,Employed,1,1,0,1 or more per member,5,25,1,Coloured,Western Cape,Non-metro urban,8,1,0,1,No
+DUMMY0603,992.79,Employed,1,1,0,Fewer than 1 per member,-1,1,0,Black African,Gauteng,Non-metro urban,4,0,0,0,Yes
+DUMMY0604,1119.09,Employed,0,1,1,1 or more per member,11,121,1,Black African,Limpopo,Metro urban,3,0,0,0,Yes
+DUMMY0605,1365.07,Employed,0,1,0,Fewer than 1 per member,-6,36,1,Black African,Gauteng,Metro urban,2,0,0,0,Yes
+DUMMY0606,1890.71,Unemployed,0,1,0,Fewer than 1 per member,-11,121,1,Black African,Western Cape,Traditional,4,3,0,3,No other working-age member
+DUMMY0607,1681.86,Unemployed,0,1,0,None,-21,441,1,Black African,Limpopo,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY0608,549.93,Unemployed,0,0,0,Fewer than 1 per member,5,25,0,Black African,Gauteng,Traditional,4,0,0,0,Yes
+DUMMY0609,1204.58,Employed,1,1,1,Fewer than 1 per member,-7,49,0,Black African,Gauteng,Non-metro urban,5,0,0,0,Yes
+DUMMY0610,1519.68,Unemployed,1,0,0,1 or more per member,-19,361,1,Black African,Eastern Cape,Metro urban,5,1,1,1,Yes
+DUMMY0611,1628.33,Employed,1,1,1,1 or more per member,-11,121,1,Black African,Gauteng,Traditional,6,0,0,0,Yes
+DUMMY0612,435.22,Employed,0,1,0,1 or more per member,-2,4,0,Black African,Gauteng,Metro urban,5,0,0,0,No
+DUMMY0613,601.69,Employed,0,1,1,Fewer than 1 per member,-7,49,0,Coloured,Gauteng,Non-metro urban,5,0,0,0,No
+DUMMY0614,1004.99,Employed,1,1,0,Fewer than 1 per member,8,64,1,Black African,KwaZulu-Natal,Traditional,7,2,0,2,Yes
+DUMMY0615,1336.16,Employed,0,1,0,1 or more per member,18,324,1,Black African,KwaZulu-Natal,Metro urban,2,1,0,1,No other working-age member
+DUMMY0616,860.9,Employed,0,1,0,Fewer than 1 per member,11,121,0,Black African,North West,Non-metro urban,6,0,0,0,Yes
+DUMMY0617,1629.8,Unemployed,0,1,1,Fewer than 1 per member,14,196,1,Black African,Western Cape,Traditional,4,0,0,0,Yes
+DUMMY0618,1609.58,Employed,0,1,0,Fewer than 1 per member,11,121,1,Black African,Mpumalanga,Non-metro urban,4,2,0,2,No
+DUMMY0619,617.97,Unemployed,1,1,0,Fewer than 1 per member,9,81,1,Black African,Western Cape,Farms,2,1,0,1,No other working-age member
+DUMMY0620,1874.53,Unemployed,0,1,0,1 or more per member,-10,100,0,Black African,North West,Metro urban,4,0,1,0,Yes
+DUMMY0621,452.45,Unemployed,0,1,0,Fewer than 1 per member,-8,64,1,Black African,Northern Cape,Traditional,4,0,0,0,No
+DUMMY0622,1223.25,Employed,1,1,0,Fewer than 1 per member,4,16,1,Coloured,KwaZulu-Natal,Farms,4,0,1,0,Yes
+DUMMY0623,604.19,Employed,0,1,1,None,1,1,0,Black African,Limpopo,Metro urban,1,0,0,0,No other working-age member
+DUMMY0624,656.25,Employed,1,1,0,Fewer than 1 per member,14,196,1,Black African,Gauteng,Metro urban,2,1,0,1,No other working-age member
+DUMMY0625,1381.52,Unemployed,0,1,0,Fewer than 1 per member,-23,529,1,Black African,Gauteng,Metro urban,6,2,0,2,Yes
+DUMMY0626,1814.26,Employed,0,1,1,Fewer than 1 per member,-3,9,1,Black African,Mpumalanga,Metro urban,2,1,1,1,No other working-age member
+DUMMY0627,811.29,Employed,1,1,1,Fewer than 1 per member,24,576,1,Black African,Northern Cape,Non-metro urban,7,1,0,1,Yes
+DUMMY0628,636.41,Unemployed,0,1,0,None,-23,529,1,Black African,Gauteng,Traditional,2,1,0,1,No other working-age member
+DUMMY0629,1255.05,Unemployed,1,1,0,Fewer than 1 per member,-12,144,1,Coloured,North West,Farms,4,1,0,1,Yes
+DUMMY0630,1154.89,Employed,0,0,0,1 or more per member,19,361,0,Black African,Northern Cape,Metro urban,2,1,0,0,No other working-age member
+DUMMY0631,901.32,Employed,1,1,0,1 or more per member,-11,121,0,Black African,North West,Traditional,6,1,1,0,Yes
+DUMMY0632,1939.49,Employed,1,1,1,1 or more per member,0,0,0,Black African,North West,Metro urban,4,0,0,0,Yes
+DUMMY0633,435.53,Employed,1,1,1,Fewer than 1 per member,-12,144,1,Black African,Eastern Cape,Traditional,2,1,0,1,No other working-age member
+DUMMY0634,1085.82,Unemployed,1,1,0,None,-25,625,0,Black African,Gauteng,Non-metro urban,2,1,1,0,No other working-age member
+DUMMY0635,436.48,Unemployed,0,1,0,Fewer than 1 per member,-15,225,0,Black African,Gauteng,Non-metro urban,3,1,0,0,Yes
+DUMMY0636,1854.74,Employed,0,1,1,Fewer than 1 per member,14,196,0,Black African,KwaZulu-Natal,Metro urban,4,1,0,0,Yes
+DUMMY0637,532.76,Unemployed,1,0,0,Fewer than 1 per member,14,196,1,Black African,Western Cape,Traditional,5,1,0,1,No
+DUMMY0638,1902.34,Unemployed,1,0,0,None,9,81,0,Black African,Gauteng,Metro urban,2,1,0,0,No other working-age member
+DUMMY0639,727.11,Employed,0,1,0,1 or more per member,5,25,0,Black African,Northern Cape,Metro urban,3,0,0,0,No
+DUMMY0640,1823.43,Employed,1,1,0,Fewer than 1 per member,-4,16,0,Black African,North West,Non-metro urban,3,0,0,0,Yes
+DUMMY0641,1140.53,Employed,1,1,0,Fewer than 1 per member,16,256,1,Black African,Limpopo,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY0642,532.82,Employed,1,0,0,None,9,81,1,Coloured,Gauteng,Traditional,2,0,1,0,No
+DUMMY0643,442.68,Employed,1,0,0,Fewer than 1 per member,-5,25,1,Black African,Free State,Traditional,3,1,1,1,Yes
+DUMMY0644,1129.21,Unemployed,1,1,0,Fewer than 1 per member,2,4,1,Black African,Gauteng,Metro urban,3,1,1,1,Yes
+DUMMY0645,1851.36,Employed,1,0,0,Fewer than 1 per member,-3,9,0,Black African,Mpumalanga,Traditional,3,1,0,0,Yes
+DUMMY0646,538.33,Employed,1,1,0,Fewer than 1 per member,23,529,0,Black African,North West,Traditional,2,1,0,0,No other working-age member
+DUMMY0647,409.19,Unemployed,0,1,1,Fewer than 1 per member,20,400,0,Black African,Mpumalanga,Traditional,3,0,0,0,Yes
+DUMMY0648,422.17,Unemployed,0,1,0,1 or more per member,0,0,0,Black African,Gauteng,Non-metro urban,6,0,0,0,No
+DUMMY0649,1308.27,Unemployed,0,1,1,Fewer than 1 per member,-21,441,0,Black African,KwaZulu-Natal,Non-metro urban,5,1,1,0,No
+DUMMY0650,1045.47,Employed,0,1,0,None,-2,4,1,Coloured,Western Cape,Farms,7,0,0,0,Yes
+DUMMY0651,491.34,Employed,0,1,1,Fewer than 1 per member,11,121,1,Black African,KwaZulu-Natal,Metro urban,6,2,1,2,Yes
+DUMMY0652,887.95,Employed,1,1,0,1 or more per member,6,36,1,Coloured,KwaZulu-Natal,Metro urban,5,2,0,2,No
+DUMMY0653,1774.83,Employed,0,1,1,1 or more per member,-17,289,1,Black African,Gauteng,Traditional,4,2,0,2,No
+DUMMY0654,1236.1,Employed,1,1,1,Fewer than 1 per member,-7,49,0,Black African,Gauteng,Non-metro urban,2,0,0,0,Yes
+DUMMY0655,1433.91,Employed,0,1,1,Fewer than 1 per member,0,0,0,Black African,Eastern Cape,Metro urban,4,0,0,0,No
+DUMMY0656,1883.07,Employed,0,1,0,Fewer than 1 per member,-11,121,0,Black African,Limpopo,Non-metro urban,4,1,0,0,Yes
+DUMMY0657,1315.48,Unemployed,1,0,0,Fewer than 1 per member,11,121,0,Coloured,Gauteng,Metro urban,5,0,0,0,No
+DUMMY0658,963.27,Employed,1,1,0,Fewer than 1 per member,-4,16,0,Black African,Limpopo,Traditional,1,0,0,0,No other working-age member
+DUMMY0659,942.74,Employed,0,1,0,Fewer than 1 per member,-16,256,1,Black African,Mpumalanga,Farms,3,2,0,2,No other working-age member
+DUMMY0660,666.04,Employed,1,1,1,Fewer than 1 per member,19,361,1,Black African,Gauteng,Metro urban,3,1,0,1,Yes
+DUMMY0661,1974.61,Unemployed,0,1,0,Fewer than 1 per member,-8,64,1,Black African,KwaZulu-Natal,Metro urban,8,4,1,4,No
+DUMMY0662,1650.54,Employed,0,1,0,None,2,4,0,Black African,Gauteng,Traditional,3,0,0,0,Yes
+DUMMY0663,733.22,Employed,0,1,0,1 or more per member,4,16,0,Black African,Free State,Metro urban,4,0,0,0,Yes
+DUMMY0664,1599.52,Unemployed,1,1,0,Fewer than 1 per member,-8,64,0,Black African,KwaZulu-Natal,Non-metro urban,4,2,0,0,No
+DUMMY0665,1417.71,Unemployed,1,0,0,Fewer than 1 per member,-9,81,0,Black African,Eastern Cape,Farms,4,1,0,0,No
+DUMMY0666,561.68,Unemployed,1,0,0,Fewer than 1 per member,-1,1,1,Black African,Free State,Metro urban,1,0,1,0,No other working-age member
+DUMMY0667,1196.86,Unemployed,1,1,1,None,-10,100,0,Black African,Limpopo,Traditional,7,0,0,0,Yes
+DUMMY0668,1041.13,Employed,0,1,1,1 or more per member,17,289,0,Black African,Eastern Cape,Metro urban,4,1,0,0,Yes
+DUMMY0669,1960.53,Employed,1,1,0,Fewer than 1 per member,-7,49,0,Black African,Mpumalanga,Metro urban,1,0,0,0,No other working-age member
+DUMMY0670,815.63,Employed,1,1,1,Fewer than 1 per member,14,196,0,Black African,Limpopo,Traditional,3,2,0,0,No other working-age member
+DUMMY0671,764.42,Employed,0,0,0,1 or more per member,13,169,0,Black African,Eastern Cape,Non-metro urban,4,2,0,0,No
+DUMMY0672,746.89,Unemployed,1,0,0,Fewer than 1 per member,-18,324,0,Black African,Mpumalanga,Metro urban,5,0,0,0,Yes
+DUMMY0673,1875.65,Employed,0,0,0,Fewer than 1 per member,-2,4,0,Black African,Free State,Metro urban,3,0,0,0,Yes
+DUMMY0674,1351.36,Employed,1,1,0,Fewer than 1 per member,-2,4,0,Black African,Free State,Non-metro urban,3,0,0,0,No
+DUMMY0675,1280.66,Employed,1,1,0,Fewer than 1 per member,-7,49,1,Black African,Gauteng,Traditional,3,1,0,1,No
+DUMMY0676,1025.24,Employed,1,0,0,1 or more per member,8,64,0,Black African,Western Cape,Traditional,1,0,0,0,No other working-age member
+DUMMY0677,1064.64,Employed,1,1,0,Fewer than 1 per member,13,169,1,Black African,North West,Non-metro urban,3,2,1,2,No other working-age member
+DUMMY0678,476.55,Employed,0,1,0,Fewer than 1 per member,-18,324,0,Black African,Western Cape,Non-metro urban,2,1,0,0,No other working-age member
+DUMMY0679,1913.05,Unemployed,1,1,1,Fewer than 1 per member,7,49,0,Black African,Eastern Cape,Metro urban,8,0,0,0,No
+DUMMY0680,822.59,Employed,1,0,0,Fewer than 1 per member,18,324,0,Coloured,Limpopo,Metro urban,1,0,1,0,No other working-age member
+DUMMY0681,1870.97,Unemployed,0,1,0,None,12,144,1,Black African,Gauteng,Traditional,4,3,0,3,No other working-age member
+DUMMY0682,433.48,Unemployed,0,1,0,Fewer than 1 per member,-11,121,1,Black African,North West,Non-metro urban,4,2,0,2,No
+DUMMY0683,835.24,Employed,0,1,1,Fewer than 1 per member,10,100,1,Black African,Eastern Cape,Non-metro urban,3,0,0,0,Yes
+DUMMY0684,711.68,Employed,1,1,1,1 or more per member,-1,1,0,Black African,KwaZulu-Natal,Non-metro urban,1,0,1,0,No other working-age member
+DUMMY0685,891.47,Unemployed,0,0,0,Fewer than 1 per member,-18,324,1,Black African,Mpumalanga,Metro urban,2,1,0,1,No other working-age member
+DUMMY0686,1607.49,Employed,1,1,0,None,-3,9,1,Black African,North West,Metro urban,7,0,0,0,No
+DUMMY0687,612.51,Employed,1,1,1,Fewer than 1 per member,-14,196,0,Black African,Gauteng,Traditional,7,2,0,0,No
+DUMMY0688,785.26,Unemployed,1,1,0,1 or more per member,4,16,0,Black African,KwaZulu-Natal,Farms,5,3,0,0,No
+DUMMY0689,952.83,Employed,1,0,0,1 or more per member,-9,81,0,Black African,Gauteng,Traditional,2,1,0,0,No other working-age member
+DUMMY0690,915.06,Unemployed,1,1,0,1 or more per member,-11,121,0,Black African,Eastern Cape,Metro urban,5,2,0,0,Yes
+DUMMY0691,886.38,Employed,0,0,0,Fewer than 1 per member,11,121,1,Black African,Limpopo,Metro urban,4,1,0,1,Yes
+DUMMY0692,1770.37,Employed,1,0,0,1 or more per member,-1,1,1,Coloured,Eastern Cape,Metro urban,1,0,0,0,No other working-age member
+DUMMY0693,1273.02,Unemployed,1,1,0,Fewer than 1 per member,13,169,0,Black African,KwaZulu-Natal,Traditional,5,1,1,0,Yes
+DUMMY0694,1593.45,Employed,1,1,1,Fewer than 1 per member,-1,1,0,Black African,Gauteng,Traditional,2,1,0,0,No other working-age member
+DUMMY0695,1745.21,Unemployed,0,1,1,1 or more per member,-20,400,0,Black African,Northern Cape,Non-metro urban,5,1,0,0,Yes
+DUMMY0696,1161.7,Employed,0,1,0,Fewer than 1 per member,12,144,0,Black African,Western Cape,Traditional,4,1,0,0,No
+DUMMY0697,1119.23,Employed,1,1,0,Fewer than 1 per member,-2,4,0,Black African,Western Cape,Non-metro urban,2,1,1,0,No other working-age member
+DUMMY0698,1016.86,Employed,1,1,1,Fewer than 1 per member,-11,121,0,Black African,Eastern Cape,Metro urban,3,0,0,0,Yes
+DUMMY0699,1355.21,Employed,0,1,1,Fewer than 1 per member,14,196,0,Black African,Gauteng,Non-metro urban,2,0,0,0,No
+DUMMY0700,742.55,Employed,0,1,1,None,-2,4,0,Coloured,Limpopo,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0701,538.88,Employed,0,1,0,Fewer than 1 per member,-25,625,1,Black African,Gauteng,Traditional,2,1,0,1,No other working-age member
+DUMMY0702,1968.99,Unemployed,1,1,0,Fewer than 1 per member,2,4,1,Black African,Mpumalanga,Metro urban,2,0,0,0,Yes
+DUMMY0703,534,Employed,0,1,1,Fewer than 1 per member,-13,169,0,Black African,Free State,Metro urban,4,0,0,0,Yes
+DUMMY0704,1941.81,Employed,1,1,0,None,-14,196,1,Indian/Asian,Gauteng,Non-metro urban,3,2,0,2,No other working-age member
+DUMMY0705,810.31,Employed,0,1,0,Fewer than 1 per member,24,576,1,Black African,Western Cape,Non-metro urban,4,2,0,2,No
+DUMMY0706,768.07,Employed,1,1,1,None,0,0,0,White,North West,Metro urban,2,1,0,0,No other working-age member
+DUMMY0707,1635.21,Employed,1,1,1,1 or more per member,-15,225,0,Coloured,Limpopo,Non-metro urban,3,2,0,0,No other working-age member
+DUMMY0708,1181.04,Employed,0,1,0,1 or more per member,8,64,1,Black African,Gauteng,Traditional,2,1,0,1,No other working-age member
+DUMMY0709,1495.24,Unemployed,0,1,0,1 or more per member,-9,81,0,Black African,Mpumalanga,Traditional,2,0,0,0,Yes
+DUMMY0710,1766.13,Employed,1,1,0,Fewer than 1 per member,4,16,1,Black African,Western Cape,Metro urban,5,0,0,0,Yes
+DUMMY0711,1978.48,Employed,1,1,0,1 or more per member,-2,4,0,Black African,Eastern Cape,Traditional,1,0,1,0,No other working-age member
+DUMMY0712,1655.52,Employed,1,1,0,1 or more per member,13,169,1,Black African,Free State,Non-metro urban,4,0,0,0,Yes
+DUMMY0713,1436.68,Employed,1,1,0,1 or more per member,12,144,1,Coloured,KwaZulu-Natal,Metro urban,5,0,1,0,No
+DUMMY0714,1492.5,Unemployed,1,1,0,Fewer than 1 per member,-7,49,1,Black African,Gauteng,Metro urban,5,0,0,0,Yes
+DUMMY0715,1438.87,Employed,1,1,0,1 or more per member,-14,196,0,Black African,Gauteng,Non-metro urban,3,1,1,0,Yes
+DUMMY0716,463.97,Employed,1,0,0,1 or more per member,22,484,1,Black African,Mpumalanga,Non-metro urban,3,2,0,2,No other working-age member
+DUMMY0717,627.97,Employed,0,1,0,Fewer than 1 per member,-9,81,0,White,KwaZulu-Natal,Metro urban,4,0,1,0,Yes
+DUMMY0718,764.63,Employed,1,1,0,1 or more per member,-1,1,0,Black African,Northern Cape,Non-metro urban,2,1,0,0,No other working-age member
+DUMMY0719,913.08,Employed,1,1,1,1 or more per member,-8,64,0,White,Free State,Non-metro urban,5,2,0,0,Yes
+DUMMY0720,1838.27,Unemployed,1,1,0,1 or more per member,6,36,0,Black African,Gauteng,Metro urban,4,1,0,0,Yes
+DUMMY0721,1419.24,Unemployed,0,0,0,Fewer than 1 per member,-21,441,0,Black African,KwaZulu-Natal,Traditional,4,2,0,0,Yes
+DUMMY0722,479.22,Employed,0,1,0,Fewer than 1 per member,-1,1,1,Black African,Mpumalanga,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY0723,1234.25,Unemployed,1,1,0,Fewer than 1 per member,-12,144,0,Black African,Limpopo,Metro urban,2,1,0,0,No other working-age member
+DUMMY0724,1424.27,Employed,1,1,1,1 or more per member,3,9,0,Coloured,Gauteng,Metro urban,4,2,0,0,Yes
+DUMMY0725,1696.29,Employed,1,1,1,Fewer than 1 per member,-6,36,0,Black African,North West,Metro urban,2,0,0,0,Yes
+DUMMY0726,1293.37,Employed,0,1,0,Fewer than 1 per member,-16,256,0,Black African,Gauteng,Traditional,4,1,0,0,Yes
+DUMMY0727,1059.98,Unemployed,0,1,1,Fewer than 1 per member,-14,196,1,Black African,Gauteng,Non-metro urban,1,0,1,0,No other working-age member
+DUMMY0728,1696.09,Unemployed,1,1,0,1 or more per member,-9,81,1,Black African,Limpopo,Traditional,4,2,1,2,Yes
+DUMMY0729,1592.42,Unemployed,1,1,0,Fewer than 1 per member,-20,400,1,Indian/Asian,Gauteng,Metro urban,2,1,1,1,No other working-age member
+DUMMY0730,1715.03,Employed,0,1,1,Fewer than 1 per member,-2,4,1,Black African,Eastern Cape,Non-metro urban,4,1,0,1,Yes
+DUMMY0731,1803.35,Employed,1,1,0,1 or more per member,-21,441,0,Black African,Western Cape,Non-metro urban,4,0,0,0,No
+DUMMY0732,1566.55,Employed,0,1,0,Fewer than 1 per member,4,16,0,Black African,North West,Metro urban,7,2,0,0,Yes
+DUMMY0733,1670.83,Unemployed,1,1,0,Fewer than 1 per member,-15,225,1,Black African,Limpopo,Traditional,4,0,0,0,Yes
+DUMMY0734,1402.36,Unemployed,1,1,0,Fewer than 1 per member,-10,100,1,Black African,Mpumalanga,Farms,5,0,0,0,Yes
+DUMMY0735,1510.59,Unemployed,1,0,0,1 or more per member,2,4,0,Black African,Eastern Cape,Metro urban,2,0,0,0,Yes
+DUMMY0736,1192.79,Employed,1,1,0,Fewer than 1 per member,8,64,1,Black African,Mpumalanga,Metro urban,7,2,0,2,Yes
+DUMMY0737,1288.89,Employed,0,0,0,Fewer than 1 per member,14,196,0,Coloured,KwaZulu-Natal,Traditional,6,1,0,0,Yes
+DUMMY0738,650.55,Employed,1,1,0,1 or more per member,-13,169,1,Black African,Gauteng,Metro urban,3,0,0,0,No
+DUMMY0739,895.37,Employed,1,1,0,Fewer than 1 per member,9,81,0,Black African,Gauteng,Metro urban,4,1,0,0,Yes
+DUMMY0740,867.9,Employed,1,1,0,1 or more per member,12,144,0,Black African,Gauteng,Metro urban,1,0,0,0,No other working-age member
+DUMMY0741,412.2,Employed,1,1,0,Fewer than 1 per member,10,100,0,Black African,Western Cape,Farms,8,1,0,0,Yes
+DUMMY0742,1956.49,Unemployed,1,0,0,Fewer than 1 per member,-7,49,1,Black African,Mpumalanga,Non-metro urban,3,0,0,0,Yes
+DUMMY0743,1701.29,Employed,0,1,1,Fewer than 1 per member,12,144,0,Black African,Mpumalanga,Non-metro urban,5,1,0,0,No
+DUMMY0744,1749.99,Unemployed,1,1,0,Fewer than 1 per member,-7,49,0,Black African,KwaZulu-Natal,Metro urban,3,0,1,0,Yes
+DUMMY0745,1952.97,Employed,0,1,0,Fewer than 1 per member,10,100,0,Black African,KwaZulu-Natal,Non-metro urban,3,0,0,0,No
+DUMMY0746,1552.5,Unemployed,1,1,0,Fewer than 1 per member,-4,16,1,Black African,Gauteng,Farms,4,1,1,1,Yes
+DUMMY0747,1097.3,Unemployed,0,1,0,None,-11,121,0,Black African,Eastern Cape,Traditional,5,0,0,0,No
+DUMMY0748,826.88,Employed,0,1,0,1 or more per member,22,484,0,Black African,Western Cape,Traditional,3,2,0,0,No other working-age member
+DUMMY0749,1869.55,Employed,1,1,0,None,19,361,1,Black African,Limpopo,Farms,4,0,0,0,Yes
+DUMMY0750,1226.75,Unemployed,0,0,0,Fewer than 1 per member,-22,484,1,Black African,North West,Metro urban,4,1,0,1,No
+DUMMY0751,503.04,Employed,1,1,0,1 or more per member,-1,1,0,Black African,Gauteng,Non-metro urban,4,2,0,0,Yes
+DUMMY0752,839.42,Employed,0,1,0,Fewer than 1 per member,-8,64,1,Black African,KwaZulu-Natal,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY0753,505.21,Employed,1,1,1,1 or more per member,6,36,0,Black African,Western Cape,Metro urban,6,0,0,0,Yes
+DUMMY0754,954.19,Unemployed,0,1,1,Fewer than 1 per member,-1,1,0,Black African,Free State,Metro urban,2,0,0,0,Yes
+DUMMY0755,1185.84,Employed,0,0,0,Fewer than 1 per member,-6,36,1,Black African,Western Cape,Non-metro urban,6,1,0,1,No
+DUMMY0756,1804.25,Employed,1,1,0,1 or more per member,4,16,0,Black African,KwaZulu-Natal,Non-metro urban,4,1,0,0,Yes
+DUMMY0757,1332.24,Employed,1,1,0,Fewer than 1 per member,2,4,0,Black African,Gauteng,Non-metro urban,4,0,0,0,Yes
+DUMMY0758,1671.02,Unemployed,0,0,0,1 or more per member,-12,144,1,Black African,Mpumalanga,Traditional,3,0,0,0,No
+DUMMY0759,1394.76,Unemployed,0,1,1,Fewer than 1 per member,7,49,0,Black African,Limpopo,Traditional,4,0,1,0,Yes
+DUMMY0760,1008.08,Employed,0,1,0,None,-9,81,1,Black African,Mpumalanga,Non-metro urban,6,1,0,1,Yes
+DUMMY0761,838.05,Employed,0,0,0,Fewer than 1 per member,0,0,1,Black African,Gauteng,Farms,4,2,0,2,No
+DUMMY0762,948.34,Employed,1,1,1,Fewer than 1 per member,-5,25,1,Black African,KwaZulu-Natal,Metro urban,3,1,0,1,No
+DUMMY0763,1993.58,Employed,1,0,0,Fewer than 1 per member,13,169,0,Black African,Gauteng,Traditional,3,0,0,0,No
+DUMMY0764,1443.98,Employed,1,1,0,Fewer than 1 per member,19,361,0,Black African,Free State,Metro urban,3,1,0,0,No
+DUMMY0765,708.94,Employed,1,1,0,Fewer than 1 per member,-9,81,1,Black African,Eastern Cape,Farms,6,2,0,2,Yes
+DUMMY0766,795.71,Unemployed,1,1,1,Fewer than 1 per member,-13,169,1,Black African,Eastern Cape,Traditional,3,1,0,1,Yes
+DUMMY0767,762,Unemployed,0,1,0,Fewer than 1 per member,11,121,0,Coloured,KwaZulu-Natal,Metro urban,5,3,0,0,Yes
+DUMMY0768,1618.98,Unemployed,0,0,0,Fewer than 1 per member,-17,289,0,Black African,Mpumalanga,Non-metro urban,3,2,1,0,No other working-age member
+DUMMY0769,1641.41,Employed,0,0,0,Fewer than 1 per member,1,1,0,Black African,Western Cape,Non-metro urban,2,1,0,0,No other working-age member
+DUMMY0770,1673.39,Unemployed,1,1,0,Fewer than 1 per member,-8,64,1,Black African,Mpumalanga,Metro urban,4,0,0,0,No
+DUMMY0771,1377.39,Unemployed,0,0,0,Fewer than 1 per member,-10,100,1,Black African,Limpopo,Non-metro urban,3,0,0,0,Yes
+DUMMY0772,1326.37,Employed,1,1,0,1 or more per member,23,529,0,Black African,Western Cape,Non-metro urban,5,0,0,0,Yes
+DUMMY0773,411.29,Employed,1,1,1,None,9,81,0,Black African,Northern Cape,Metro urban,4,1,0,0,No
+DUMMY0774,573.52,Unemployed,1,1,0,Fewer than 1 per member,-15,225,1,Black African,Gauteng,Metro urban,4,2,0,2,No
+DUMMY0775,1522.67,Employed,0,1,0,Fewer than 1 per member,1,1,1,Indian/Asian,KwaZulu-Natal,Traditional,5,1,0,1,Yes
+DUMMY0776,627.13,Employed,1,1,0,Fewer than 1 per member,-7,49,1,Black African,Mpumalanga,Metro urban,3,1,0,1,No
+DUMMY0777,1151.33,Unemployed,0,1,1,Fewer than 1 per member,-11,121,0,Black African,Gauteng,Metro urban,5,0,0,0,Yes
+DUMMY0778,1070.69,Employed,0,1,1,None,10,100,0,Coloured,Gauteng,Non-metro urban,3,0,0,0,No
+DUMMY0779,1318.79,Employed,0,0,1,Fewer than 1 per member,12,144,0,Black African,Limpopo,Non-metro urban,6,1,0,0,Yes
+DUMMY0780,1837.35,Unemployed,0,0,0,Fewer than 1 per member,9,81,1,Black African,Eastern Cape,Non-metro urban,5,0,0,0,Yes
+DUMMY0781,1421.08,Employed,1,0,0,Fewer than 1 per member,-9,81,0,Black African,North West,Traditional,6,2,0,0,No
+DUMMY0782,1132.05,Employed,0,0,0,Fewer than 1 per member,-22,484,0,Black African,Eastern Cape,Traditional,5,3,0,0,Yes
+DUMMY0783,1367.11,Employed,1,1,0,Fewer than 1 per member,24,576,1,Black African,Mpumalanga,Traditional,4,2,0,2,No
+DUMMY0784,570.15,Unemployed,1,1,0,1 or more per member,-8,64,0,Black African,Gauteng,Metro urban,5,1,1,0,Yes
+DUMMY0785,1246.1,Employed,1,1,0,Fewer than 1 per member,-9,81,0,Black African,Gauteng,Metro urban,3,1,0,0,Yes
+DUMMY0786,868.83,Unemployed,0,1,0,Fewer than 1 per member,-19,361,1,Black African,Gauteng,Non-metro urban,1,0,1,0,No other working-age member
+DUMMY0787,860.66,Employed,1,1,0,Fewer than 1 per member,14,196,0,Coloured,Gauteng,Farms,3,1,0,0,No
+DUMMY0788,1044.23,Employed,0,1,1,Fewer than 1 per member,-5,25,1,Black African,Gauteng,Non-metro urban,3,0,1,0,No
+DUMMY0789,1554.34,Employed,1,1,0,Fewer than 1 per member,-3,9,1,Black African,Western Cape,Metro urban,3,0,0,0,Yes
+DUMMY0790,655.63,Employed,1,1,0,Fewer than 1 per member,4,16,1,Black African,Western Cape,Metro urban,4,0,0,0,Yes
+DUMMY0791,1992.58,Unemployed,1,1,0,Fewer than 1 per member,-12,144,1,Black African,Gauteng,Metro urban,6,2,0,2,Yes
+DUMMY0792,713.89,Employed,1,0,0,1 or more per member,-7,49,0,Black African,Western Cape,Non-metro urban,4,0,1,0,No
+DUMMY0793,1055.88,Employed,0,1,0,1 or more per member,8,64,0,Black African,Northern Cape,Metro urban,8,1,0,0,No
+DUMMY0794,1519.92,Employed,0,1,0,Fewer than 1 per member,-10,100,0,Indian/Asian,KwaZulu-Natal,Metro urban,4,1,0,0,No
+DUMMY0795,1643.86,Unemployed,0,1,0,1 or more per member,0,0,0,Black African,Gauteng,Metro urban,6,1,0,0,No
+DUMMY0796,492.47,Unemployed,1,1,1,Fewer than 1 per member,11,121,0,Black African,KwaZulu-Natal,Metro urban,3,1,0,0,Yes
+DUMMY0797,1393.75,Employed,0,1,0,1 or more per member,21,441,1,Black African,Eastern Cape,Metro urban,5,2,0,2,No
+DUMMY0798,830.42,Employed,1,1,0,None,8,64,1,Black African,Gauteng,Metro urban,4,0,1,0,No
+DUMMY0799,1841.65,Unemployed,1,1,0,Fewer than 1 per member,-14,196,1,Black African,Gauteng,Non-metro urban,8,0,0,0,Yes
+DUMMY0800,1742.8,Employed,1,1,0,Fewer than 1 per member,-2,4,1,Black African,Gauteng,Non-metro urban,4,1,1,1,Yes
+DUMMY0801,1442.18,Unemployed,1,1,0,Fewer than 1 per member,-21,441,1,Black African,Gauteng,Non-metro urban,3,0,1,0,Yes
+DUMMY0802,1860.04,Employed,1,1,0,Fewer than 1 per member,4,16,1,Black African,Gauteng,Non-metro urban,5,2,1,2,Yes
+DUMMY0803,1022.86,Unemployed,0,1,0,Fewer than 1 per member,7,49,1,Black African,Eastern Cape,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0804,744.25,Unemployed,0,0,0,None,-17,289,0,Black African,Gauteng,Metro urban,4,2,0,0,Yes
+DUMMY0805,1011.4,Unemployed,1,1,1,Fewer than 1 per member,-15,225,1,Black African,Limpopo,Traditional,1,0,0,0,No other working-age member
+DUMMY0806,1393.49,Employed,1,0,0,1 or more per member,22,484,1,Black African,KwaZulu-Natal,Metro urban,2,1,0,1,No other working-age member
+DUMMY0807,1689.71,Employed,0,0,0,1 or more per member,-2,4,1,Black African,Gauteng,Metro urban,3,0,0,0,No
+DUMMY0808,1713.23,Employed,0,1,1,1 or more per member,-16,256,1,Black African,Gauteng,Traditional,5,1,0,1,No
+DUMMY0809,1274.09,Employed,1,1,0,1 or more per member,-8,64,1,Coloured,Mpumalanga,Metro urban,3,0,0,0,Yes
+DUMMY0810,1264.65,Employed,1,1,0,1 or more per member,-22,484,1,Indian/Asian,KwaZulu-Natal,Traditional,2,1,0,1,No other working-age member
+DUMMY0811,1773.77,Employed,0,1,0,Fewer than 1 per member,-14,196,1,Black African,Western Cape,Traditional,3,1,0,1,No
+DUMMY0812,1907.62,Unemployed,1,1,1,Fewer than 1 per member,-23,529,1,Black African,KwaZulu-Natal,Metro urban,2,1,1,1,No other working-age member
+DUMMY0813,549.03,Unemployed,0,0,0,None,21,441,1,Coloured,Limpopo,Traditional,3,2,1,2,No other working-age member
+DUMMY0814,1678.52,Employed,0,1,1,Fewer than 1 per member,5,25,0,Black African,Eastern Cape,Metro urban,3,1,0,0,Yes
+DUMMY0815,1781.41,Employed,1,1,0,Fewer than 1 per member,23,529,1,Black African,Gauteng,Metro urban,3,2,0,2,No other working-age member
+DUMMY0816,1952.9,Unemployed,0,1,0,Fewer than 1 per member,-20,400,1,Black African,Gauteng,Non-metro urban,4,0,0,0,Yes
+DUMMY0817,1912.13,Employed,0,1,0,Fewer than 1 per member,0,0,1,Black African,Mpumalanga,Metro urban,2,1,0,1,No other working-age member
+DUMMY0818,1943.55,Employed,1,1,0,Fewer than 1 per member,-9,81,0,Black African,Gauteng,Non-metro urban,4,0,0,0,No
+DUMMY0819,1441.1,Employed,0,0,0,1 or more per member,-6,36,1,Black African,Eastern Cape,Traditional,6,2,0,2,Yes
+DUMMY0820,1101.45,Unemployed,1,1,1,Fewer than 1 per member,13,169,0,Black African,Eastern Cape,Metro urban,4,1,1,0,Yes
+DUMMY0821,1472.78,Employed,1,1,0,1 or more per member,14,196,0,Black African,Gauteng,Metro urban,3,0,0,0,No
+DUMMY0822,640.19,Unemployed,1,1,0,Fewer than 1 per member,-13,169,0,Black African,Mpumalanga,Metro urban,2,0,0,0,Yes
+DUMMY0823,1984.37,Employed,0,1,0,Fewer than 1 per member,-11,121,0,Black African,Free State,Metro urban,3,0,0,0,Yes
+DUMMY0824,621.19,Unemployed,1,0,0,Fewer than 1 per member,1,1,1,Black African,Gauteng,Traditional,3,2,0,2,No other working-age member
+DUMMY0825,1889.82,Employed,1,1,0,1 or more per member,11,121,1,Black African,Gauteng,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY0826,1786.28,Employed,0,1,0,Fewer than 1 per member,18,324,1,Black African,Western Cape,Traditional,2,1,0,1,No other working-age member
+DUMMY0827,588.29,Employed,0,1,0,Fewer than 1 per member,-22,484,1,Black African,Gauteng,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0828,1781.6,Employed,0,1,1,1 or more per member,-13,169,0,Black African,Gauteng,Metro urban,7,5,0,0,Yes
+DUMMY0829,1598.44,Unemployed,1,1,1,None,-5,25,0,Black African,Gauteng,Non-metro urban,4,0,0,0,No
+DUMMY0830,899.49,Employed,0,1,0,Fewer than 1 per member,-10,100,0,Black African,Eastern Cape,Traditional,9,5,0,0,Yes
+DUMMY0831,1373.26,Unemployed,1,1,0,None,-1,1,1,Black African,Eastern Cape,Non-metro urban,5,0,0,0,No
+DUMMY0832,1041.27,Unemployed,0,1,1,1 or more per member,-3,9,0,Black African,KwaZulu-Natal,Metro urban,4,3,0,0,No other working-age member
+DUMMY0833,1191.89,Employed,0,1,1,Fewer than 1 per member,-20,400,0,Black African,Eastern Cape,Non-metro urban,2,0,0,0,Yes
+DUMMY0834,404.84,Employed,0,1,0,Fewer than 1 per member,5,25,1,Coloured,KwaZulu-Natal,Non-metro urban,6,1,0,1,No
+DUMMY0835,1641.86,Unemployed,1,1,0,Fewer than 1 per member,-16,256,1,Black African,KwaZulu-Natal,Metro urban,6,3,0,3,Yes
+DUMMY0836,1797.26,Employed,0,1,0,1 or more per member,24,576,1,Coloured,Limpopo,Metro urban,4,1,0,1,Yes
+DUMMY0837,766.56,Unemployed,1,0,0,Fewer than 1 per member,13,169,0,Black African,Mpumalanga,Traditional,4,0,0,0,Yes
+DUMMY0838,1221.94,Unemployed,0,1,1,1 or more per member,-17,289,0,Coloured,Gauteng,Farms,3,2,0,0,No other working-age member
+DUMMY0839,1139.33,Employed,0,1,0,1 or more per member,-4,16,0,Black African,Gauteng,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0840,1898.96,Employed,1,1,0,None,5,25,0,Coloured,Gauteng,Metro urban,6,0,0,0,Yes
+DUMMY0841,1150.54,Employed,1,1,1,None,-16,256,1,Black African,Gauteng,Non-metro urban,6,1,0,1,Yes
+DUMMY0842,1880.5,Unemployed,1,0,0,Fewer than 1 per member,-22,484,0,Black African,Gauteng,Traditional,2,1,0,0,No other working-age member
+DUMMY0843,1569.27,Employed,0,1,0,1 or more per member,5,25,0,Black African,Gauteng,Metro urban,7,3,0,0,No
+DUMMY0844,1250.35,Unemployed,1,1,0,Fewer than 1 per member,-23,529,1,Black African,Gauteng,Metro urban,3,2,0,2,No other working-age member
+DUMMY0845,1387.04,Employed,1,1,1,Fewer than 1 per member,24,576,0,Coloured,Mpumalanga,Traditional,2,0,0,0,Yes
+DUMMY0846,793.56,Employed,0,1,0,Fewer than 1 per member,9,81,1,Black African,Gauteng,Metro urban,5,2,0,2,Yes
+DUMMY0847,1839.84,Employed,0,0,1,Fewer than 1 per member,-15,225,0,Black African,KwaZulu-Natal,Non-metro urban,2,0,0,0,No
+DUMMY0848,628.48,Employed,1,1,0,Fewer than 1 per member,7,49,0,Coloured,KwaZulu-Natal,Metro urban,2,1,0,0,No other working-age member
+DUMMY0849,1904.95,Unemployed,0,1,0,Fewer than 1 per member,-4,16,0,Black African,Gauteng,Metro urban,3,0,0,0,No
+DUMMY0850,565.56,Employed,1,0,0,Fewer than 1 per member,-8,64,1,Black African,North West,Traditional,3,1,0,1,Yes
+DUMMY0851,1814.22,Unemployed,1,1,0,Fewer than 1 per member,-24,576,0,Black African,KwaZulu-Natal,Traditional,4,0,0,0,Yes
+DUMMY0852,1985.86,Employed,0,1,1,Fewer than 1 per member,-12,144,1,Black African,Gauteng,Metro urban,3,1,0,1,Yes
+DUMMY0853,1973.57,Unemployed,1,1,1,1 or more per member,-14,196,1,Coloured,Limpopo,Metro urban,3,1,0,1,No
+DUMMY0854,584.46,Unemployed,1,0,0,1 or more per member,3,9,1,Black African,Gauteng,Traditional,2,1,0,1,No other working-age member
+DUMMY0855,1940.67,Employed,1,1,0,1 or more per member,-11,121,0,Black African,Gauteng,Non-metro urban,3,0,0,0,Yes
+DUMMY0856,1863.07,Employed,0,1,0,None,5,25,0,Black African,Eastern Cape,Metro urban,5,4,0,0,No other working-age member
+DUMMY0857,1714.08,Employed,1,1,0,1 or more per member,8,64,1,Black African,Limpopo,Metro urban,3,0,0,0,Yes
+DUMMY0858,1166.16,Employed,1,1,1,Fewer than 1 per member,6,36,1,Black African,Gauteng,Traditional,1,0,0,0,No other working-age member
+DUMMY0859,985.75,Unemployed,1,1,0,None,-13,169,0,Coloured,Gauteng,Metro urban,4,3,0,0,No other working-age member
+DUMMY0860,1298.22,Employed,1,0,0,1 or more per member,-4,16,0,Indian/Asian,Western Cape,Non-metro urban,4,1,0,0,No
+DUMMY0861,895.96,Employed,1,1,1,1 or more per member,-1,1,0,Black African,Free State,Traditional,4,1,0,0,Yes
+DUMMY0862,989.52,Employed,1,1,1,Fewer than 1 per member,0,0,1,Black African,North West,Metro urban,3,1,0,1,Yes
+DUMMY0863,1732.06,Unemployed,0,0,0,1 or more per member,-18,324,0,Black African,Gauteng,Metro urban,4,2,0,0,No
+DUMMY0864,1503.36,Unemployed,0,1,0,1 or more per member,-1,1,1,Black African,KwaZulu-Natal,Metro urban,4,0,0,0,No
+DUMMY0865,1511.53,Employed,0,1,0,Fewer than 1 per member,18,324,1,Black African,Limpopo,Metro urban,4,1,0,1,Yes
+DUMMY0866,979.6,Employed,1,1,0,Fewer than 1 per member,-3,9,0,Black African,Mpumalanga,Metro urban,2,1,0,0,No other working-age member
+DUMMY0867,1679.6,Employed,0,1,1,Fewer than 1 per member,2,4,1,Black African,Free State,Farms,3,0,0,0,Yes
+DUMMY0868,1913.78,Employed,1,0,0,Fewer than 1 per member,-6,36,1,Black African,Northern Cape,Metro urban,6,0,1,0,Yes
+DUMMY0869,1584.36,Employed,1,1,0,None,-20,400,1,Black African,Gauteng,Non-metro urban,4,1,0,1,Yes
+DUMMY0870,1317.7,Employed,1,1,1,None,8,64,0,Black African,Limpopo,Traditional,3,0,1,0,No
+DUMMY0871,1875.89,Unemployed,1,1,0,Fewer than 1 per member,-15,225,1,Black African,Limpopo,Traditional,6,1,0,1,Yes
+DUMMY0872,1773.35,Employed,0,1,1,Fewer than 1 per member,17,289,1,Black African,Gauteng,Traditional,3,2,0,2,No other working-age member
+DUMMY0873,1284.87,Unemployed,0,1,0,1 or more per member,-2,4,0,Black African,Gauteng,Non-metro urban,5,2,0,0,Yes
+DUMMY0874,1191.06,Unemployed,1,1,0,Fewer than 1 per member,-11,121,0,Black African,Gauteng,Metro urban,3,0,0,0,No
+DUMMY0875,1972.84,Unemployed,1,0,0,Fewer than 1 per member,-13,169,0,Black African,KwaZulu-Natal,Metro urban,2,0,0,0,Yes
+DUMMY0876,1089.99,Employed,1,1,1,Fewer than 1 per member,8,64,1,Black African,North West,Non-metro urban,3,2,1,2,No other working-age member
+DUMMY0877,1455.8,Employed,1,0,0,Fewer than 1 per member,-12,144,0,Black African,Gauteng,Metro urban,5,1,0,0,Yes
+DUMMY0878,1071.9,Unemployed,0,1,0,Fewer than 1 per member,8,64,1,Black African,Gauteng,Metro urban,4,2,0,2,Yes
+DUMMY0879,1869.82,Employed,1,1,1,Fewer than 1 per member,20,400,0,Coloured,KwaZulu-Natal,Metro urban,2,0,0,0,Yes
+DUMMY0880,684.75,Unemployed,1,1,0,Fewer than 1 per member,-11,121,0,Black African,Mpumalanga,Non-metro urban,3,0,0,0,Yes
+DUMMY0881,946.63,Unemployed,1,1,1,None,11,121,0,Black African,Limpopo,Traditional,3,2,0,0,No other working-age member
+DUMMY0882,1437.85,Employed,1,1,0,Fewer than 1 per member,13,169,1,Black African,Gauteng,Metro urban,9,2,0,2,Yes
+DUMMY0883,1463.04,Employed,1,1,0,Fewer than 1 per member,12,144,0,Black African,Limpopo,Traditional,5,1,0,0,Yes
+DUMMY0884,923.86,Employed,1,1,1,Fewer than 1 per member,-12,144,0,Coloured,Eastern Cape,Metro urban,2,1,0,0,No other working-age member
+DUMMY0885,883.72,Employed,0,0,0,Fewer than 1 per member,-12,144,1,Coloured,Western Cape,Non-metro urban,4,2,0,2,No
+DUMMY0886,1424.82,Employed,1,1,0,1 or more per member,1,1,1,Black African,Northern Cape,Traditional,4,3,0,3,No other working-age member
+DUMMY0887,496.77,Employed,1,1,1,Fewer than 1 per member,-11,121,1,Black African,Gauteng,Metro urban,5,1,0,1,Yes
+DUMMY0888,1334.31,Employed,1,1,1,Fewer than 1 per member,-7,49,0,Black African,Western Cape,Metro urban,6,1,0,0,Yes
+DUMMY0889,575.41,Employed,0,1,1,None,8,64,1,Black African,Eastern Cape,Non-metro urban,3,1,0,1,Yes
+DUMMY0890,1483.99,Unemployed,0,1,0,Fewer than 1 per member,-15,225,0,Black African,Gauteng,Non-metro urban,6,2,0,0,Yes
+DUMMY0891,1970.55,Unemployed,0,0,0,Fewer than 1 per member,-11,121,1,Black African,Eastern Cape,Traditional,3,2,0,2,No other working-age member
+DUMMY0892,1688.93,Employed,1,1,0,Fewer than 1 per member,-15,225,0,Black African,Limpopo,Traditional,6,2,1,0,Yes
+DUMMY0893,662.52,Unemployed,0,1,1,Fewer than 1 per member,16,256,1,Black African,Free State,Metro urban,1,0,0,0,No other working-age member
+DUMMY0894,935.53,Unemployed,0,1,0,Fewer than 1 per member,-2,4,0,Black African,KwaZulu-Natal,Traditional,4,1,0,0,Yes
+DUMMY0895,444.6,Employed,0,0,0,Fewer than 1 per member,3,9,0,Black African,Gauteng,Metro urban,4,1,1,0,No
+DUMMY0896,1121.26,Employed,1,0,0,Fewer than 1 per member,10,100,1,Black African,Gauteng,Non-metro urban,1,0,1,0,No other working-age member
+DUMMY0897,1015.98,Employed,1,1,0,Fewer than 1 per member,8,64,0,Black African,Gauteng,Non-metro urban,4,0,0,0,Yes
+DUMMY0898,1871.12,Employed,1,1,0,1 or more per member,2,4,1,Black African,North West,Traditional,2,0,1,0,No
+DUMMY0899,758.52,Unemployed,1,1,1,Fewer than 1 per member,-14,196,1,Black African,Western Cape,Metro urban,6,1,0,1,Yes
+DUMMY0900,1134.46,Employed,0,1,0,Fewer than 1 per member,1,1,0,Coloured,Gauteng,Non-metro urban,3,2,0,0,No other working-age member
+DUMMY0901,1592.65,Employed,1,1,0,1 or more per member,12,144,0,White,Gauteng,Traditional,8,0,0,0,No
+DUMMY0902,1984.95,Employed,0,1,0,Fewer than 1 per member,8,64,1,Black African,Western Cape,Metro urban,2,1,0,1,No other working-age member
+DUMMY0903,1105.41,Employed,1,1,1,1 or more per member,-22,484,1,Black African,Limpopo,Non-metro urban,4,2,0,2,No
+DUMMY0904,1837.41,Employed,1,1,0,1 or more per member,-14,196,1,Black African,Limpopo,Metro urban,1,0,0,0,No other working-age member
+DUMMY0905,1315.61,Employed,1,0,0,Fewer than 1 per member,12,144,0,Black African,Western Cape,Metro urban,2,0,0,0,Yes
+DUMMY0906,646.38,Employed,1,1,0,Fewer than 1 per member,-15,225,0,Black African,Eastern Cape,Traditional,2,1,0,0,No other working-age member
+DUMMY0907,1023.11,Employed,1,1,1,Fewer than 1 per member,-5,25,0,Black African,Gauteng,Metro urban,4,1,0,0,No
+DUMMY0908,1550.36,Unemployed,0,1,0,Fewer than 1 per member,-16,256,0,Black African,Mpumalanga,Traditional,1,0,0,0,No other working-age member
+DUMMY0909,1222.36,Employed,0,1,0,Fewer than 1 per member,21,441,1,Black African,Gauteng,Traditional,2,0,0,0,Yes
+DUMMY0910,1804.62,Employed,1,1,0,Fewer than 1 per member,-5,25,0,Black African,Western Cape,Traditional,5,3,0,0,Yes
+DUMMY0911,1562.99,Unemployed,0,1,1,Fewer than 1 per member,13,169,0,Black African,Western Cape,Non-metro urban,4,1,0,0,No
+DUMMY0912,1595.8,Employed,1,1,0,Fewer than 1 per member,-11,121,0,Black African,Eastern Cape,Metro urban,4,0,0,0,Yes
+DUMMY0913,1713.45,Employed,1,1,0,1 or more per member,5,25,0,Black African,North West,Metro urban,3,1,0,0,Yes
+DUMMY0914,609.71,Unemployed,0,1,0,Fewer than 1 per member,-14,196,1,Black African,Gauteng,Traditional,2,1,0,1,No other working-age member
+DUMMY0915,780.23,Unemployed,0,1,0,Fewer than 1 per member,-21,441,1,Black African,Gauteng,Metro urban,5,1,0,1,Yes
+DUMMY0916,1238.93,Employed,1,1,0,1 or more per member,16,256,0,Black African,Mpumalanga,Metro urban,4,1,0,0,Yes
+DUMMY0917,1961.05,Employed,1,1,0,Fewer than 1 per member,10,100,1,White,Western Cape,Non-metro urban,3,0,0,0,Yes
+DUMMY0918,645.39,Employed,0,1,0,Fewer than 1 per member,-8,64,1,Black African,Gauteng,Traditional,3,1,1,1,Yes
+DUMMY0919,1797.63,Employed,0,1,0,1 or more per member,20,400,0,Black African,Gauteng,Metro urban,4,0,0,0,No
+DUMMY0920,516.87,Employed,0,1,0,Fewer than 1 per member,-2,4,1,Black African,KwaZulu-Natal,Non-metro urban,3,1,0,1,Yes
+DUMMY0921,943.86,Employed,0,1,1,Fewer than 1 per member,14,196,1,Black African,Limpopo,Traditional,6,5,0,5,No other working-age member
+DUMMY0922,722.37,Unemployed,0,1,1,Fewer than 1 per member,-20,400,0,Black African,Mpumalanga,Metro urban,4,0,0,0,No
+DUMMY0923,739.26,Unemployed,1,1,0,Fewer than 1 per member,-25,625,1,Coloured,Northern Cape,Non-metro urban,3,0,0,0,Yes
+DUMMY0924,1485.41,Unemployed,0,1,0,Fewer than 1 per member,-17,289,0,Black African,Gauteng,Metro urban,1,0,0,0,No other working-age member
+DUMMY0925,1623.47,Unemployed,0,1,1,1 or more per member,-24,576,0,Black African,Limpopo,Metro urban,3,2,0,0,No other working-age member
+DUMMY0926,691.04,Employed,1,1,0,Fewer than 1 per member,-3,9,0,Black African,Gauteng,Farms,3,2,0,0,No other working-age member
+DUMMY0927,745.71,Employed,1,1,0,None,13,169,1,Black African,Limpopo,Traditional,5,0,1,0,Yes
+DUMMY0928,1733.39,Unemployed,1,1,0,Fewer than 1 per member,15,225,0,Black African,Gauteng,Metro urban,7,2,0,0,Yes
+DUMMY0929,606.49,Employed,1,1,0,Fewer than 1 per member,-17,289,1,Black African,Limpopo,Metro urban,1,0,0,0,No other working-age member
+DUMMY0930,1121.52,Employed,1,1,1,Fewer than 1 per member,-3,9,0,Black African,Gauteng,Non-metro urban,3,0,0,0,No
+DUMMY0931,513.36,Employed,1,1,1,1 or more per member,9,81,1,Black African,KwaZulu-Natal,Metro urban,3,2,0,2,No other working-age member
+DUMMY0932,655.5,Unemployed,1,1,0,None,3,9,0,Coloured,Western Cape,Non-metro urban,6,0,0,0,Yes
+DUMMY0933,1395.07,Employed,1,0,0,Fewer than 1 per member,-13,169,1,Black African,Gauteng,Metro urban,1,0,0,0,No other working-age member
+DUMMY0934,1766.15,Unemployed,0,0,0,1 or more per member,-9,81,0,Coloured,Limpopo,Traditional,5,0,0,0,Yes
+DUMMY0935,1624.84,Employed,0,1,0,1 or more per member,-6,36,0,Black African,North West,Traditional,2,1,0,0,No other working-age member
+DUMMY0936,975.46,Employed,1,1,0,Fewer than 1 per member,-17,289,1,Black African,Gauteng,Traditional,1,0,0,0,No other working-age member
+DUMMY0937,804.36,Unemployed,0,1,1,Fewer than 1 per member,21,441,0,Black African,Gauteng,Metro urban,8,3,0,0,Yes
+DUMMY0938,1860.48,Employed,1,1,1,Fewer than 1 per member,22,484,1,Black African,Limpopo,Farms,4,1,0,1,Yes
+DUMMY0939,1861.39,Employed,1,1,0,Fewer than 1 per member,20,400,1,Black African,Gauteng,Traditional,6,2,0,2,Yes
+DUMMY0940,817.19,Employed,1,1,0,Fewer than 1 per member,-13,169,1,Black African,Gauteng,Traditional,4,2,0,2,Yes
+DUMMY0941,464.14,Unemployed,0,0,0,Fewer than 1 per member,-5,25,1,Black African,Western Cape,Non-metro urban,6,1,0,1,No
+DUMMY0942,691.98,Unemployed,0,1,0,None,-21,441,0,Black African,Mpumalanga,Non-metro urban,4,1,0,0,No
+DUMMY0943,744.03,Employed,0,1,0,1 or more per member,-8,64,0,Black African,Northern Cape,Traditional,6,0,0,0,Yes
+DUMMY0944,1203.73,Unemployed,0,1,0,Fewer than 1 per member,18,324,1,Black African,Mpumalanga,Traditional,5,0,0,0,Yes
+DUMMY0945,1199.91,Unemployed,0,1,0,1 or more per member,-8,64,1,Black African,North West,Metro urban,5,1,0,1,No
+DUMMY0946,926.15,Employed,1,0,0,1 or more per member,-20,400,0,White,Gauteng,Metro urban,2,1,1,0,No other working-age member
+DUMMY0947,1325.33,Employed,0,1,0,1 or more per member,-7,49,0,Black African,North West,Metro urban,1,0,0,0,No other working-age member
+DUMMY0948,429.85,Unemployed,1,1,1,Fewer than 1 per member,-10,100,0,Black African,Mpumalanga,Metro urban,3,1,0,0,No
+DUMMY0949,559.97,Employed,1,1,0,Fewer than 1 per member,-15,225,1,White,Limpopo,Non-metro urban,5,1,0,1,Yes
+DUMMY0950,725.6,Employed,1,1,0,Fewer than 1 per member,1,1,1,Black African,Western Cape,Non-metro urban,6,2,0,2,Yes
+DUMMY0951,1388.89,Employed,0,1,0,Fewer than 1 per member,-18,324,1,Black African,Gauteng,Metro urban,4,3,0,3,No other working-age member
+DUMMY0952,607.17,Employed,1,1,1,1 or more per member,-9,81,0,Black African,Limpopo,Metro urban,2,1,0,0,No other working-age member
+DUMMY0953,910.95,Unemployed,0,0,0,Fewer than 1 per member,2,4,0,Black African,KwaZulu-Natal,Traditional,2,1,1,0,No other working-age member
+DUMMY0954,569.16,Employed,1,1,0,1 or more per member,-15,225,0,Black African,Mpumalanga,Non-metro urban,5,0,0,0,Yes
+DUMMY0955,802.88,Employed,1,1,0,None,22,484,1,Black African,Gauteng,Traditional,5,0,0,0,Yes
+DUMMY0956,425.1,Employed,0,1,1,Fewer than 1 per member,-14,196,0,Black African,Free State,Traditional,3,2,0,0,No other working-age member
+DUMMY0957,482.36,Unemployed,1,1,0,Fewer than 1 per member,-10,100,0,Black African,Eastern Cape,Traditional,4,2,0,0,Yes
+DUMMY0958,1162.74,Unemployed,1,1,0,Fewer than 1 per member,23,529,1,Black African,Gauteng,Traditional,2,1,1,1,No other working-age member
+DUMMY0959,1023.07,Employed,0,1,0,Fewer than 1 per member,-11,121,0,Black African,Mpumalanga,Farms,3,1,0,0,Yes
+DUMMY0960,1791.82,Employed,0,1,1,Fewer than 1 per member,-7,49,0,White,Western Cape,Non-metro urban,3,1,0,0,Yes
+DUMMY0961,1041.05,Employed,1,1,1,Fewer than 1 per member,7,49,1,Black African,Gauteng,Metro urban,5,0,0,0,Yes
+DUMMY0962,473.85,Employed,0,1,0,Fewer than 1 per member,14,196,1,Black African,Limpopo,Metro urban,4,2,0,2,Yes
+DUMMY0963,1760.38,Unemployed,1,1,1,None,-21,441,0,Black African,Eastern Cape,Metro urban,4,0,0,0,Yes
+DUMMY0964,1057.95,Unemployed,0,0,0,Fewer than 1 per member,-9,81,0,Black African,Gauteng,Metro urban,3,0,0,0,Yes
+DUMMY0965,433.11,Employed,1,0,0,1 or more per member,1,1,0,Black African,KwaZulu-Natal,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY0966,899.24,Unemployed,1,1,0,1 or more per member,-17,289,0,Black African,Gauteng,Traditional,2,1,1,0,No other working-age member
+DUMMY0967,1959.95,Employed,1,0,0,None,-9,81,1,Black African,KwaZulu-Natal,Traditional,3,1,1,1,No
+DUMMY0968,853.95,Unemployed,0,1,0,None,-12,144,0,Black African,KwaZulu-Natal,Metro urban,6,1,0,0,Yes
+DUMMY0969,961.51,Employed,0,1,1,Fewer than 1 per member,21,441,0,Black African,Gauteng,Metro urban,2,0,0,0,Yes
+DUMMY0970,1387.6,Employed,1,1,0,Fewer than 1 per member,2,4,1,Black African,KwaZulu-Natal,Metro urban,3,0,0,0,No
+DUMMY0971,1762.08,Employed,0,0,0,None,18,324,0,Indian/Asian,Mpumalanga,Farms,6,1,0,0,No
+DUMMY0972,1936.67,Employed,0,1,0,Fewer than 1 per member,9,81,1,Black African,Gauteng,Traditional,4,3,1,3,No other working-age member
+DUMMY0973,1330.79,Unemployed,0,1,0,1 or more per member,-24,576,0,Black African,KwaZulu-Natal,Traditional,7,0,0,0,No
+DUMMY0974,1810.67,Employed,0,1,0,Fewer than 1 per member,18,324,0,Black African,KwaZulu-Natal,Metro urban,5,0,0,0,Yes
+DUMMY0975,1659.82,Employed,0,1,1,1 or more per member,-18,324,0,Black African,KwaZulu-Natal,Traditional,2,1,0,0,No other working-age member
+DUMMY0976,1003.85,Employed,1,1,0,Fewer than 1 per member,-8,64,1,White,Gauteng,Traditional,5,0,0,0,Yes
+DUMMY0977,1408.27,Employed,1,0,0,Fewer than 1 per member,-11,121,1,White,Gauteng,Non-metro urban,3,1,0,1,Yes
+DUMMY0978,1786.07,Unemployed,1,1,1,Fewer than 1 per member,8,64,1,Black African,KwaZulu-Natal,Metro urban,3,0,0,0,Yes
+DUMMY0979,899.66,Employed,1,1,1,Fewer than 1 per member,-8,64,0,Coloured,Gauteng,Traditional,3,1,0,0,No
+DUMMY0980,1993,Unemployed,0,1,0,None,-8,64,1,Black African,Limpopo,Traditional,4,1,0,1,No
+DUMMY0981,849.02,Unemployed,1,1,0,None,24,576,0,Black African,KwaZulu-Natal,Metro urban,5,0,0,0,Yes
+DUMMY0982,1625.12,Employed,0,1,0,1 or more per member,1,1,1,Black African,Limpopo,Non-metro urban,4,0,0,0,Yes
+DUMMY0983,547.75,Employed,1,1,1,Fewer than 1 per member,5,25,0,Black African,Gauteng,Metro urban,3,1,0,0,No
+DUMMY0984,744.95,Unemployed,1,1,0,1 or more per member,-15,225,0,Coloured,Limpopo,Metro urban,1,0,0,0,No other working-age member
+DUMMY0985,1459.17,Unemployed,0,1,0,1 or more per member,-9,81,0,Black African,KwaZulu-Natal,Metro urban,4,2,0,0,Yes
+DUMMY0986,1614.82,Unemployed,1,0,0,1 or more per member,-12,144,1,Coloured,North West,Non-metro urban,4,1,1,1,Yes
+DUMMY0987,542.56,Employed,1,0,0,1 or more per member,20,400,1,Black African,KwaZulu-Natal,Metro urban,4,0,0,0,Yes
+DUMMY0988,1234.76,Employed,0,1,0,1 or more per member,7,49,1,Coloured,KwaZulu-Natal,Metro urban,2,1,0,1,No other working-age member
+DUMMY0989,1122.82,Employed,0,1,0,Fewer than 1 per member,-9,81,1,Black African,Gauteng,Traditional,1,0,0,0,No other working-age member
+DUMMY0990,984.6,Employed,1,1,1,Fewer than 1 per member,-3,9,0,Black African,Gauteng,Traditional,4,0,0,0,Yes
+DUMMY0991,828.97,Employed,1,1,0,None,3,9,0,Black African,Gauteng,Traditional,2,1,0,0,No other working-age member
+DUMMY0992,1439.34,Employed,1,1,1,Fewer than 1 per member,5,25,1,Coloured,Mpumalanga,Non-metro urban,4,3,0,3,No other working-age member
+DUMMY0993,1279.72,Employed,1,1,0,1 or more per member,12,144,1,Black African,KwaZulu-Natal,Non-metro urban,2,0,0,0,Yes
+DUMMY0994,407.26,Unemployed,1,1,1,None,-13,169,0,Black African,Eastern Cape,Traditional,4,1,0,0,Yes
+DUMMY0995,1793.8,Employed,1,1,0,Fewer than 1 per member,-9,81,0,Black African,Eastern Cape,Non-metro urban,2,1,0,0,No other working-age member
+DUMMY0996,1879.63,Employed,0,1,0,Fewer than 1 per member,0,0,0,Coloured,Western Cape,Traditional,4,3,0,0,No other working-age member
+DUMMY0997,472.07,Employed,0,1,0,1 or more per member,-1,1,0,Black African,Gauteng,Metro urban,3,0,0,0,No
+DUMMY0998,1548.58,Employed,1,1,1,Fewer than 1 per member,11,121,0,Black African,North West,Non-metro urban,3,1,1,0,No
+DUMMY0999,1363.15,Unemployed,0,1,0,1 or more per member,-7,49,0,Black African,KwaZulu-Natal,Traditional,2,1,1,0,No other working-age member
+DUMMY1000,1409.76,Employed,1,0,0,Fewer than 1 per member,-8,64,0,Black African,KwaZulu-Natal,Traditional,5,0,0,0,Yes
+DUMMY1001,925.57,Employed,1,1,0,1 or more per member,-17,289,0,Coloured,Gauteng,Metro urban,5,1,1,0,Yes
+DUMMY1002,1772.03,Employed,1,0,0,Fewer than 1 per member,4,16,0,Black African,Gauteng,Non-metro urban,6,0,0,0,No
+DUMMY1003,1461.18,Employed,0,1,0,1 or more per member,6,36,0,Black African,Gauteng,Traditional,3,0,0,0,No
+DUMMY1004,750.36,Unemployed,1,1,0,Fewer than 1 per member,-5,25,0,Black African,Mpumalanga,Traditional,5,2,0,0,No
+DUMMY1005,622.17,Employed,0,1,1,Fewer than 1 per member,-1,1,0,Black African,Western Cape,Metro urban,3,1,0,0,Yes
+DUMMY1006,749.46,Employed,1,1,0,Fewer than 1 per member,23,529,0,Black African,Eastern Cape,Metro urban,3,1,0,0,Yes
+DUMMY1007,528.04,Unemployed,0,1,0,Fewer than 1 per member,-16,256,0,Black African,Western Cape,Metro urban,4,2,0,0,Yes
+DUMMY1008,816.65,Unemployed,0,0,1,1 or more per member,1,1,0,Black African,KwaZulu-Natal,Metro urban,5,1,0,0,No
+DUMMY1009,1385.13,Employed,0,1,0,Fewer than 1 per member,3,9,0,Coloured,Western Cape,Traditional,3,1,0,0,Yes
+DUMMY1010,1102.94,Employed,0,1,0,Fewer than 1 per member,-4,16,0,Black African,Eastern Cape,Traditional,4,1,0,0,Yes
+DUMMY1011,1357.62,Employed,1,1,1,Fewer than 1 per member,3,9,0,Black African,Western Cape,Non-metro urban,5,1,0,0,Yes
+DUMMY1012,792.31,Unemployed,1,1,0,Fewer than 1 per member,-17,289,0,Black African,Free State,Non-metro urban,4,2,0,0,Yes
+DUMMY1013,1534.29,Employed,0,1,0,Fewer than 1 per member,2,4,0,Black African,Limpopo,Traditional,6,1,0,0,Yes
+DUMMY1014,1663.23,Employed,1,1,0,None,-1,1,0,Black African,North West,Farms,2,1,0,0,No other working-age member
+DUMMY1015,616.84,Unemployed,0,1,0,1 or more per member,-6,36,1,Black African,Eastern Cape,Traditional,3,0,0,0,No
+DUMMY1016,1374.22,Employed,0,1,0,1 or more per member,13,169,0,Coloured,Eastern Cape,Traditional,3,2,0,0,No other working-age member
+DUMMY1017,446.92,Employed,0,1,0,Fewer than 1 per member,-2,4,0,Black African,Gauteng,Metro urban,2,0,0,0,Yes
+DUMMY1018,1163.96,Employed,1,1,0,None,-16,256,0,Coloured,Eastern Cape,Metro urban,2,1,0,0,No other working-age member
+DUMMY1019,1896.43,Unemployed,0,1,1,Fewer than 1 per member,-22,484,0,Black African,Gauteng,Metro urban,7,1,0,0,Yes
+DUMMY1020,1025.53,Employed,1,1,0,Fewer than 1 per member,-11,121,0,Coloured,KwaZulu-Natal,Non-metro urban,4,1,0,0,No
+DUMMY1021,1049.76,Employed,0,1,1,Fewer than 1 per member,14,196,1,White,Mpumalanga,Non-metro urban,3,1,0,1,Yes
+DUMMY1022,864.53,Employed,0,1,0,Fewer than 1 per member,-15,225,0,Black African,Western Cape,Non-metro urban,2,1,0,0,No other working-age member
+DUMMY1023,1185.45,Employed,1,1,1,1 or more per member,24,576,0,Black African,Limpopo,Non-metro urban,4,1,0,0,No
+DUMMY1024,945.91,Employed,1,1,1,Fewer than 1 per member,13,169,0,White,Free State,Traditional,2,0,1,0,Yes
+DUMMY1025,1184.98,Employed,0,1,0,Fewer than 1 per member,-13,169,0,Black African,Free State,Non-metro urban,5,3,1,0,No
+DUMMY1026,1705.65,Employed,1,0,0,1 or more per member,7,49,0,Black African,Eastern Cape,Traditional,4,2,1,0,No
+DUMMY1027,912.16,Unemployed,1,1,0,Fewer than 1 per member,-3,9,1,Black African,Gauteng,Non-metro urban,4,1,0,1,Yes
+DUMMY1028,1113.24,Employed,1,1,0,Fewer than 1 per member,13,169,0,Black African,KwaZulu-Natal,Non-metro urban,7,1,0,0,Yes
+DUMMY1029,507.84,Unemployed,1,1,0,Fewer than 1 per member,-23,529,0,Black African,Eastern Cape,Metro urban,2,0,1,0,Yes
+DUMMY1030,1182.56,Employed,1,0,0,Fewer than 1 per member,14,196,1,Black African,Free State,Non-metro urban,3,1,0,1,Yes
+DUMMY1031,1273.74,Employed,0,0,0,Fewer than 1 per member,-6,36,1,Black African,KwaZulu-Natal,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY1032,846.14,Unemployed,1,1,0,Fewer than 1 per member,-1,1,0,Black African,Eastern Cape,Non-metro urban,3,0,0,0,No
+DUMMY1033,748.75,Employed,1,1,0,1 or more per member,-7,49,1,Coloured,Gauteng,Traditional,2,0,0,0,Yes
+DUMMY1034,488.77,Employed,0,1,0,Fewer than 1 per member,-6,36,1,Coloured,KwaZulu-Natal,Metro urban,5,1,0,1,Yes
+DUMMY1035,882.22,Employed,1,1,0,Fewer than 1 per member,13,169,1,Black African,Western Cape,Metro urban,2,1,0,1,No other working-age member
+DUMMY1036,863.04,Employed,1,0,0,1 or more per member,-19,361,1,Black African,Free State,Metro urban,1,0,0,0,No other working-age member
+DUMMY1037,1887.39,Unemployed,0,1,0,Fewer than 1 per member,1,1,0,Black African,Northern Cape,Metro urban,7,1,0,0,Yes
+DUMMY1038,1711.83,Employed,0,1,0,Fewer than 1 per member,-5,25,1,Black African,North West,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY1039,1243.18,Unemployed,1,1,0,Fewer than 1 per member,-8,64,0,Black African,Free State,Metro urban,3,1,0,0,Yes
+DUMMY1040,1189.45,Employed,0,1,0,Fewer than 1 per member,3,9,1,White,Eastern Cape,Farms,4,1,0,1,Yes
+DUMMY1041,545.96,Unemployed,1,1,0,Fewer than 1 per member,-8,64,0,Black African,Limpopo,Metro urban,3,0,0,0,Yes
+DUMMY1042,784.7,Employed,0,1,1,Fewer than 1 per member,-10,100,0,Black African,Limpopo,Metro urban,1,0,0,0,No other working-age member
+DUMMY1043,723.58,Unemployed,1,1,0,1 or more per member,-25,625,0,Black African,Gauteng,Metro urban,4,1,0,0,Yes
+DUMMY1044,1482.07,Employed,1,1,0,1 or more per member,-11,121,1,Black African,Limpopo,Traditional,2,1,1,1,No other working-age member
+DUMMY1045,973.69,Employed,1,1,0,Fewer than 1 per member,-11,121,1,Black African,Free State,Metro urban,2,1,0,1,No other working-age member
+DUMMY1046,491.09,Employed,1,1,0,Fewer than 1 per member,10,100,0,Black African,Limpopo,Non-metro urban,3,0,0,0,No
+DUMMY1047,1949.76,Employed,0,1,0,Fewer than 1 per member,-5,25,1,Black African,Limpopo,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY1048,637.65,Employed,0,1,1,Fewer than 1 per member,4,16,1,Black African,Western Cape,Metro urban,3,0,0,0,Yes
+DUMMY1049,1403.47,Employed,1,1,0,Fewer than 1 per member,-10,100,0,Black African,KwaZulu-Natal,Metro urban,3,1,0,0,No
+DUMMY1050,1207.11,Employed,1,1,0,1 or more per member,-19,361,1,Black African,Limpopo,Metro urban,1,0,1,0,No other working-age member
+DUMMY1051,1258.68,Employed,0,1,1,1 or more per member,7,49,0,Black African,Western Cape,Non-metro urban,2,1,0,0,No other working-age member
+DUMMY1052,663.32,Unemployed,1,1,0,Fewer than 1 per member,-21,441,1,Coloured,Gauteng,Traditional,2,1,1,1,No other working-age member
+DUMMY1053,1229.83,Employed,1,0,0,Fewer than 1 per member,-13,169,0,Black African,Gauteng,Non-metro urban,2,0,0,0,Yes
+DUMMY1054,1559.88,Unemployed,0,1,0,Fewer than 1 per member,-8,64,1,Black African,Gauteng,Farms,4,0,0,0,No
+DUMMY1055,1142.03,Employed,0,1,0,1 or more per member,6,36,1,Black African,Free State,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY1056,531.65,Employed,1,1,0,Fewer than 1 per member,-10,100,1,Black African,Eastern Cape,Non-metro urban,2,0,0,0,No
+DUMMY1057,781.63,Employed,1,1,0,1 or more per member,-7,49,0,Black African,Free State,Metro urban,1,0,0,0,No other working-age member
+DUMMY1058,1864.31,Unemployed,1,0,0,1 or more per member,-11,121,1,Black African,Limpopo,Non-metro urban,3,1,1,1,No
+DUMMY1059,998.01,Unemployed,1,1,0,1 or more per member,19,361,0,Black African,Eastern Cape,Metro urban,5,0,1,0,No
+DUMMY1060,1593.95,Employed,1,0,0,1 or more per member,23,529,1,Indian/Asian,Gauteng,Non-metro urban,5,1,0,1,Yes
+DUMMY1061,1634.61,Employed,1,1,1,Fewer than 1 per member,12,144,1,Black African,Eastern Cape,Metro urban,3,0,0,0,Yes
+DUMMY1062,516.28,Unemployed,1,1,1,Fewer than 1 per member,0,0,1,Black African,Eastern Cape,Metro urban,3,1,0,1,Yes
+DUMMY1063,798.45,Employed,0,1,0,1 or more per member,-7,49,1,Black African,Northern Cape,Metro urban,4,1,0,1,No
+DUMMY1064,1906.77,Unemployed,1,1,0,Fewer than 1 per member,-1,1,1,Black African,Free State,Farms,7,1,0,1,No
+DUMMY1065,449.88,Employed,1,1,0,1 or more per member,20,400,0,Black African,Gauteng,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY1066,1250.47,Unemployed,1,1,0,Fewer than 1 per member,-14,196,1,Black African,Gauteng,Non-metro urban,11,2,0,2,Yes
+DUMMY1067,1899.68,Unemployed,0,0,0,None,-4,16,0,Black African,Eastern Cape,Metro urban,3,1,0,0,No
+DUMMY1068,1872.42,Unemployed,1,1,0,1 or more per member,-13,169,0,Black African,KwaZulu-Natal,Metro urban,10,0,1,0,Yes
+DUMMY1069,1202.73,Employed,0,1,1,Fewer than 1 per member,13,169,1,Black African,Gauteng,Non-metro urban,5,0,0,0,No
+DUMMY1070,1456.25,Employed,1,1,0,Fewer than 1 per member,-13,169,0,Black African,Limpopo,Non-metro urban,3,1,0,0,Yes
+DUMMY1071,1669.17,Employed,1,1,0,Fewer than 1 per member,23,529,0,Coloured,Western Cape,Non-metro urban,2,1,0,0,No other working-age member
+DUMMY1072,1199.53,Unemployed,0,1,1,None,6,36,0,Black African,Mpumalanga,Metro urban,8,2,1,0,No
+DUMMY1073,962.59,Employed,1,1,1,1 or more per member,8,64,0,Black African,Gauteng,Metro urban,6,2,0,0,Yes
+DUMMY1074,612.41,Employed,0,1,0,Fewer than 1 per member,-17,289,0,Black African,KwaZulu-Natal,Non-metro urban,5,1,0,0,No
+DUMMY1075,1807.47,Employed,0,0,0,Fewer than 1 per member,18,324,0,White,Gauteng,Metro urban,3,1,0,0,Yes
+DUMMY1076,405.01,Employed,1,1,1,Fewer than 1 per member,3,9,0,White,Limpopo,Traditional,1,0,0,0,No other working-age member
+DUMMY1077,1490.66,Unemployed,0,1,1,Fewer than 1 per member,-15,225,0,Coloured,Western Cape,Metro urban,4,1,1,0,No
+DUMMY1078,1606.08,Employed,1,0,0,Fewer than 1 per member,-4,16,0,Coloured,Gauteng,Metro urban,1,0,0,0,No other working-age member
+DUMMY1079,1833.45,Employed,0,0,0,Fewer than 1 per member,11,121,0,Black African,Gauteng,Traditional,3,1,1,0,No
+DUMMY1080,1501.79,Employed,1,1,0,None,11,121,0,Black African,Gauteng,Metro urban,3,2,0,0,No other working-age member
+DUMMY1081,1775.99,Employed,1,1,0,Fewer than 1 per member,6,36,1,Black African,Western Cape,Metro urban,4,1,0,1,No
+DUMMY1082,877.27,Employed,1,1,0,Fewer than 1 per member,-17,289,0,Black African,Western Cape,Traditional,4,3,0,0,No other working-age member
+DUMMY1083,1570.78,Unemployed,1,1,1,1 or more per member,-20,400,1,Black African,Mpumalanga,Traditional,4,1,0,1,No
+DUMMY1084,582.29,Employed,1,1,0,1 or more per member,-3,9,1,Black African,Gauteng,Traditional,6,1,0,1,No
+DUMMY1085,412.01,Unemployed,1,1,1,1 or more per member,-19,361,1,Black African,Gauteng,Metro urban,2,1,1,1,No other working-age member
+DUMMY1086,1013.08,Unemployed,1,1,0,Fewer than 1 per member,-24,576,1,Indian/Asian,Free State,Traditional,4,3,0,3,No other working-age member
+DUMMY1087,824.81,Employed,1,1,0,Fewer than 1 per member,10,100,1,Black African,Limpopo,Metro urban,4,0,0,0,Yes
+DUMMY1088,1002.62,Employed,0,0,0,Fewer than 1 per member,13,169,0,Black African,Gauteng,Metro urban,6,2,0,0,Yes
+DUMMY1089,482.67,Unemployed,1,1,0,None,-7,49,0,Black African,Gauteng,Traditional,2,1,0,0,No other working-age member
+DUMMY1090,856.96,Unemployed,1,1,1,1 or more per member,-18,324,1,Black African,Limpopo,Metro urban,4,3,0,3,No other working-age member
+DUMMY1091,595.72,Employed,0,1,0,Fewer than 1 per member,-4,16,0,Black African,Gauteng,Non-metro urban,5,2,1,0,Yes
+DUMMY1092,1948.76,Employed,0,1,1,Fewer than 1 per member,-21,441,1,Black African,Gauteng,Traditional,4,0,0,0,Yes
+DUMMY1093,916.42,Employed,1,1,0,Fewer than 1 per member,3,9,1,Black African,Western Cape,Non-metro urban,6,0,0,0,No
+DUMMY1094,413.77,Employed,1,1,0,Fewer than 1 per member,2,4,0,Black African,Gauteng,Traditional,6,1,0,0,No
+DUMMY1095,1145.17,Unemployed,0,0,0,Fewer than 1 per member,-1,1,1,Black African,Mpumalanga,Non-metro urban,4,0,0,0,No
+DUMMY1096,532.99,Employed,1,1,0,Fewer than 1 per member,-6,36,0,Coloured,KwaZulu-Natal,Metro urban,4,0,0,0,No
+DUMMY1097,1055,Employed,0,0,0,1 or more per member,11,121,0,Black African,KwaZulu-Natal,Non-metro urban,2,1,1,0,No other working-age member
+DUMMY1098,895.23,Employed,1,1,0,1 or more per member,2,4,1,Black African,Western Cape,Traditional,4,1,0,1,No
+DUMMY1099,1890.98,Employed,0,1,1,1 or more per member,-12,144,0,Coloured,Western Cape,Non-metro urban,2,1,0,0,No other working-age member
+DUMMY1100,1594.93,Employed,1,1,1,1 or more per member,24,576,0,White,KwaZulu-Natal,Metro urban,4,0,0,0,Yes
+DUMMY1101,1287.32,Employed,0,1,1,Fewer than 1 per member,-22,484,0,Black African,Northern Cape,Metro urban,1,0,0,0,No other working-age member
+DUMMY1102,1332.47,Unemployed,1,1,1,Fewer than 1 per member,-14,196,1,Coloured,North West,Farms,3,0,0,0,Yes
+DUMMY1103,1901.98,Employed,0,1,1,Fewer than 1 per member,10,100,1,Black African,Western Cape,Traditional,5,1,0,1,Yes
+DUMMY1104,1498.36,Employed,1,1,0,Fewer than 1 per member,3,9,1,Black African,Gauteng,Metro urban,5,1,0,1,No
+DUMMY1105,1442.58,Employed,0,1,1,1 or more per member,9,81,1,Black African,Western Cape,Traditional,3,2,0,2,No other working-age member
+DUMMY1106,899.58,Unemployed,1,1,0,Fewer than 1 per member,-11,121,1,Black African,Free State,Metro urban,3,1,0,1,Yes
+DUMMY1107,1063.4,Employed,0,1,0,Fewer than 1 per member,4,16,0,Black African,Gauteng,Non-metro urban,4,0,0,0,No
+DUMMY1108,1940.26,Unemployed,1,1,0,1 or more per member,7,49,1,Black African,Mpumalanga,Traditional,1,0,0,0,No other working-age member
+DUMMY1109,1386.65,Unemployed,1,1,0,Fewer than 1 per member,-15,225,1,Black African,Gauteng,Metro urban,3,0,0,0,No
+DUMMY1110,825.65,Unemployed,1,1,1,Fewer than 1 per member,-3,9,1,Coloured,Free State,Traditional,4,1,0,1,No
+DUMMY1111,442.23,Employed,1,0,0,Fewer than 1 per member,21,441,1,Black African,KwaZulu-Natal,Non-metro urban,2,0,0,0,Yes
+DUMMY1112,908.41,Employed,0,1,0,None,8,64,1,Black African,Northern Cape,Non-metro urban,3,2,0,2,No other working-age member
+DUMMY1113,1862.94,Employed,0,0,0,1 or more per member,-11,121,0,Black African,Limpopo,Metro urban,2,1,0,0,No other working-age member
+DUMMY1114,1509.88,Employed,0,1,0,Fewer than 1 per member,18,324,0,Black African,Gauteng,Metro urban,3,2,0,0,No other working-age member
+DUMMY1115,1183.54,Unemployed,1,0,0,Fewer than 1 per member,-8,64,1,Black African,KwaZulu-Natal,Metro urban,4,1,0,1,Yes
+DUMMY1116,878.62,Unemployed,0,1,0,None,9,81,0,Black African,Eastern Cape,Metro urban,3,1,0,0,Yes
+DUMMY1117,1779.7,Employed,1,1,0,Fewer than 1 per member,-15,225,0,Black African,Mpumalanga,Traditional,3,0,0,0,Yes
+DUMMY1118,1539.89,Unemployed,0,1,0,Fewer than 1 per member,-2,4,1,Indian/Asian,North West,Non-metro urban,4,0,0,0,Yes
+DUMMY1119,1514.19,Unemployed,1,0,0,1 or more per member,16,256,1,White,Gauteng,Traditional,3,1,0,1,Yes
+DUMMY1120,441.57,Employed,1,1,1,Fewer than 1 per member,-10,100,1,Coloured,Gauteng,Metro urban,3,1,1,1,No
+DUMMY1121,1257.88,Unemployed,1,1,1,Fewer than 1 per member,-3,9,0,Black African,KwaZulu-Natal,Traditional,3,2,0,0,No other working-age member
+DUMMY1122,1730.34,Employed,1,1,0,Fewer than 1 per member,-8,64,0,Black African,Gauteng,Traditional,5,1,0,0,No
+DUMMY1123,1163.11,Unemployed,0,1,0,Fewer than 1 per member,-17,289,0,Black African,KwaZulu-Natal,Non-metro urban,3,0,0,0,Yes
+DUMMY1124,713.17,Employed,1,1,0,Fewer than 1 per member,4,16,1,Black African,Limpopo,Metro urban,3,1,0,1,Yes
+DUMMY1125,1781.11,Employed,1,1,0,1 or more per member,-15,225,1,Black African,Western Cape,Non-metro urban,7,0,0,0,Yes
+DUMMY1126,1972.82,Unemployed,0,1,0,1 or more per member,8,64,0,Coloured,Gauteng,Traditional,3,0,0,0,Yes
+DUMMY1127,1194.8,Employed,1,1,0,1 or more per member,-1,1,0,Black African,Limpopo,Non-metro urban,4,0,0,0,No
+DUMMY1128,1593.58,Employed,1,1,1,1 or more per member,12,144,1,White,KwaZulu-Natal,Metro urban,5,1,0,1,Yes
+DUMMY1129,951.8,Unemployed,1,1,0,Fewer than 1 per member,2,4,1,Black African,Limpopo,Traditional,4,1,1,1,No
+DUMMY1130,1870.68,Employed,0,1,0,Fewer than 1 per member,6,36,0,Black African,Western Cape,Metro urban,4,1,0,0,No
+DUMMY1131,1795.91,Employed,0,1,0,Fewer than 1 per member,14,196,0,Black African,KwaZulu-Natal,Metro urban,4,2,0,0,Yes
+DUMMY1132,1972.37,Employed,0,0,0,Fewer than 1 per member,6,36,0,Black African,Gauteng,Traditional,6,2,0,0,No
+DUMMY1133,1185.09,Employed,0,1,0,1 or more per member,-1,1,0,Black African,Gauteng,Non-metro urban,4,0,0,0,Yes
+DUMMY1134,582.53,Unemployed,0,1,1,Fewer than 1 per member,-13,169,1,Black African,Western Cape,Traditional,4,1,0,1,No
+DUMMY1135,1188.05,Employed,1,1,0,1 or more per member,11,121,0,Black African,Gauteng,Metro urban,5,0,0,0,Yes
+DUMMY1136,1784.99,Employed,1,1,0,Fewer than 1 per member,-10,100,0,Black African,KwaZulu-Natal,Traditional,4,1,0,0,Yes
+DUMMY1137,1631.58,Unemployed,0,0,0,Fewer than 1 per member,-2,4,1,Black African,KwaZulu-Natal,Metro urban,4,0,0,0,Yes
+DUMMY1138,1998.34,Employed,0,1,1,1 or more per member,-3,9,1,Black African,Mpumalanga,Metro urban,4,2,0,2,No
+DUMMY1139,1663.25,Employed,0,1,0,None,0,0,0,Black African,Mpumalanga,Metro urban,1,0,1,0,No other working-age member
+DUMMY1140,564.17,Employed,1,1,1,Fewer than 1 per member,2,4,0,Black African,KwaZulu-Natal,Non-metro urban,3,1,0,0,Yes
+DUMMY1141,1361.68,Employed,1,1,0,1 or more per member,23,529,0,Coloured,Limpopo,Metro urban,5,2,0,0,Yes
+DUMMY1142,1255.39,Employed,1,1,1,Fewer than 1 per member,14,196,0,Black African,Eastern Cape,Metro urban,2,0,0,0,Yes
+DUMMY1143,1434.79,Employed,1,1,1,Fewer than 1 per member,-9,81,1,Black African,Mpumalanga,Farms,3,0,0,0,Yes
+DUMMY1144,1101.13,Employed,0,1,1,Fewer than 1 per member,9,81,0,Black African,Eastern Cape,Metro urban,4,0,0,0,No
+DUMMY1145,1613.8,Employed,1,1,0,Fewer than 1 per member,-18,324,0,Black African,Gauteng,Traditional,4,2,0,0,Yes
+DUMMY1146,964.79,Employed,0,1,0,1 or more per member,12,144,1,Black African,Mpumalanga,Metro urban,3,1,1,1,Yes
+DUMMY1147,1577.6,Unemployed,1,1,0,Fewer than 1 per member,-19,361,0,Coloured,KwaZulu-Natal,Metro urban,3,0,0,0,Yes
+DUMMY1148,1085.93,Unemployed,1,1,0,Fewer than 1 per member,-20,400,1,Black African,Gauteng,Metro urban,1,0,0,0,No other working-age member
+DUMMY1149,501.54,Employed,1,0,0,1 or more per member,22,484,0,Black African,Western Cape,Metro urban,2,0,0,0,No
+DUMMY1150,485.07,Employed,1,1,0,1 or more per member,3,9,1,Black African,Gauteng,Non-metro urban,5,0,0,0,Yes
+DUMMY1151,1596.84,Employed,0,1,1,1 or more per member,5,25,0,Black African,KwaZulu-Natal,Farms,3,2,0,0,No other working-age member
+DUMMY1152,1455.15,Employed,0,1,1,Fewer than 1 per member,-14,196,0,Black African,KwaZulu-Natal,Traditional,1,0,0,0,No other working-age member
+DUMMY1153,1070.49,Unemployed,0,1,0,None,10,100,1,Black African,Eastern Cape,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY1154,1383.28,Unemployed,1,0,0,1 or more per member,-9,81,0,Black African,KwaZulu-Natal,Metro urban,3,1,0,0,Yes
+DUMMY1155,515.27,Unemployed,1,1,1,1 or more per member,-1,1,1,Black African,Mpumalanga,Traditional,3,1,0,1,No
+DUMMY1156,1447.47,Employed,1,1,0,Fewer than 1 per member,14,196,0,Black African,Western Cape,Non-metro urban,4,2,0,0,No
+DUMMY1157,501.95,Employed,0,1,0,1 or more per member,5,25,1,Black African,Western Cape,Non-metro urban,3,0,0,0,Yes
+DUMMY1158,1848.28,Unemployed,0,1,1,1 or more per member,-9,81,0,Black African,North West,Traditional,3,0,1,0,No
+DUMMY1159,631.86,Employed,0,1,0,None,8,64,0,Black African,Gauteng,Metro urban,2,1,0,0,No other working-age member
+DUMMY1160,1790.18,Unemployed,1,1,0,Fewer than 1 per member,-7,49,1,Black African,Limpopo,Traditional,6,1,0,1,No
+DUMMY1161,1903.11,Employed,1,1,1,1 or more per member,1,1,1,Coloured,KwaZulu-Natal,Metro urban,5,0,0,0,Yes
+DUMMY1162,989.14,Unemployed,1,1,1,Fewer than 1 per member,-18,324,0,Black African,Gauteng,Non-metro urban,7,3,0,0,Yes
+DUMMY1163,1670.16,Unemployed,1,1,1,Fewer than 1 per member,-24,576,1,Black African,Free State,Traditional,5,1,0,1,Yes
+DUMMY1164,1924.98,Unemployed,0,1,0,Fewer than 1 per member,20,400,1,Black African,Eastern Cape,Traditional,5,0,0,0,Yes
+DUMMY1165,1071.65,Employed,1,1,1,Fewer than 1 per member,8,64,0,Black African,Western Cape,Traditional,3,2,0,0,No other working-age member
+DUMMY1166,1476.51,Employed,1,1,0,Fewer than 1 per member,8,64,1,Black African,Gauteng,Metro urban,4,0,0,0,Yes
+DUMMY1167,1653.67,Unemployed,1,1,0,None,6,36,0,Black African,KwaZulu-Natal,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY1168,576.14,Employed,1,1,1,1 or more per member,2,4,0,Black African,Free State,Traditional,1,0,1,0,No other working-age member
+DUMMY1169,1164.14,Employed,0,1,0,Fewer than 1 per member,22,484,0,Black African,KwaZulu-Natal,Metro urban,2,1,0,0,No other working-age member
+DUMMY1170,1226.15,Employed,1,0,0,Fewer than 1 per member,13,169,0,Coloured,Western Cape,Non-metro urban,5,1,0,0,No
+DUMMY1171,417.31,Employed,0,1,0,Fewer than 1 per member,11,121,0,Black African,Limpopo,Metro urban,4,0,0,0,Yes
+DUMMY1172,719.03,Employed,1,1,1,Fewer than 1 per member,-4,16,0,Black African,Western Cape,Farms,4,2,0,0,Yes
+DUMMY1173,1433.12,Unemployed,1,1,0,Fewer than 1 per member,-3,9,1,Black African,Western Cape,Non-metro urban,3,0,1,0,No
+DUMMY1174,1724.7,Employed,1,1,0,Fewer than 1 per member,5,25,1,Black African,Western Cape,Non-metro urban,3,0,0,0,No
+DUMMY1175,1339.06,Employed,1,0,0,Fewer than 1 per member,9,81,1,Black African,Free State,Traditional,5,3,0,3,No
+DUMMY1176,1902.76,Employed,0,1,0,Fewer than 1 per member,-15,225,0,Black African,Gauteng,Non-metro urban,4,0,0,0,Yes
+DUMMY1177,1567.98,Employed,1,1,0,1 or more per member,3,9,1,Coloured,Mpumalanga,Metro urban,3,0,0,0,Yes
+DUMMY1178,1993.76,Employed,1,1,0,Fewer than 1 per member,-3,9,0,Black African,Eastern Cape,Metro urban,3,0,0,0,No
+DUMMY1179,796.36,Employed,0,1,0,None,-6,36,0,Black African,Western Cape,Non-metro urban,3,1,0,0,No
+DUMMY1180,784.77,Employed,1,1,1,Fewer than 1 per member,-5,25,1,Black African,Limpopo,Traditional,2,1,1,1,No other working-age member
+DUMMY1181,1674.1,Employed,1,1,0,1 or more per member,3,9,0,Black African,Gauteng,Non-metro urban,1,0,0,0,No other working-age member
+DUMMY1182,723.52,Employed,0,1,1,1 or more per member,1,1,0,Black African,Mpumalanga,Traditional,3,1,0,0,Yes
+DUMMY1183,1023.8,Employed,0,1,1,Fewer than 1 per member,-5,25,1,Black African,Northern Cape,Non-metro urban,5,0,0,0,Yes
+DUMMY1184,1885.19,Unemployed,0,1,0,None,-10,100,0,Coloured,KwaZulu-Natal,Traditional,4,0,0,0,Yes
+DUMMY1185,821.28,Employed,0,1,0,1 or more per member,-17,289,0,Black African,Northern Cape,Non-metro urban,3,2,0,0,No other working-age member
+DUMMY1186,816.79,Employed,1,1,1,Fewer than 1 per member,2,4,0,Black African,KwaZulu-Natal,Non-metro urban,5,2,0,0,Yes
+DUMMY1187,579.93,Employed,0,1,0,Fewer than 1 per member,7,49,1,Black African,Gauteng,Non-metro urban,3,0,0,0,Yes
+DUMMY1188,1560.73,Employed,1,1,1,Fewer than 1 per member,2,4,0,Black African,Eastern Cape,Traditional,5,2,0,0,Yes
+DUMMY1189,1472.87,Unemployed,1,1,0,1 or more per member,-10,100,0,Black African,Eastern Cape,Traditional,1,0,1,0,No other working-age member
+DUMMY1190,628.13,Employed,0,1,0,1 or more per member,1,1,1,Black African,Gauteng,Metro urban,3,1,0,1,Yes
+DUMMY1191,584.56,Employed,1,1,0,Fewer than 1 per member,0,0,0,Coloured,KwaZulu-Natal,Non-metro urban,4,0,1,0,Yes
+DUMMY1192,619.3,Employed,0,0,0,Fewer than 1 per member,12,144,1,White,Gauteng,Non-metro urban,2,1,0,1,No other working-age member
+DUMMY1193,864.87,Unemployed,0,1,0,Fewer than 1 per member,-11,121,0,Black African,Northern Cape,Traditional,1,0,0,0,No other working-age member
+DUMMY1194,1839.02,Employed,1,1,1,Fewer than 1 per member,-14,196,0,Black African,Gauteng,Metro urban,4,2,0,0,No
+DUMMY1195,1960.08,Unemployed,1,1,0,1 or more per member,-1,1,0,Black African,Gauteng,Non-metro urban,9,1,0,0,Yes
+DUMMY1196,1382.9,Employed,0,1,0,1 or more per member,1,1,0,Black African,Mpumalanga,Non-metro urban,3,1,0,0,Yes
+DUMMY1197,547.28,Unemployed,1,1,0,Fewer than 1 per member,-7,49,1,White,Gauteng,Traditional,4,1,0,1,Yes
+DUMMY1198,800.6,Employed,1,1,0,Fewer than 1 per member,-16,256,0,Black African,Gauteng,Non-metro urban,3,1,1,0,No
+DUMMY1199,1220.81,Employed,1,1,0,None,-7,49,0,Black African,Limpopo,Non-metro urban,2,0,0,0,No
+DUMMY1200,474.14,Unemployed,1,0,0,Fewer than 1 per member,-5,25,1,Black African,Gauteng,Non-metro urban,2,0,0,0,Yes
