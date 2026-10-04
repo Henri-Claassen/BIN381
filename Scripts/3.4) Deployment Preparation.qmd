@@ -21,69 +21,68 @@ execute:
 ```{r}
 #| label: Install Packages
 #| eval: false
-# Only needed if the packages are not installed yet: remove the # in front of
-# install.packages() and run this chunk once. It is skipped when rendering.
+# Only needed if the packages are not installed yet:
 # install.packages(c("tidyverse", "survey", "pROC"))
 ```
 
 ## About this file
 
-This file covers the Milestone 3 deployment task (Task 4). It documents the deployment strategy and the choice of deployment tool, and it builds `Shiny-App/app_data.rds`: the one file the Shiny app in `Shiny-App/app.R` loads. It also documents how new data is validated and how the deployed model is monitored.
+This file documents the deployment strategy and the choice of deployment tool, and it builds `Shiny-App/app_data.rds`: the one file the Shiny app in `Shiny-App/app.R` loads. It also documents how new data is validated and how the deployed model is monitored.
 
-The deployed model is the **survey-weighted logistic regression** for employment, selected in `3.3) Model Evaluation.qmd` (section 9.3).
+The deployed model is the **survey-weighted logistic regression** for employment, selected in `3.3) Model Evaluation.qmd`.
 
 ## How this notebook works
 
-1.  **Load** the selected model, the thresholds and the data (section 4).
-2.  **Make the slim model**, the part of the logistic regression the app needs to predict, and check that it predicts exactly like the full model (section 5).
+1.  **Load** the selected model, the thresholds and the data.
+2.  **Make the slim model**, the part of the logistic regression the app needs to predict, and check that it predicts exactly like the full model.
 3.  **Calculate the numbers each app page shows**, so the app never needs the survey microdata:
-    - the predicted employment rates of the four matric × internet groups, for every combination of the app's filters (section 6);
-    - the province scenario figures (section 7);
-    - the test-set baseline and training-data mix that monitoring compares new data with (section 8);
-    - the key results and subgroup table for the Overview and About pages (section 9).
-4.  **Save** everything to `Shiny-App/app_data.rds` (section 10).
+    - The predicted employment rates of the four matric × internet groups, for every combination of the app's filters.
+    - The province scenario figures.
+    - The test-set baseline and training-data mix that monitoring compares new data with.
+    - The key results and subgroup table for the Overview and About pages.
+4.  **Save** everything to `Shiny-App/app_data.rds`.
 
 Rerun this notebook whenever the deployed model is retrained, then restart the app.
 
 # 1. Deployment strategy
 
 | Element | Plan |
-|----|----|
-| **Intended users** | Policy analysts at National Treasury (the Milestone 1 stakeholder), and the analysts who maintain the model. |
+|------------------------------------|------------------------------------|
+| **Intended users** | Policy analysts at National Treasury, and the analysts who maintain the model. |
 | **Decisions supported** | How to divide limited funding between digital-access subsidies and education programmes: whether the two reinforce each other (complements) and in which provinces more home internet access is associated with the largest employment gains. |
 | **Inputs** | \(1\) Filter choices: province, settlement type, age band and sex. (2) A scenario target: the share of households with home internet. (3) New survey data as a CSV file in the documented format, for checking and scoring. |
-| **Outputs** | Predicted employment rates for groups of people, with 95% confidence intervals; province scenarios; accuracy measures with plain-language explanations; a data validation report; monitoring checks marked OK (green), Investigate (amber) or Action needed (red). **No output is ever a prediction for an individual person.** |
-| **Operational workflow** | The notebooks 2.1–3.3 and this one are run in order to (re)build the models and `Shiny-App/app_data.rds`. Users open the app (`shiny::runApp("Shiny-App")`). When a new survey wave arrives, an analyst uploads it on the "Check new data" page; the app validates it, predicts, and runs the monitoring checks. An "Action needed" (red) check triggers retraining: the notebooks are rerun on the new data. |
+| **Outputs** | Predicted employment rates for groups of people, with 95% confidence intervals, province scenarios, accuracy measures with plain-language explanations, a data validation report, monitoring checks marked OK (green), Investigate (amber) or Action needed (red). **No output is ever a prediction for an individual person.** |
+| **Operational workflow** | The notebooks 2.1–3.3 and this one are run in order to rebuild the models and `Shiny-App/app_data.rds`. Users open the app (`shiny::runApp("Shiny-App")`). When a new survey wave arrives, an analyst uploads it on the "Check new data" page, the app validates it, predicts, and runs the monitoring checks. An "Action needed" (red) check triggers retraining: the notebooks are rerun on the new data. |
 
-**Why group-level only.** The evaluation found that the model's classifications are unreliable for individuals in some groups (section 7.6 of the evaluation: specificity of 0.04 for White and 0.20 for Indian/Asian people). Treasury's decisions are also about groups and provinces, not people. The app therefore shows predicted employment **rates** for groups, and accuracy measures for whole files, but never labels a person as employed or unemployed.
+**Why group-level only.** The evaluation found that the model's classifications are unreliable for individuals in some groups. Treasury's decisions are also about groups and provinces, not people. The app therefore shows predicted employment **rates** for groups, and accuracy measures for whole files, but never labels a person as employed or unemployed.
 
 # 2. Deployment tools compared
 
 | Tool | What it is | Strengths | Weaknesses for this project |
-|----|----|----|----|
-| **R Shiny** (with `bslib`) | Interactive web app written in R | Runs the R model directly, no translation; interactive filters, uploads and charts; recommended in the project outline; can run locally or be hosted on shinyapps.io | Needs R (locally) or a hosting service |
+|------------------|------------------|------------------|------------------|
+| **R Shiny** (with `bslib`) | Interactive web app written in R | Runs the R model directly, no translation, interactive filters, uploads and charts, recommended in the project outline, can run locally or be hosted on shinyapps.io | Needs R (locally) or a hosting service |
 | `plumber` | Turns R functions into a web API | Good for other software to request predictions | No user interface: Treasury analysts need screens, not an API |
-| `vetiver` | Versions and deploys models as APIs | Model versioning and monitoring helpers | Also API-first; more infrastructure than a student project needs |
-| `flexdashboard` / Quarto dashboard | Dashboard produced from an R Markdown or Quarto file | Simple to build | Static unless combined with Shiny; cannot validate and score uploaded data |
+| `vetiver` | Versions and deploys models as APIs | Model versioning and monitoring helpers | Also API-first, more infrastructure required |
+| `flexdashboard` / Quarto dashboard | Dashboard produced from an R Markdown or Quarto file | Simple to build | Static unless combined with Shiny, cannot validate and score uploaded data |
 | Power BI with R visuals | R scripts inside Power BI | The team already uses Power BI | R visuals are static images, uploads cannot be validated or scored, and publishing R visuals needs a Power BI service licence |
 
-**Recommendation: Shiny.** It is the only option that gives Treasury analysts an interactive interface **and** runs the validation, prediction and monitoring code in the same R environment the model was built in. It runs locally with `shiny::runApp("Shiny-App")`. Because the app contains only the slim model and aggregated tables (section 3), it could also be hosted on shinyapps.io without publishing any survey microdata.
+**Selected deployment strategy: Shiny.** It is the only option that gives Treasury analysts an interactive interface **and** runs the validation, prediction and monitoring code in the same R environment the model was built in. It runs locally with `shiny::runApp("Shiny-App")`. Because the app contains only the slim model and aggregated tables, it could also be hosted on shinyapps.io without publishing any survey microdata.
 
 # 3. What the app loads, and why not the saved model
 
-The app does **not** load `Models/employment_logistic.rds`. That file is about 7 MB because the fitted `svyglm` object stores a full copy of the training data (22,671 people, including every `household_id`) inside it, plus working matrices from the fit. A deployed app should never carry survey microdata: if it were hosted, the data would be published with it, which the Milestone 1 ethics section (disclosure risk, usage terms) rules out.
+The app does **not** load `Models/employment_logistic.rds`. That file is about 7 MB because the fitted `svyglm` object stores a full copy of the training data (22,671 people, including every `household_id`) inside it, plus working matrices from the fit. A deployed app should never carry survey microdata: if it were hosted, the data would be published with it.
 
 Instead, this notebook saves `Shiny-App/app_data.rds`, which holds only:
 
 | Item | What it contains | Used on app page |
-|----|----|----|
-| `slim_model` | Coefficients, their covariance matrix, the formula terms and category levels: all that is needed to predict (section 5) | Check new data |
+|------------------------|------------------------|------------------------|
+| `slim_model` | Coefficients, their covariance matrix, the formula terms and category levels: all that is needed to predict | Check new data |
 | `threshold` | The classification threshold (0.639) chosen in the evaluation | Check new data |
-| `group_cells`, `group_gradients` | Predicted employment rates of the four matric × internet groups for every filter combination, with what is needed for their confidence intervals. Combinations with fewer than 50 people are suppressed (section 6) | Education × internet |
-| `provinces` | Province totals for the scenario calculation (section 7) | Province scenarios |
-| `baseline`, `baseline_subgroups`, `baseline_subgroup_gap` | Test-set accuracy measures the monitoring checks compare with (section 8) | Check new data, About the model |
-| `reference_shares` | The share of training people in each category of the drift variables (section 8) | Check new data |
-| `key_results`, `subgroups` | The interaction result, the income result and the subgroup performance table (section 9) | Overview, About the model |
+| `group_cells`, `group_gradients` | Predicted employment rates of the four matric × internet groups for every filter combination, with what is needed for their confidence intervals. Combinations with fewer than 50 people are suppressed | Education × internet |
+| `provinces` | Province totals for the scenario calculation | Province scenarios |
+| `baseline`, `baseline_subgroups`, `baseline_subgroup_gap` | Test-set accuracy measures the monitoring checks compare with | Check new data, About the model |
+| `reference_shares` | The share of training people in each category of the drift variables | Check new data |
+| `key_results`, `subgroups` | The interaction result, the income result and the subgroup performance table | Overview, About the model |
 | `built` | When the file was built and from which data | About the model |
 
 Every item is a model parameter, a total or an average. None is a row of survey data.
@@ -116,13 +115,13 @@ source("../Shiny-App/monitoring.R")        # accuracy measures, drift and thresh
 employment_logistic <- readRDS(file.path(model_directory, "employment_logistic.rds"))
 income_linear <- readRDS(file.path(model_directory, "income_linear.rds"))
 
-# The threshold chosen in the evaluation (section 4.4 of 3.3) for the logistic regression
+# The threshold chosen in the evaluation for the logistic regression
 threshold <- read_csv(file.path(model_directory, "employment_thresholds.csv"), show_col_types = FALSE) |>
   filter(model == "Logistic regression") |>
   pull(threshold)
 
 # model_data = the whole labour force (training + test), used for the population
-# figures on the app's pages; model_train for the training mix; model_test for the baseline
+# figures on the app's pages: model_train for the training mix, model_test for the baseline
 population <- prepare_employment_data(file.path(analytical_directory, "model_data.csv"))
 model_train <- prepare_employment_data(file.path(analytical_directory, "model_train.csv"))
 model_test <- prepare_employment_data(file.path(analytical_directory, "model_test.csv"))
@@ -163,13 +162,13 @@ The largest difference is at the level of rounding error in the last decimal pla
 
 # 6. Education × internet page: group predictions
 
-The main app page compares the predicted employment rate of the four matric × internet groups. The method is the one used in section 8.2 of the evaluation: **every person** matching the user's filters is given each group's `matric_plus` and `any_home_internet` values in turn, with all their other characteristics unchanged, and the predictions are averaged using `person_weight`. The four groups then differ only in education and internet access, and the averages describe the real mix of people (including their population groups and households) rather than one invented "typical" person. This is why population group does not need to be a filter.
+The main app page compares the predicted employment rate of the four matric × internet groups. The method is the one used in the evaluation: **every person** matching the user's filters is given each group's `matric_plus` and `any_home_internet` values in turn, with all their other characteristics unchanged, and the predictions are averaged using `person_weight`. The four groups then differ only in education and internet access, and the averages describe the real mix of people. This is why population group does not need to be a filter.
 
 This is calculated here for every combination of the app's filters (province, settlement type, age band and sex, each including "All"), so the app only looks the result up.
 
-**Confidence intervals.** The uncertainty of an average prediction comes from the uncertainty of the coefficients. For each average, its gradient (how the average changes when each coefficient changes slightly) is stored; the app combines it with the coefficient covariance matrix (the delta method) to give a 95% confidence interval. For a person with predicted probability *p* and design row *x*, the gradient of *p* is *p*(1 − *p*)*x*; the gradient of a weighted average is the weighted average of these.
+**Confidence intervals.** The uncertainty of an average prediction comes from the uncertainty of the coefficients. For each average, its gradient (how the average changes when each coefficient changes slightly) is stored, the app combines it with the coefficient covariance matrix (the delta method) to give a 95% confidence interval. For a person with predicted probability *p* and design row *x*, the gradient of *p* is *p*(1 − *p*)*x*, the gradient of a weighted average is the weighted average of these.
 
-**Small groups.** Combinations with fewer than 50 people in the survey are suppressed: their estimates would be unreliable, and publishing results for very small groups risks identifying people (Milestone 1 ethics).
+**Small groups.** Combinations with fewer than 50 people in the survey are suppressed: their estimates would be unreliable, and publishing results for very small groups risks identifying people.
 
 ```{r}
 #| label: Group Predictions
@@ -248,23 +247,21 @@ group_cells |>
   mutate(across(p00:p11, \(x) round(100 * x, 1)))
 ```
 
-The national rates (in %) should match the logistic regression's group probabilities in section 8.2 of the evaluation, apart from small differences because the evaluation averaged over the training people only and this uses the whole labour force.
+The national rates (in %) should match the logistic regression's group probabilities from the evaluation, apart from small differences because the evaluation averaged over the training people only and this uses the whole labour force.
 
 # 7. Province scenarios page
 
-The scenario page asks: *if the share of households with home internet in a province rose to a target level, what employment rate would the model's association predict?*
-
 For each province this section stores:
 
-- the labour force (the sum of `person_weight`) and the actual weighted employment rate,
-- the current share of people with home internet and the model's current predicted employment rate,
-- the **uplift for the unconnected**: for each person currently without home internet, the model's predicted probability with internet minus without it (everything else unchanged), averaged with `person_weight`.
+- The labour force (the sum of `person_weight`) and the actual weighted employment rate.
+- The current share of people with home internet and the model's current predicted employment rate.
+- The **uplift for the unconnected**: It determines how much better employment becomes if a person without internet were to get internet. By subtracting the models prediction without internet from groups with internet without anything else and then averaging it with person_weight.
 
 The app then calculates, for a target share *t* above the current share *c*:
 
 > predicted rate at *t* = current predicted rate + ((*t* − *c*) / (1 − *c*)) × uplift for the unconnected
 
-(*t* − *c*) / (1 − *c*) is the fraction of currently unconnected people who would need to be connected to reach the target. This assumes the newly connected are a typical mix of the currently unconnected, and that the association between internet and employment seen today would hold for them. It is a scenario, not a forecast of what a subsidy would cause.
+(*t* − *c*) / (1 − *c*) is the fraction of currently unconnected people who would need to be connected to reach the target. .
 
 ```{r}
 #| label: Province Scenarios
@@ -302,7 +299,7 @@ provinces |>
 
 ## 8.1 Test-set accuracy
 
-Every monitoring check compares new data with the deployed model's performance on the test set. The measures are calculated with `compute_metrics()` in `Shiny-App/monitoring.R`, which uses the same definitions as the evaluation, so the values must match section 9.1 of `3.3) Model Evaluation.qmd` (AUC 0.765, balanced accuracy 0.693, Brier score 0.183):
+Every monitoring check compares new data with the deployed model's performance on the test set. The measures are calculated with `compute_metrics()` in `Shiny-App/monitoring.R`, which uses the same definitions as the evaluation, so the values must match `3.3) Model Evaluation.qmd` (AUC 0.765, balanced accuracy 0.693, Brier score 0.183):
 
 ```{r}
 #| label: Test Baseline
@@ -371,7 +368,7 @@ drift_report(model_test, reference_shares) |> mutate(psi = round(psi, 4))
 
 # 9. Key results for the Overview and About pages
 
-The interaction result for employment and income, with the Rao-Scott likelihood-ratio test used in section 8.1 of the evaluation:
+The interaction result for employment and income, with the Rao-Scott likelihood-ratio test used in the evaluation:
 
 ```{r}
 #| label: Key Results
@@ -404,12 +401,12 @@ tibble(result = names(key_results),
 #| label: Save App Data
 
 # Everything the Shiny app needs, and nothing that identifies a person: model
-# parameters, totals and averages only (see section 3 for what each item is for)
+# parameters, totals and averages only
 app_data <- list(
   slim_model = slim_model,                     # predicts like the full model, without the microdata
   threshold = threshold,                       # 0.639: turns a probability into Employed / Unemployed
   group_cells = group_cells,                   # education x internet page: rates per filter combination
-  group_gradients = group_gradients,           # ... and what is needed for their confidence intervals
+  group_gradients = group_gradients,           # what is needed for their confidence intervals
   provinces = provinces,                       # province scenarios page: province totals
   baseline = baseline,                         # test-set accuracy: what monitoring compares with
   baseline_subgroups = baseline_subgroups,     # AUC per population group on the test set
@@ -442,12 +439,12 @@ On the app's "Check new data" page, an uploaded CSV goes through these steps (`S
 
 2.  **Validate** with `validate_input()`:
 
-    - all 15 predictor columns are present (otherwise the file is rejected and the missing columns are named);
-    - numbers are numbers, 0/1 columns contain only 0 or 1, whole-number columns are whole, and values are in range (for example `age_centred` from −25 to 24, `household_size` from 1 to 25);
-    - categories only contain the values the model was trained with (for example the nine province names);
-    - calculated columns agree with their parts (`age_centred_squared` = `age_centred`², `female_x_children` = `female` × `n_children_under15`), and `n_children_under15` is smaller than `household_size`;
-    - rows with unknown education (blank `matric_plus`) are left out, as in training;
-    - a warning is given when fewer than 200 rows can be used.
+    - All 15 predictor columns are present (otherwise the file is rejected and the missing columns are named).
+    - Numbers are numbers, 0/1 columns contain only 0 or 1, whole-number columns are whole, and values are in range (for example `age_centred` from −25 to 24, `household_size` from 1 to 25).
+    - Categories only contain the values the model was trained with (for example the nine province names).
+    - Calculated columns agree with their parts (`age_centred_squared` = `age_centred`², `female_x_children` = `female` × `n_children_under15`), and `n_children_under15` is smaller than `household_size`.
+    - Rows with unknown education (blank `matric_plus`) are left out, as in training.
+    - A warning is given when fewer than 200 rows can be used.
 
     Rows that fail a check are left out, and the report says how many and why.
 
@@ -462,13 +459,13 @@ On the app's "Check new data" page, an uploaded CSV goes through these steps (`S
 The thresholds are defined once, in `Shiny-App/monitoring.R`:
 
 | Check | What it measures | Test-set value | Green | Amber | Red |
-|----|----|----|----|----|----|
-| AUC | How well the model ranks employed above unemployed people | `r round(baseline$auc, 3)` | ≥ 0.715 | 0.70–0.715 | \< 0.70 (Milestone 2 minimum) |
-| Balanced accuracy | Average of sensitivity and specificity at the 0.639 threshold | `r round(baseline$balanced_accuracy, 3)` | ≥ 0.65 | 0.60–0.65 | \< 0.60 |
-| Brier score | Accuracy of the probabilities (lower is better) | `r round(baseline$brier, 3)` | ≤ 0.20 | 0.20–0.22 | \> 0.22 |
-| Calibration gap | Predicted minus actual employment rate | `r round(baseline$calibration_gap, 3)` | within ±0.03 | ±0.03–0.05 | beyond ±0.05 |
+|------------|------------|------------|------------|------------|------------|
+| AUC | How well the model ranks employed above unemployed people | `round(baseline$auc, 3)` | ≥ 0.715 | 0.70–0.715 | \< 0.70 (Milestone 2 minimum) |
+| Balanced accuracy | Average of sensitivity and specificity at the 0.639 threshold | `round(baseline$balanced_accuracy, 3)` | ≥ 0.65 | 0.60–0.65 | \< 0.60 |
+| Brier score | Accuracy of the probabilities (lower is better) | `round(baseline$brier, 3)` | ≤ 0.20 | 0.20–0.22 | \> 0.22 |
+| Calibration gap | Predicted minus actual employment rate | `round(baseline$calibration_gap, 3)` | within ±0.03 | ±0.03–0.05 | beyond ±0.05 |
 | PSI (drift) | Change in the mix of province, settlement type, population group, age band, matric, home internet and smartphone access | ≈ 0 | \< 0.10 | 0.10–0.25 | \> 0.25 |
-| Subgroup AUC gap | Widening of the gap between the best and worst population group's AUC | `r round(baseline_subgroup_gap, 3)` | ≤ +0.05 | +0.05–0.10 | \> +0.10 |
+| Subgroup AUC gap | Widening of the gap between the best and worst population group's AUC | `round(baseline_subgroup_gap, 3)` | ≤ +0.05 | +0.05–0.10 | \> +0.10 |
 
 The drift checks need no outcome, so they run on every upload; the accuracy checks need the `employed` column.
 
@@ -476,4 +473,4 @@ The drift checks need no outcome, so they run on every upload; the accuracy chec
 
 - **Retrain** (rerun notebooks 2.1–3.4 on new data) when Stats SA releases a new survey wave, or when any check is **red**.
 - **Investigate** when a check is **amber**: find out whether the data come from a different population or collection method before relying on the predictions.
-- **Retire** the model when: retraining does not bring the AUC back above 0.70; Stats SA changes the definitions of the variables (for example the education or internet questions), so new data no longer means what the model learned; the interaction's confidence interval after retraining includes 1 in successive waves, so the complements finding no longer holds; or the app is found to be used to make decisions about individual people, which it was not designed for.
+- **Retire** the model when: retraining does not bring the AUC back above 0.70. Stats SA changes the definitions of the variables (for example the education or internet questions), so new data no longer means what the model learned. The interaction's confidence interval after retraining includes 1 in successive waves, so the complements finding no longer holds, or the app is found to be used to make decisions about individual people, which it was not designed for.

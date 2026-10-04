@@ -2287,24 +2287,23 @@ vertical-align: -.125em;
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Only needed if the packages are not installed yet: remove the # in front of</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages() and run this chunk once. It is skipped when rendering.</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c(&quot;tidyverse&quot;, &quot;survey&quot;, &quot;rpart&quot;, &quot;rpart.plot&quot;, &quot;ranger&quot;))</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Only needed if the packages are not installed yet: </span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c(&quot;tidyverse&quot;, &quot;survey&quot;, &quot;rpart&quot;, &quot;rpart.plot&quot;, &quot;ranger&quot;))</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
 <section id="about-this-file" class="level2">
 <h2 class="anchored" data-anchor-id="about-this-file">About this file</h2>
-<p>This file covers the “Modelling strategy and technique selection” and “Model implementation and reproducibility” for the <strong>employment question</strong> (research areas B and C). It restates the analytical question, chooses the candidate models, explains why each one was chosen and fits them to the training data.</p>
+<p>This file covers the “Modelling strategy and technique selection” and “Model implementation and reproducibility” for the <strong>employment question</strong> (research areas B and C). This notebook chooses the candidate models, explains why each one was chosen and fits them to the training data.</p>
 <p>Tuning and evaluation are done in a separate notebook. This file therefore <strong>does not use the test set</strong>, does not tune any parameters and does not calculate performance metrics. It fits each model once with documented starting parameters and saves it to <code>Models/</code>, so the evaluation notebook can load the models, tune them with household-grouped cross-validation and test them. The income question (research area D) is modelled in <code>3.2) Income Model.qmd</code>. The reasoning behind each model is also written up in <code>Milestone 3 Submit.docx</code> (in <code>Documentation/Milestone Documentation/Milestone 3/</code>).</p>
 </section>
 <section id="how-this-notebook-works" class="level2">
 <h2 class="anchored" data-anchor-id="how-this-notebook-works">How this notebook works</h2>
 <ol type="1">
-<li><strong>Load the shared setup</strong> with <code>source(&quot;R/model_preparation.R&quot;)</code> (section 2.1). This gives the notebook the predictor lists, the model formulas and <code>prepare_employment_data()</code>. It has to be loaded in every notebook: rendering starts a new, empty R session, so nothing from an earlier run is still in memory.</li>
-<li><strong>Prepare the training data</strong> with <code>prepare_employment_data()</code>, which reads <code>model_train.csv</code> the same way in every notebook (section 2.1).</li>
-<li><strong>Fit three models</strong> on the same rows (sections 4–6). Each model is one function call that receives a formula, the training data and the model’s parameters. Each parameter is explained in a comment next to it.</li>
-<li><strong>Save</strong> each fitted model to <code>Models/</code> and check that it reloads with identical predictions (section 7).</li>
+<li><strong>Load the shared setup</strong> with <code>source(&quot;R/model_preparation.R&quot;)</code>. This gives the notebook the predictor lists, the model formulas and <code>prepare_employment_data()</code>. It has to be loaded in every notebook, it basically just makes reusable code so that you do not have to run the same set of code over and over in each notebook you can just call the predictor lists and model formulas from inside that R Script.</li>
+<li><strong>Prepare the training data</strong> with <code>prepare_employment_data()</code>, which reads <code>model_train.csv</code> the same way in every notebook.</li>
+<li><strong>Fit three models</strong> each model is one function call that receives a formula, the training data and the model’s parameters. Each parameter is explained in a comment next to it.</li>
+<li><strong>Save</strong> each fitted model to is saved to <code>Models/</code> and check that it reloads with identical predictions.</li>
 <li><code>3.3) Model Evaluation.qmd</code> then tunes the saved models and tests them on the test set.</li>
 </ol>
 <p><strong>What “fitting” means for each model:</strong></p>
@@ -2346,7 +2345,7 @@ vertical-align: -.125em;
 </table>
 <section id="formulas-and" class="level3">
 <h3 class="anchored" data-anchor-id="formulas-and">Formulas: <code>+</code> and <code>*</code></h3>
-<p>A formula tells a model what to predict and from what: the outcome goes on the left of <code>~</code> and the predictors on the right, for example <code>employed ~ matric_plus + female</code>. The formulas are defined once, in <code>Scripts/R/model_preparation.R</code>.</p>
+<p>A formula tells a model what to predict and from what: the outcome goes on the left of <code>~</code> and the predictors on the right, for example <code>employed ~ matric_plus + female</code>. The formulas are defined once, in <code>Scripts/R/model_preparation.R</code>. This means we predict employed, based on the columns matric_plus and female.</p>
 <p><code>matric_plus</code> and <code>any_home_internet</code> are both 0/1, so together they split people into four groups. Their employment rates in the training data are:</p>
 <table class="caption-top table">
 <colgroup>
@@ -2460,13 +2459,12 @@ vertical-align: -.125em;
 </section>
 <section id="analytical-question-and-modelling-task" class="level1">
 <h1>1. Analytical question and modelling task</h1>
-<p>The Milestone 1 analytics goal is to <em>“model employment status based on education level, digital access/connectivity, and the interaction between the two”</em>, controlling for demographic, geographic and household factors. National Treasury needs to know whether education and household internet access <strong>reinforce</strong> each other (the combination is associated with more employment than either one alone) or <strong>substitute</strong> for each other (one makes up for the lack of the other).</p>
+<p>The Milestone 1 analytics goal is to model employment status based on education level and connectivity. The National Treasury needs to know whether education and household internet access <strong>reinforce</strong> each other (the combination is associated with more employment than either one alone) or <strong>substitute</strong> for each other (one makes up for the lack of the other).</p>
 <ul>
 <li><strong>Modelling task:</strong> binary <strong>classification</strong>. The target <code>employed</code> has two classes, Employed and Unemployed, for people in the labour force.</li>
 <li><strong>Population:</strong> working-age people (15–64) in the labour force, from <code>model_train.csv</code>.</li>
-<li><strong>What the models must deliver:</strong> an estimate of the education × internet interaction that can be read as an odds ratio (Milestone 1 technical success criteria 1 and 2), predicted employment probabilities for the deployed Shiny app, and a second, tree-based model to check the findings (success criterion 4).</li>
+<li><strong>What the models must deliver:</strong> an estimate of the education × internet interaction that can be read as an odds ratio, predicted employment probabilities for the deployed Shiny app, and a second, tree-based model to check the findings.</li>
 </ul>
-<p>All results are associations, not causes: the data are one 2024 cross-section.</p>
 </section>
 <section id="data-and-predictors" class="level1">
 <h1>2. Data and predictors</h1>
@@ -2666,7 +2664,7 @@ age_centred                      -0.08        1.00               -0.15
 age_centred_squared              -0.03       -0.15                1.00</code></pre>
 </div>
 </div>
-<p>The highest correlation is between <code>household_size</code> and <code>n_children_under15</code> (about 0.8). That is high but not near 1, and both are controls rather than the effects of interest, so both are kept. The education and internet columns are not affected.</p>
+<p>The highest correlation is between <code>household_size</code> and <code>n_children_under15</code> (about 0.8). Both are controls rather than the effects of interest, so both are kept. The education and internet columns are not affected.</p>
 <p>Each combination of matric and internet access must also contain enough people to estimate the interaction reliably:</p>
 <div class="cell">
 <details open class="code-fold">
@@ -2764,12 +2762,12 @@ age_centred_squared              -0.03       -0.15                1.00</code></p
 </tr>
 </tbody>
 </table>
-<p>Milestone 1 set the requirement to check findings <em>“across at least two modelling approaches, such as logistic regression and a tree-based method”</em>. Models 2 and 3 are both tree-based but play different roles: the tree is readable, and the forest is accurate but hard to read.</p>
+<p>Models 2 and 3 are both tree-based but play different roles: the tree is readable, and the forest is accurate but hard to read.</p>
 <p>Models considered but not used:</p>
 <ul>
 <li><strong>Penalised logistic regression (lasso/ridge):</strong> useful when there are many predictors. With 15 chosen predictors and more than 20,000 rows, a standard logistic regression is stable, and penalisation would shrink the interaction coefficient that the question is about.</li>
 <li><strong>k-nearest neighbours, support vector machines, neural networks:</strong> they give no interpretable effect sizes, and k-NN and SVMs need scaled numeric inputs, which the categorical predictors here do not suit.</li>
-<li><strong>Clustering:</strong> the question has a known target (<code>employed</code>), so a supervised model is the right tool.</li>
+<li><strong>Clustering:</strong> the question has a known target (<code>employed</code>), so a supervised model is more appropriate.</li>
 </ul>
 <p>All three models are fitted to the same training rows with the same predictors, so the evaluation notebook can compare them fairly.</p>
 </section>
@@ -2800,11 +2798,11 @@ age_centred_squared              -0.03       -0.15                1.00</code></p
 </tr>
 <tr class="odd">
 <td>Log-odds linear in the numeric predictors</td>
-<td>Age has a curved relationship with employment (low for the young, highest in mid-career), so <code>age_centred_squared</code> is included next to <code>age_centred</code> (Milestone 2, section 10.4).</td>
+<td>Age has a curved relationship with employment (low for the young, highest in mid-career), so <code>age_centred_squared</code> is included next to <code>age_centred</code>.</td>
 </tr>
 <tr class="even">
 <td>No strong multicollinearity</td>
-<td>Overlapping predictors were removed in section 2.2, and the remaining correlations are acceptable.</td>
+<td>Overlapping predictors were removed in preprocessing, and the remaining correlations are acceptable.</td>
 </tr>
 <tr class="odd">
 <td>Enough cases for each parameter</td>
@@ -2854,7 +2852,7 @@ age_centred_squared              -0.03       -0.15                1.00</code></p
 </section>
 <section id="fitted-coefficients" class="level2">
 <h2 class="anchored" data-anchor-id="fitted-coefficients">4.3 Fitted coefficients</h2>
-<p>The table converts each coefficient into an odds ratio with a 95% confidence interval. This is the fitted model itself; interpreting it against the business objectives is part of evaluation.</p>
+<p>The table converts each coefficient into an odds ratio with a 95% confidence interval. This is the fitted model itself interpreting it against the business objectives is part of evaluation.</p>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
@@ -3211,14 +3209,14 @@ age_centred_squared              -0.03       -0.15                1.00</code></p
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">67</span>) <span class="co"># Same seed as the train/test split, for reproducibility</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>employment_tree <span class="ot">&lt;-</span> <span class="fu">rpart</span>(</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  employment_tree_formula, <span class="co"># employed ~ the same 15 predictors joined with +; the tree finds interactions itself</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  employment_tree_formula,</span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> model_train,</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;class&quot;</span>,        <span class="co"># classification tree: predicts a class (and its probability), not a number</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;class&quot;</span>,       </span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">rpart.control</span>(</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">maxdepth =</span> <span class="dv">5</span>,          <span class="co"># at most 5 questions from the top of the tree to a prediction, so it stays readable</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">minbucket =</span> <span class="dv">100</span>,       <span class="co"># every final group (leaf) contains at least 100 people</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">cp =</span> <span class="fl">0.001</span>,            <span class="co"># a split is only kept if it improves the fit by at least 0.1%</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">xval =</span> <span class="dv">0</span>               <span class="co"># rpart&#39;s own cross-validation off: it splits by person, not by household (see 5.1)</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">maxdepth =</span> <span class="dv">5</span>,         </span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">minbucket =</span> <span class="dv">100</span>,      </span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">cp =</span> <span class="fl">0.001</span>,            </span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">xval =</span> <span class="dv">0</span>               </span>
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
@@ -3355,15 +3353,15 @@ age_centred_squared              -0.03       -0.15                1.00</code></p
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># household_id and person_weight are not in the formula, so they are not used</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>employment_forest <span class="ot">&lt;-</span> <span class="fu">ranger</span>(</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  employment_tree_formula,             <span class="co"># same formula as the tree</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  employment_tree_formula,             </span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> model_train,</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">num.trees =</span> <span class="dv">500</span>,                     <span class="co"># number of trees grown; the forest averages their predictions</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="dv">3</span>,                            <span class="co"># predictors each split may choose from, picked at random (about √15)</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">min.node.size =</span> <span class="dv">10</span>,                  <span class="co"># smallest group of people a tree may end in</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">probability =</span> <span class="cn">TRUE</span>,                  <span class="co"># predict the probability of Employed, not only a class</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">respect.unordered.factors =</span> <span class="st">&quot;order&quot;</span>, <span class="co"># sort category levels by their share employed before splitting</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">importance =</span> <span class="st">&quot;permutation&quot;</span>,          <span class="co"># measure each predictor&#39;s importance by shuffling its values</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">67</span>                            <span class="co"># fixes the random resamples, so the same forest is grown every run</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">num.trees =</span> <span class="dv">500</span>,                     </span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="dv">3</span>,                            </span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">min.node.size =</span> <span class="dv">10</span>,                  </span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">probability =</span> <span class="cn">TRUE</span>,                  </span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">respect.unordered.factors =</span> <span class="st">&quot;order&quot;</span>, </span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">importance =</span> <span class="st">&quot;permutation&quot;</span>,          </span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">67</span>                            </span>
 <span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
@@ -3566,37 +3564,6 @@ age_centred_squared              -0.03       -0.15                1.00</code></p
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>p_logistic <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">predict</span>(employment_logistic, model_test, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>))</span>
 <span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>p_tree     <span class="ot">&lt;-</span> <span class="fu">predict</span>(employment_tree, model_test, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>)[, <span class="st">&quot;Employed&quot;</span>]</span>
 <span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>p_forest   <span class="ot">&lt;-</span> <span class="fu">predict</span>(employment_forest, model_test)<span class="sc">$</span>predictions[, <span class="st">&quot;Employed&quot;</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>What is left to tune.</strong> The values above are starting points, not tuned values:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Model</th>
-<th>Parameters to tune</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Logistic regression</td>
-<td>None (only the classification threshold)</td>
-</tr>
-<tr class="even">
-<td>Decision tree</td>
-<td><code>cp</code> (pruning), <code>maxdepth</code>, <code>minbucket</code></td>
-</tr>
-<tr class="odd">
-<td>Random forest</td>
-<td><code>mtry</code>, <code>min.node.size</code> (<code>num.trees</code> only needs to be large enough)</td>
-</tr>
-<tr class="even">
-<td>All models</td>
-<td>The classification threshold. With 65% employed, a cut-off of 0.5 will rarely predict Unemployed.</td>
-</tr>
-</tbody>
-</table>
 <p>Points to keep the tuning free of leakage:</p>
 <ul>
 <li>Cross-validate <strong>by household</strong>, for example <code>caret::groupKFold(model_train$household_id, k = 5)</code>, for the same reason the train/test split was grouped by household. rpart’s own <code>xval</code> splits by person and should stay switched off.</li>
