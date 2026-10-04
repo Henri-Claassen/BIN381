@@ -16,6 +16,16 @@ execute:
   message: false
 ---
 
+## Run this if you need the packages
+
+```{r}
+#| label: Install Packages
+#| eval: false
+# Only needed if the packages are not installed yet: remove the # in front of
+# install.packages() and run this chunk once. It is skipped when rendering.
+# install.packages(c("tidyverse", "survey", "ranger"))
+```
+
 ## About this file
 
 This file covers model selection and implementation for the **income question** (research area D). It follows the same structure as `3.1) Employment Model.qmd`: it restates the question, chooses the candidate models, explains why each one was chosen and fits them to the training data.
@@ -26,7 +36,7 @@ As with the employment models, **the test set is not used here** and no paramete
 
 The steps are the same as in `3.1) Employment Model.qmd`:
 
-1.  **Load the shared setup** with `source("../R/model_preparation.R")`, which gives the notebook the predictor lists, the formulas and `prepare_income_data()`.
+1.  **Load the shared setup** with `source("R/model_preparation.R")`, which gives the notebook the predictor lists, the formulas and `prepare_income_data()`.
 2.  **Prepare the training data** with `prepare_income_data()`, which reads `income_train.csv` the same way in every notebook (section 2.1).
 3.  **Fit two models** on the same rows (sections 4–5). Parameters that work as in the employment models are only briefly commented here; the differences are explained in full.
 4.  **Save** both models to `Models/` and check that they reload with identical predictions (section 6).
@@ -37,7 +47,7 @@ The steps are the same as in `3.1) Employment Model.qmd`:
 | Linear regression | `survey::svyglm()` | Finds the coefficients that make the predicted `log_salary` as close as possible to the actual values (least squares), using the survey weights | One coefficient per predictor, readable as a percentage difference in salary |
 | Random forest | `ranger::ranger()` | Grows 500 regression trees on random resamples and averages their predicted `log_salary` | Predicted `log_salary`, and a ranking of how much each predictor is used |
 
-**Formulas.** The `+` and `*` work exactly as explained with the four-group tables in `3.1) Employment Model.qmd` (and in `R/model_preparation.R`), but the outcome is salary instead of employment:
+**Formulas.** The `+` and `*` work exactly as explained with the four-group tables in `3.1) Employment Model.qmd` (and in `Scripts/R/model_preparation.R`), but the outcome is salary instead of employment:
 
 - **With `+`**, the salary difference that goes with home internet is forced to be the same for people with and without matric.
 - **With `*`**, the regression adds a fourth number for people with **both** matric and home internet. Above zero means the salary premium for matric is larger in connected households (complements); below zero means it is smaller (substitutes).
@@ -79,12 +89,12 @@ This question is **exploratory**. Salaries are missing for a large share of empl
 
 ## 2.1 Reading the training data
 
-The data are read through `prepare_income_data()` in `R/model_preparation.R`, which the evaluation notebook and the Shiny app also use. It reads `household_id` as text, applies the fixed category levels and leaves out people with unknown education (`matric_plus` blank) or unknown household internet (`any_home_internet` blank). Milestone 2 left these missing values in `income_data.csv` to be handled here; they are left out rather than imputed, as in the employment data.
+The data are read through `prepare_income_data()` in `Scripts/R/model_preparation.R`, which the evaluation notebook and the Shiny app also use. It reads `household_id` as text, applies the fixed category levels and leaves out people with unknown education (`matric_plus` blank) or unknown household internet (`any_home_internet` blank). Milestone 2 left these missing values in `income_data.csv` to be handled here; they are left out rather than imputed, as in the employment data.
 
 ```{r}
 #| label: Read Training Data
 
-source("../R/model_preparation.R")
+source("R/model_preparation.R")
 
 # Raw file, only to count the rows before preparation
 income_train_raw <- read_csv(
@@ -339,7 +349,7 @@ tibble(
 **Preparing the test set** with the same function:
 
 ``` r
-source("../R/model_preparation.R")
+source("R/model_preparation.R")
 income_test <- prepare_income_data("../Datasets/Analytical/income_test.csv")
 ```
 

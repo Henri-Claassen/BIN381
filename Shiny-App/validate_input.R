@@ -1,7 +1,12 @@
+# ---- Run this if you need the packages ----------------------------------------
+# Only needed if the packages are not installed yet: remove the # in front of
+# install.packages() and run this line once.
+# install.packages(c("tidyverse"))
+
 # Milestone 3: validation of new data for the deployed employment model
 #
-# Used by the Shiny app (App/app.R) before any prediction is made, and documented
-# in Scripts/4) Deployment Preparation.qmd. The checks can also be run outside the
+# Used by the Shiny app (Shiny-App/app.R) before any prediction is made, and documented
+# in Scripts/3.4) Deployment Preparation.qmd. The checks can also be run outside the
 # app, for example on a new Stats SA survey wave:
 #   raw <- read_csv("new_file.csv", col_types = cols(.default = col_character()))
 #   result <- validate_input(raw)
@@ -10,7 +15,7 @@
 # type (for example "yes" in a 0/1 column) are reported instead of silently
 # becoming missing when R guesses the column types.
 #
-# Relies on R/model_preparation.R (category_levels) and R/monitoring.R
+# Relies on Scripts/R/model_preparation.R (category_levels) and monitoring.R
 # (monitoring_thresholds$min_rows), which must be sourced first.
 
 library(tidyverse)
@@ -56,7 +61,7 @@ input_columns <- tribble(
   "employed", FALSE, "category", NA, NA,
     "Optional. The actual outcome. Only needed to measure how accurate the predictions are.", "Employed",
   "person_weight", FALSE, "number", 0, Inf,
-    "Optional. Stats SA survey weight. Makes the group results describe the population; without it, every person counts equally.", "950.5",
+    "Optional. Stats SA survey weight (how many people this person represents). Checked, but not needed for the results on this page.", "950.5",
   "household_id", FALSE, "text", NA, NA,
     "Optional. Household identifier. Not used by the model.", "H001"
 )
@@ -87,8 +92,7 @@ validate_input <- function(raw) {
   missing_required <- setdiff(required, names(raw))
   if (length(missing_required) > 0) {
     add_check("Required columns present", "Fail", nrow(raw),
-              paste("Missing:", paste(missing_required, collapse = ", "),
-                    "- the file cannot be used. See the data format table."))
+              paste0("These columns are missing: ", paste(missing_required, collapse = ", "), ". The model needs them to predict."))
     return(list(fatal = TRUE, checks = checks, data = raw, valid = rep(FALSE, nrow(raw))))
   }
   add_check("Required columns present", "Pass", 0, "All 15 predictor columns are in the file.")
