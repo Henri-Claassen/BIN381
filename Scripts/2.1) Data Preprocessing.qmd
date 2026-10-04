@@ -3031,8 +3031,7 @@ analytical <- analytical |>
     edu_digital_group = factor(
       edu_digital_group, 
       levels = c(
-        "Below matric, 
-        no internet",
+        "Below matric, no internet",
         "Below matric, internet",
         "Matric+, no internet", 
         "Matric+, internet", "Education unknown")
