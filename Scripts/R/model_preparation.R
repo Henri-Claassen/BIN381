@@ -47,7 +47,7 @@ apply_category_levels <- function(data) {
 
 # 2. Predictor sets -------------------------------------------------------------
 # The reasons for including or leaving out each column are given in section 2 of
-# each modelling notebook and in "Model Choices.docx".
+# each modelling notebook and in "Milestone 3 Submit.docx".
 
 employment_predictors <- c(
   # Research question: education and digital access

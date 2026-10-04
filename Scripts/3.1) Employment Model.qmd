@@ -30,7 +30,7 @@ execute:
 
 This file covers the "Modelling strategy and technique selection" and "Model implementation and reproducibility" for the **employment question** (research areas B and C). It restates the analytical question, chooses the candidate models, explains why each one was chosen and fits them to the training data.
 
-Tuning and evaluation are done in a separate notebook. This file therefore **does not use the test set**, does not tune any parameters and does not calculate performance metrics. It fits each model once with documented starting parameters and saves it to `Models/`, so the evaluation notebook can load the models, tune them with household-grouped cross-validation and test them. The income question (research area D) is modelled in `3.2) Income Model.qmd`. The reasoning behind each model is also written up in `Model Choices.docx`.
+Tuning and evaluation are done in a separate notebook. This file therefore **does not use the test set**, does not tune any parameters and does not calculate performance metrics. It fits each model once with documented starting parameters and saves it to `Models/`, so the evaluation notebook can load the models, tune them with household-grouped cross-validation and test them. The income question (research area D) is modelled in `3.2) Income Model.qmd`. The reasoning behind each model is also written up in `Milestone 3 Submit.docx` (in `Documentation/Milestone Documentation/Milestone 3/`).
 
 ## How this notebook works
 

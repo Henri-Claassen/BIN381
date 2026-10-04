@@ -2209,11 +2209,13 @@ vertical-align: -.125em;
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#run-this-if-you-need-the-packages" id="toc-run-this-if-you-need-the-packages" class="nav-link active" data-scroll-target="#run-this-if-you-need-the-packages">Run this if you need the packages</a></li>
-  <li><a href="#about-this-file" id="toc-about-this-file" class="nav-link" data-scroll-target="#about-this-file">About this file</a></li>
+  <li><a href="#initial-setup" id="toc-initial-setup" class="nav-link active" data-scroll-target="#initial-setup">Initial Setup</a>
+  <ul class="collapse">
+  <li><a href="#run-this-if-you-need-the-packages" id="toc-run-this-if-you-need-the-packages" class="nav-link" data-scroll-target="#run-this-if-you-need-the-packages">Run this if you need the packages</a></li>
   <li><a href="#loading-the-packages-we-need" id="toc-loading-the-packages-we-need" class="nav-link" data-scroll-target="#loading-the-packages-we-need">Loading the packages we need</a></li>
   <li><a href="#file-paths" id="toc-file-paths" class="nav-link" data-scroll-target="#file-paths">File paths</a></li>
-  <li><a href="#evaluation-design" id="toc-evaluation-design" class="nav-link" data-scroll-target="#evaluation-design">1. Evaluation design</a>
+  </ul></li>
+  <li><a href="#evaluating-models" id="toc-evaluating-models" class="nav-link" data-scroll-target="#evaluating-models">1. Evaluating Models</a>
   <ul class="collapse">
   <li><a href="#what-is-being-compared" id="toc-what-is-being-compared" class="nav-link" data-scroll-target="#what-is-being-compared">1.1 What is being compared</a></li>
   <li><a href="#metrics-and-why-they-were-chosen" id="toc-metrics-and-why-they-were-chosen" class="nav-link" data-scroll-target="#metrics-and-why-they-were-chosen">1.2 Metrics and why they were chosen</a></li>
@@ -2300,6 +2302,8 @@ vertical-align: -.125em;
 </header>
 
 
+<section id="initial-setup" class="level1">
+<h1>Initial Setup</h1>
 <section id="run-this-if-you-need-the-packages" class="level2">
 <h2 class="anchored" data-anchor-id="run-this-if-you-need-the-packages">Run this if you need the packages</h2>
 <div class="cell">
@@ -2311,69 +2315,17 @@ vertical-align: -.125em;
 </details>
 </div>
 </section>
-<section id="about-this-file" class="level2">
-<h2 class="anchored" data-anchor-id="about-this-file">About this file</h2>
-<p>This file covers the Milestone 3 rubric items “Model implementation and reproducibility” (tuning and resampling) and “Technical model evaluation and comparison”. It continues from <code>3.1) Employment Model.qmd</code> and <code>3.2) Income Model.qmd</code>, which chose the candidate models, fitted them once with starting parameters and saved them to <code>Models/</code>.</p>
-<p>The file works in a fixed order, so that the test sets cannot influence any choice:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Section</th>
-<th>Data used</th>
-<th>What happens</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>2–3</td>
-<td>Training files only</td>
-<td>Household-grouped cross-validation folds are built.</td>
-</tr>
-<tr class="even">
-<td>4–5</td>
-<td>Training files only</td>
-<td>The tree and forest parameters are tuned, the baseline models are cross-validated and each employment model’s classification threshold is chosen, all from out-of-fold predictions.</td>
-</tr>
-<tr class="odd">
-<td>6</td>
-<td>Training files only</td>
-<td>The tuned models are refitted on the full training files and saved.</td>
-</tr>
-<tr class="even">
-<td>7</td>
-<td>Test files, <strong>used once</strong></td>
-<td>Every model is scored on the test sets with the parameters and thresholds fixed in sections 4–6.</td>
-</tr>
-<tr class="odd">
-<td>8</td>
-<td>Training files and fitted models</td>
-<td>The education × internet interaction is tested and checked across the models (Milestone 1 success criteria).</td>
-</tr>
-<tr class="even">
-<td>9</td>
-<td>Results of sections 4–8</td>
-<td>The comparison matrix and the final model selection.</td>
-</tr>
-</tbody>
-</table>
-</section>
 <section id="loading-the-packages-we-need" class="level2">
 <h2 class="anchored" data-anchor-id="loading-the-packages-we-need">Loading the packages we need</h2>
 <div class="cell">
 <details open class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)  <span class="co"># data handling</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)     <span class="co"># svyglm(): survey-weighted regressions, regTermTest(): likelihood-ratio test</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart)      <span class="co"># decision tree</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart.plot) <span class="co"># plot of the tuned tree</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)  </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(survey)     <span class="co"># survey-weighted regressions, likelihood-ratio test</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart)      </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart.plot) </span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ranger)     <span class="co"># random forest</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pROC)       <span class="co"># ROC curves, AUC with confidence intervals, DeLong test</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># caret is used for one function only, caret::groupKFold(), so it is not loaded</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pROC)       <span class="co"># ROC curves, AUC with confidence intervals, DeLong test</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -2387,8 +2339,9 @@ vertical-align: -.125em;
 </details>
 </div>
 </section>
-<section id="evaluation-design" class="level1">
-<h1>1. Evaluation design</h1>
+</section>
+<section id="evaluating-models" class="level1">
+<h1>1. Evaluating Models</h1>
 <section id="what-is-being-compared" class="level2">
 <h2 class="anchored" data-anchor-id="what-is-being-compared">1.1 What is being compared</h2>
 <table class="caption-top table">
@@ -2406,22 +2359,22 @@ vertical-align: -.125em;
 </thead>
 <tbody>
 <tr class="odd">
-<td>Employment (research areas B and C)</td>
+<td>Employment</td>
 <td>Survey-weighted logistic regression, decision tree, random forest, and a demographics-only baseline</td>
-<td>Binary classification of <code>employed</code></td>
+<td>Binary classification of employed</td>
 </tr>
 <tr class="even">
-<td>Income (research area D)</td>
+<td>Income</td>
 <td>Survey-weighted linear regression, random forest, and a demographics-only baseline</td>
-<td>Regression of <code>log_salary</code></td>
+<td>Regression of log_salary</td>
 </tr>
 </tbody>
 </table>
-<p>The <strong>baseline models</strong> are new in this file. The Milestone 2 success criteria require the models to be compared with a demographics-only baseline: a model that knows a person’s age, sex, population group, province and settlement type, but nothing about their education, digital access or household. If the full models do not predict clearly better than the baseline, education and digital access add little predictive information beyond who and where a person is. Each baseline is a survey-weighted regression with the same design as the main regression, so the only difference between the two is the predictors.</p>
+<p>The <strong>baseline models</strong> are what we create in this file. The Milestone 2 success criteria required the models to be compared with a demographics only baseline (a model that knows a person’s age, sex, population group, province and settlement type), but nothing about their education, digital access or household. If the full models do not predict better than the baseline we create in this section, education and digital access add little predictive information beyond who and where a person is.</p>
 </section>
 <section id="metrics-and-why-they-were-chosen" class="level2">
 <h2 class="anchored" data-anchor-id="metrics-and-why-they-were-chosen">1.2 Metrics and why they were chosen</h2>
-<p>No single metric is enough, so each task gets several that measure different things.</p>
+<p>We can’t predict based off of a single metric, therefore each task gets several that measure different things.</p>
 <p><strong>Employment (classification).</strong> The models predict the probability of being <strong>Employed</strong>, so Employed is the positive class. About 35% of the labour force is unemployed, so a model that always predicts Employed would already be 65% accurate; accuracy on its own is therefore misleading.</p>
 <table class="caption-top table">
 <colgroup>
@@ -2439,37 +2392,37 @@ vertical-align: -.125em;
 <tbody>
 <tr class="odd">
 <td>ROC-AUC</td>
-<td>How well the predicted probabilities rank employed people above unemployed people, over every possible threshold</td>
-<td>Main tuning and comparison metric: it does not depend on the threshold or on the class balance. Milestone 2 set AUC ≥ 0.70 as the minimum acceptable performance.</td>
+<td>How well the predicted probabilities rank employed people compared to unemployed people.</td>
+<td>It is the main tuning and comparison metric: it does not depend on the threshold or on the class balance.</td>
 </tr>
 <tr class="even">
 <td>Balanced accuracy</td>
-<td>The average of sensitivity and specificity</td>
+<td>The average of sensitivity and specificity.</td>
 <td>Treats both classes as equally important, unlike accuracy.</td>
 </tr>
 <tr class="odd">
 <td>Sensitivity (recall)</td>
-<td>Share of employed people predicted Employed</td>
+<td>Share of employed people predicted Employed.</td>
 <td></td>
 </tr>
 <tr class="even">
 <td>Specificity</td>
-<td>Share of unemployed people predicted Unemployed</td>
+<td>Share of unemployed people that get predicted as unemployed.</td>
 <td>The smaller class, and the one policy is most concerned with.</td>
 </tr>
 <tr class="odd">
 <td>Precision, F1</td>
-<td>Share of Employed predictions that are correct; the balance of precision and sensitivity</td>
+<td>Share of Employed predictions that are correct; the balance of precision and sensitivity.</td>
 <td>Required by the brief’s list of classification metrics.</td>
 </tr>
 <tr class="even">
 <td>Accuracy</td>
-<td>Share of all predictions that are correct</td>
+<td>Share of all predictions that are correct.</td>
 <td>Reported for completeness, next to the 65% of the “always Employed” rule.</td>
 </tr>
 <tr class="odd">
 <td>Brier score</td>
-<td>Mean squared difference between predicted probability and the actual outcome (0 = perfect)</td>
+<td>Mean squared difference between predicted probability and the actual outcome (0 = perfect).</td>
 <td>The Shiny app will show probabilities, so they must be accurate, not only well ranked.</td>
 </tr>
 </tbody>

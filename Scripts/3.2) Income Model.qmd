@@ -30,7 +30,7 @@ execute:
 
 This file covers model selection and implementation for the **income question** (research area D). It follows the same structure as `3.1) Employment Model.qmd`: it restates the question, chooses the candidate models, explains why each one was chosen and fits them to the training data.
 
-As with the employment models, **the test set is not used here** and no parameters are tuned. Each model is fitted once with documented starting parameters and saved to `Models/`, for tuning and evaluation in the evaluation notebook. The reasoning is also written up in `Model Choices.docx`.
+As with the employment models, **the test set is not used here** and no parameters are tuned. Each model is fitted once with documented starting parameters and saved to `Models/`, for tuning and evaluation in the evaluation notebook. The reasoning is also written up in `Milestone 3 Submit.docx` (in `Documentation/Milestone Documentation/Milestone 3/`).
 
 ## How this notebook works
 
