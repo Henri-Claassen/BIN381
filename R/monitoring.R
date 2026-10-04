@@ -200,17 +200,17 @@ drift_report <- function(prepared, reference) {
 # Groups with fewer than min_group_rows people, or without both employed and
 # unemployed people, are left out because their AUC would be too imprecise.
 subgroup_auc <- function(truth, probability, group) {
-  group <- as.character(group)
-  eligible <- unique(group)[sapply(unique(group), \(g) {
-    sum(group == g) >= monitoring_thresholds$min_group_rows && n_distinct(truth[group == g]) == 2
+  person_group <- as.character(group)
+  eligible <- unique(person_group)[sapply(unique(person_group), \(g) {
+    sum(person_group == g) >= monitoring_thresholds$min_group_rows && n_distinct(truth[person_group == g]) == 2
   })]
-  tibble(
-    group = eligible,
-    people = map_int(eligible, \(g) sum(group == g)),
-    auc = map_dbl(eligible, \(g) as.numeric(auc(roc(truth[group == g], probability[group == g],
-                                                    levels = c("Unemployed", "Employed"),
-                                                    direction = "<", quiet = TRUE))))
-  )
+  # Calculated before tibble(): inside tibble() a column called "group" would
+  # hide the per-person groups and select the wrong people
+  people <- map_int(eligible, \(g) sum(person_group == g))
+  group_auc <- map_dbl(eligible, \(g) as.numeric(auc(roc(truth[person_group == g], probability[person_group == g],
+                                                         levels = c("Unemployed", "Employed"),
+                                                         direction = "<", quiet = TRUE))))
+  tibble(group = eligible, people = people, auc = group_auc)
 }
 
 subgroup_gap_status <- function(gap, baseline_gap) {

@@ -24,14 +24,14 @@ The deployed model is the **survey-weighted logistic regression** for employment
 
 ## How this notebook works
 
-1. **Load** the selected model, the thresholds and the data (section 4).
-2. **Make the slim model**, the part of the logistic regression the app needs to predict, and check that it predicts exactly like the full model (section 5).
-3. **Calculate the numbers each app page shows**, so the app never needs the survey microdata:
-   - the predicted employment rates of the four matric × internet groups, for every combination of the app's filters (section 6);
-   - the province scenario figures (section 7);
-   - the test-set baseline and training-data mix that monitoring compares new data with (section 8);
-   - the key results and subgroup table for the Overview and About pages (section 9).
-4. **Save** everything to `App/app_data.rds` (section 10).
+1.  **Load** the selected model, the thresholds and the data (section 4).
+2.  **Make the slim model**, the part of the logistic regression the app needs to predict, and check that it predicts exactly like the full model (section 5).
+3.  **Calculate the numbers each app page shows**, so the app never needs the survey microdata:
+    - the predicted employment rates of the four matric × internet groups, for every combination of the app's filters (section 6);
+    - the province scenario figures (section 7);
+    - the test-set baseline and training-data mix that monitoring compares new data with (section 8);
+    - the key results and subgroup table for the Overview and About pages (section 9).
+4.  **Save** everything to `App/app_data.rds` (section 10).
 
 Rerun this notebook whenever the deployed model is retrained, then restart the app.
 
@@ -41,7 +41,7 @@ Rerun this notebook whenever the deployed model is retrained, then restart the a
 |----|----|
 | **Intended users** | Policy analysts at National Treasury (the Milestone 1 stakeholder), and the analysts who maintain the model. |
 | **Decisions supported** | How to divide limited funding between digital-access subsidies and education programmes: whether the two reinforce each other (complements) and in which provinces more home internet access is associated with the largest employment gains. |
-| **Inputs** | (1) Filter choices: province, settlement type, age band and sex. (2) A scenario target: the share of households with home internet. (3) New survey data as a CSV file in the documented format, for checking and scoring. |
+| **Inputs** | \(1\) Filter choices: province, settlement type, age band and sex. (2) A scenario target: the share of households with home internet. (3) New survey data as a CSV file in the documented format, for checking and scoring. |
 | **Outputs** | Predicted employment rates for groups of people, with 95% confidence intervals; province scenarios; accuracy measures with plain-language explanations; a data validation report; monitoring checks with a green / amber / red status. **No output is ever a prediction for an individual person.** |
 | **Operational workflow** | The notebooks 2.1–3.3 and this one are run in order to (re)build the models and `App/app_data.rds`. Users open the app (`shiny::runApp("App")`). When a new survey wave arrives, an analyst uploads it on the "Check and predict new data" page; the app validates it, predicts, and runs the monitoring checks. A red check triggers retraining: the notebooks are rerun on the new data. |
 
@@ -428,19 +428,24 @@ tibble(
 
 On the app's "Check and predict new data" page, an uploaded CSV goes through these steps (`R/validate_input.R`, `R/model_preparation.R`, `R/deployment_model.R`):
 
-1. **Read every column as text**, so a value of the wrong type (for example "yes" in a 0/1 column) is reported instead of silently becoming missing.
-2. **Validate** with `validate_input()`:
-   - all 15 predictor columns are present (otherwise the file is rejected and the missing columns are named);
-   - numbers are numbers, 0/1 columns contain only 0 or 1, whole-number columns are whole, and values are in range (for example `age_centred` from −25 to 24, `household_size` from 1 to 25);
-   - categories only contain the values the model was trained with (for example the nine province names);
-   - calculated columns agree with their parts (`age_centred_squared` = `age_centred`², `female_x_children` = `female` × `n_children_under15`), and `n_children_under15` is smaller than `household_size`;
-   - rows with unknown education (blank `matric_plus`) are left out, as in training;
-   - a warning is given when fewer than 200 rows can be used.
+1.  **Read every column as text**, so a value of the wrong type (for example "yes" in a 0/1 column) is reported instead of silently becoming missing.
 
-   Rows that fail a check are left out, and the report says how many and why.
-3. **Prepare** the valid rows with `prepare_employment_frame()`, the same steps used for the training data.
-4. **Predict** each person's probability with the slim model, and show only group-level results: predicted (and, if available, actual) employment rates by province, settlement type and matric × internet group.
-5. If the file contains the actual outcome (`employed`), **measure accuracy** and **run the monitoring checks** below.
+2.  **Validate** with `validate_input()`:
+
+    - all 15 predictor columns are present (otherwise the file is rejected and the missing columns are named);
+    - numbers are numbers, 0/1 columns contain only 0 or 1, whole-number columns are whole, and values are in range (for example `age_centred` from −25 to 24, `household_size` from 1 to 25);
+    - categories only contain the values the model was trained with (for example the nine province names);
+    - calculated columns agree with their parts (`age_centred_squared` = `age_centred`², `female_x_children` = `female` × `n_children_under15`), and `n_children_under15` is smaller than `household_size`;
+    - rows with unknown education (blank `matric_plus`) are left out, as in training;
+    - a warning is given when fewer than 200 rows can be used.
+
+    Rows that fail a check are left out, and the report says how many and why.
+
+3.  **Prepare** the valid rows with `prepare_employment_frame()`, the same steps used for the training data.
+
+4.  **Predict** each person's probability with the slim model, and show only group-level results: predicted (and, if available, actual) employment rates by province, settlement type and matric × internet group.
+
+5.  If the file contains the actual outcome (`employed`), **measure accuracy** and **run the monitoring checks** below.
 
 ## 11.2 Monitoring measures and thresholds
 
@@ -448,12 +453,12 @@ The thresholds are defined once, in `R/monitoring.R`:
 
 | Check | What it measures | Test-set value | Green | Amber | Red |
 |----|----|----|----|----|----|
-| AUC | How well the model ranks employed above unemployed people | `r round(baseline$auc, 3)` | ≥ 0.715 | 0.70–0.715 | < 0.70 (Milestone 2 minimum) |
-| Balanced accuracy | Average of sensitivity and specificity at the 0.639 threshold | `r round(baseline$balanced_accuracy, 3)` | ≥ 0.65 | 0.60–0.65 | < 0.60 |
-| Brier score | Accuracy of the probabilities (lower is better) | `r round(baseline$brier, 3)` | ≤ 0.20 | 0.20–0.22 | > 0.22 |
+| AUC | How well the model ranks employed above unemployed people | `r round(baseline$auc, 3)` | ≥ 0.715 | 0.70–0.715 | \< 0.70 (Milestone 2 minimum) |
+| Balanced accuracy | Average of sensitivity and specificity at the 0.639 threshold | `r round(baseline$balanced_accuracy, 3)` | ≥ 0.65 | 0.60–0.65 | \< 0.60 |
+| Brier score | Accuracy of the probabilities (lower is better) | `r round(baseline$brier, 3)` | ≤ 0.20 | 0.20–0.22 | \> 0.22 |
 | Calibration gap | Predicted minus actual employment rate | `r round(baseline$calibration_gap, 3)` | within ±0.03 | ±0.03–0.05 | beyond ±0.05 |
-| PSI (drift) | Change in the mix of province, settlement type, population group, age band, matric, home internet and smartphone access | ≈ 0 | < 0.10 | 0.10–0.25 | > 0.25 |
-| Subgroup AUC gap | Widening of the gap between the best and worst population group's AUC | `r round(baseline_subgroup_gap, 3)` | ≤ +0.05 | +0.05–0.10 | > +0.10 |
+| PSI (drift) | Change in the mix of province, settlement type, population group, age band, matric, home internet and smartphone access | ≈ 0 | \< 0.10 | 0.10–0.25 | \> 0.25 |
+| Subgroup AUC gap | Widening of the gap between the best and worst population group's AUC | `r round(baseline_subgroup_gap, 3)` | ≤ +0.05 | +0.05–0.10 | \> +0.10 |
 
 The drift checks need no outcome, so they run on every upload; the accuracy checks need the `employed` column.
 
