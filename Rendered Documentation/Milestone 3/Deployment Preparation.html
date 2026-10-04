@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Group 5">
-<meta name="dcterms.date" content="2026-09-29">
+<meta name="dcterms.date" content="2026-10-04">
 
 <title>Deployment Preparation</title>
 <style>
@@ -2256,7 +2256,7 @@ vertical-align: -.125em;
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 29, 2026</p>
+      <p class="date">October 4, 2026</p>
     </div>
   </div>
   
@@ -3125,7 +3125,7 @@ vertical-align: -.125em;
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(baseline_subgroup_gap, <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.052</code></pre>
+<pre><code>[1] 0.133</code></pre>
 </div>
 </div>
 </section>
@@ -3336,7 +3336,7 @@ vertical-align: -.125em;
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">App/app_data.rds</td>
-<td style="text-align: right;">357</td>
+<td style="text-align: right;">356.9</td>
 <td style="text-align: left;">FALSE</td>
 </tr>
 </tbody>
@@ -3352,8 +3352,8 @@ vertical-align: -.125em;
 <h2 class="anchored" data-anchor-id="how-new-data-is-validated-and-scored">11.1 How new data is validated and scored</h2>
 <p>On the app’s “Check and predict new data” page, an uploaded CSV goes through these steps (<code>R/validate_input.R</code>, <code>R/model_preparation.R</code>, <code>R/deployment_model.R</code>):</p>
 <ol type="1">
-<li><strong>Read every column as text</strong>, so a value of the wrong type (for example “yes” in a 0/1 column) is reported instead of silently becoming missing.</li>
-<li><strong>Validate</strong> with <code>validate_input()</code>:
+<li><p><strong>Read every column as text</strong>, so a value of the wrong type (for example “yes” in a 0/1 column) is reported instead of silently becoming missing.</p></li>
+<li><p><strong>Validate</strong> with <code>validate_input()</code>:</p>
 <ul>
 <li>all 15 predictor columns are present (otherwise the file is rejected and the missing columns are named);</li>
 <li>numbers are numbers, 0/1 columns contain only 0 or 1, whole-number columns are whole, and values are in range (for example <code>age_centred</code> from −25 to 24, <code>household_size</code> from 1 to 25);</li>
@@ -3362,10 +3362,10 @@ vertical-align: -.125em;
 <li>rows with unknown education (blank <code>matric_plus</code>) are left out, as in training;</li>
 <li>a warning is given when fewer than 200 rows can be used.</li>
 </ul>
-Rows that fail a check are left out, and the report says how many and why.</li>
-<li><strong>Prepare</strong> the valid rows with <code>prepare_employment_frame()</code>, the same steps used for the training data.</li>
-<li><strong>Predict</strong> each person’s probability with the slim model, and show only group-level results: predicted (and, if available, actual) employment rates by province, settlement type and matric × internet group.</li>
-<li>If the file contains the actual outcome (<code>employed</code>), <strong>measure accuracy</strong> and <strong>run the monitoring checks</strong> below.</li>
+<p>Rows that fail a check are left out, and the report says how many and why.</p></li>
+<li><p><strong>Prepare</strong> the valid rows with <code>prepare_employment_frame()</code>, the same steps used for the training data.</p></li>
+<li><p><strong>Predict</strong> each person’s probability with the slim model, and show only group-level results: predicted (and, if available, actual) employment rates by province, settlement type and matric × internet group.</p></li>
+<li><p>If the file contains the actual outcome (<code>employed</code>), <strong>measure accuracy</strong> and <strong>run the monitoring checks</strong> below.</p></li>
 </ol>
 </section>
 <section id="monitoring-measures-and-thresholds" class="level2">
@@ -3434,7 +3434,7 @@ Rows that fail a check are left out, and the report says how many and why.</li>
 <tr class="even">
 <td>Subgroup AUC gap</td>
 <td>Widening of the gap between the best and worst population group’s AUC</td>
-<td>0.052</td>
+<td>0.133</td>
 <td>≤ +0.05</td>
 <td>+0.05–0.10</td>
 <td>&gt; +0.10</td>
