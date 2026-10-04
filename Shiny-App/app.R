@@ -517,7 +517,11 @@ ui <- page_navbar(
             note("Without the", code("employed"), "column the app can still predict, but it cannot measure accuracy.")
           )
         ),
-        div(class = "mt-2", downloadButton("template", "Download an example file", class = "btn-outline-primary btn-sm"))
+        div(class = "mt-2 d-flex flex-wrap gap-2",
+            downloadButton("template", "Download an example file", class = "btn-outline-primary btn-sm"),
+            downloadButton("test_data", "Download test data (1,200 people)", class = "btn-primary btn-sm")),
+        note("The example file shows the format with 3 rows. The test data is a ready-made file of 1,200 made-up people:",
+             "download it and upload it in step 2 to see the whole page working.")
       ),
       card(
         card_header("2. Upload it"),
@@ -813,6 +817,14 @@ server <- function(input, output, session) {
   output$template <- downloadHandler(
     filename = "employment_data_example.csv",
     content = function(file) write_csv(template_file, file)
+  )
+
+  # Ready-made test data: 1,200 made-up people in the right format, kept in the
+  # app folder. Their mix matches the training data and "employed" was simulated
+  # from the model's own chances, so every check on this page can run.
+  output$test_data <- downloadHandler(
+    filename = "test_data.csv",
+    content = function(file) file.copy("dummy_employment_test_data.csv", file)
   )
 
   # Read -> validate -> prepare -> predict, once per upload
