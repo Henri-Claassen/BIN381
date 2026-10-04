@@ -16,33 +16,18 @@ execute:
   message: false
 ---
 
-## About this file
-
-This file covers the Milestone 3 rubric items "Model implementation and reproducibility" (tuning and resampling) and "Technical model evaluation and comparison". It continues from `Employment Model.qmd` and `Income Model.qmd`, which chose the candidate models, fitted them once with starting parameters and saved them to `Models/`.
-
-The file works in a fixed order, so that the test sets cannot influence any choice:
-
-| Section | Data used | What happens |
-|------------------------|------------------------|------------------------|
-| 2–3 | Training files only | Household-grouped cross-validation folds are built. |
-| 4–5 | Training files only | The tree and forest parameters are tuned, the baseline models are cross-validated and each employment model's classification threshold is chosen, all from out-of-fold predictions. |
-| 6 | Training files only | The tuned models are refitted on the full training files and saved. |
-| 7 | Test files, **used once** | Every model is scored on the test sets with the parameters and thresholds fixed in sections 4–6. |
-| 8 | Training files and fitted models | The education × internet interaction is tested and checked across the models (Milestone 1 success criteria). |
-| 9 | Results of sections 4–8 | The comparison matrix and the final model selection. |
-
-## Loading the packages we need
+# Initial Setup
 
 ```{r}
 #| label: Package Setup
+#install.packages(c("tidyverse","survey","rpart","rpart.plot","ranger","pROC"))
 
-library(tidyverse)  # data handling
-library(survey)     # svyglm(): survey-weighted regressions, regTermTest(): likelihood-ratio test
-library(rpart)      # decision tree
-library(rpart.plot) # plot of the tuned tree
+library(tidyverse)  
+library(survey)     # survey-weighted regressions, likelihood-ratio test
+library(rpart)      
+library(rpart.plot) 
 library(ranger)     # random forest
 library(pROC)       # ROC curves, AUC with confidence intervals, DeLong test
-# caret is used for one function only, caret::groupKFold(), so it is not loaded
 ```
 
 ## File paths
@@ -54,32 +39,32 @@ analytical_directory <- "../Datasets/Analytical/"
 model_directory <- "../Models/"
 ```
 
-# 1. Evaluation design
+# 1. Evaluating Models
 
 ## 1.1 What is being compared
 
 | Question | Models | Task |
 |------------------------|------------------------|------------------------|
-| Employment (research areas B and C) | Survey-weighted logistic regression, decision tree, random forest, and a demographics-only baseline | Binary classification of `employed` |
-| Income (research area D) | Survey-weighted linear regression, random forest, and a demographics-only baseline | Regression of `log_salary` |
+| Employment | Survey-weighted logistic regression, decision tree, random forest, and a demographics-only baseline | Binary classification of employed |
+| Income | Survey-weighted linear regression, random forest, and a demographics-only baseline | Regression of log_salary |
 
-The **baseline models** are new in this file. The Milestone 2 success criteria require the models to be compared with a demographics-only baseline: a model that knows a person's age, sex, population group, province and settlement type, but nothing about their education, digital access or household. If the full models do not predict clearly better than the baseline, education and digital access add little predictive information beyond who and where a person is. Each baseline is a survey-weighted regression with the same design as the main regression, so the only difference between the two is the predictors.
+The **baseline models** are what we create in this file. The Milestone 2 success criteria required the models to be compared with a demographics only baseline (a model that knows a person's age, sex, population group, province and settlement type), but nothing about their education, digital access or household. If the full models do not predict better than the baseline wee create in this section, education and digital access add little predictive information beyond who and where a person is.
 
 ## 1.2 Metrics and why they were chosen
 
-No single metric is enough, so each task gets several that measure different things.
+We can't predict based off of a single metric, therefore each task gets several that measure different things.
 
 **Employment (classification).** The models predict the probability of being **Employed**, so Employed is the positive class. About 35% of the labour force is unemployed, so a model that always predicts Employed would already be 65% accurate; accuracy on its own is therefore misleading.
 
 | Metric | What it measures | Why it is used |
 |------------------------|------------------------|------------------------|
-| ROC-AUC | How well the predicted probabilities rank employed people above unemployed people, over every possible threshold | Main tuning and comparison metric: it does not depend on the threshold or on the class balance. Milestone 2 set AUC ≥ 0.70 as the minimum acceptable performance. |
-| Balanced accuracy | The average of sensitivity and specificity | Treats both classes as equally important, unlike accuracy. |
-| Sensitivity (recall) | Share of employed people predicted Employed |  |
-| Specificity | Share of unemployed people predicted Unemployed | The smaller class, and the one policy is most concerned with. |
-| Precision, F1 | Share of Employed predictions that are correct; the balance of precision and sensitivity | Required by the brief's list of classification metrics. |
-| Accuracy | Share of all predictions that are correct | Reported for completeness, next to the 65% of the "always Employed" rule. |
-| Brier score | Mean squared difference between predicted probability and the actual outcome (0 = perfect) | The Shiny app will show probabilities, so they must be accurate, not only well ranked. |
+| ROC-AUC | How well the predicted probabilities rank employed people compared to unemployed people. | It is the main tuning and comparison metric: it does not depend on the threshold or on the class balance. |
+| Balanced accuracy | The average of sensitivity and specificity. | Treats both classes as equally important, unlike accuracy. |
+| Sensitivity (recall) | Share of employed people predicted Employed. |  |
+| Specificity | Share of unemployed people that get predicted as unemployed. | The smaller class, and the one policy is most concerned with. |
+| Precision, F1 | Share of Employed predictions that are correct; the balance of precision and sensitivity. | Required by the brief's list of classification metrics. |
+| Accuracy | Share of all predictions that are correct. | Reported for completeness, next to the 65% of the "always Employed" rule. |
+| Brier score | Mean squared difference between predicted probability and the actual outcome (0 = perfect). | The Shiny app will show probabilities, so they must be accurate, not only well ranked. |
 
 **Income (regression).** Errors are measured on the log scale, where the model was fitted:
 
