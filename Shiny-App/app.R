@@ -1,10 +1,8 @@
 # ---- Run this if you need the packages ----------------------------------------
-# Only needed if the packages are not installed yet: remove the # in front of
-# install.packages() and run this line once.
+# Only needed if the packages are not installed yet: 
 # install.packages(c("shiny", "bslib", "tidyverse", "pROC"))
 
-# BIN381 Group 5: Education, Internet and Employment (Milestone 3 deployment)
-#
+
 # A Shiny app for National Treasury policy analysts. It shows how the predicted
 # employment rate differs between people with and without matric and home
 # internet, lets analysts explore province scenarios, and checks, scores and
@@ -19,11 +17,7 @@
 #   3. Province scenarios        what the model's pattern implies if home internet access rose
 #   4. Check new data            upload a CSV: validation, group predictions, accuracy, monitoring
 #   5. About the model           intended use, accuracy, fairness, limitations, retraining
-#
-# Writing rules for the text on screen: lead with the answer, use everyday words
-# ("out of 100 people"), explain a technical term once in brackets, and keep
-# every box to one or two short lines.
-#
+
 # The app never shows a prediction for an individual person: the evaluation
 # found the model unreliable for individuals in some groups, and Treasury's
 # decisions are about groups and provinces.
@@ -36,6 +30,7 @@ library(pROC)      # AUC (used by R/monitoring.R)
 # Shiny runs the app with its own folder (Shiny-App) as the working directory:
 # the app's helper files sit next to app.R, and model_preparation.R is shared
 # with the notebooks in Scripts/R
+
 source("../Scripts/R/model_preparation.R") # category levels, predictor list, prepare_employment_frame()
 source("deployment_model.R")  # predict_slim(), delta_method_se()
 source("monitoring.R")        # accuracy measures, explanations, drift, thresholds
@@ -50,19 +45,21 @@ source("validate_input.R")    # validate_input(), input_columns (the data format
 #                       measure accuracy, never to label a person)
 #   group_cells,        the four groups' predicted employment rates for every
 #   group_gradients     filter combination on page 2, and what is needed for their
-#                       confidence intervals; groups under 50 people are suppressed
+#                       confidence intervals. Groups under 50 people are suppressed
 #   provinces           province totals for the scenarios on page 3
-#   baseline, ...       test-set accuracy measures that monitoring compares with
+#   baseline,           test-set accuracy measures that monitoring compares with
 #   reference_shares    the training data's mix of people, for the drift check
 #   key_results,        the interaction results and subgroup performance for
 #   subgroups           pages 1 and 5
-#
+
+
 # The app does NOT load Models/employment_logistic.rds. That file is about 7 MB
 # because the fitted svyglm object stores a full copy of the training data,
 # including every household_id. A deployed app must not carry survey microdata:
 # if it were hosted, the data would be published with it. app_data.rds (about
 # 360 KB) holds only model parameters, totals and averages, and the deployment
 # notebook checks that the slim model predicts exactly like the full model.
+
 app_data <- readRDS("app_data.rds")
 slim_model <- app_data$slim_model
 key <- app_data$key_results
@@ -109,10 +106,6 @@ status_badge <- function(status) {
   paste0('<span class="badge rounded-pill ', colour, '">', status_label[status], "</span>")
 }
 
-# Table outputs with the app's standard look. The expression is passed on with
-# quoted = TRUE, the documented way to wrap a render function, so the table
-# re-runs whenever its inputs change. html_table() also shows HTML (the badges)
-# instead of printing it as text.
 plain_table <- function(expr, ...) {
   renderTable(substitute(expr), env = parent.frame(), quoted = TRUE,
               striped = TRUE, spacing = "s", width = "100%", ...)
@@ -139,6 +132,8 @@ note <- function(...) p(class = "note", ...)
 # Value box styles: white with dark text, or deep teal for the box that matters most
 box_plain <- value_box_theme(bg = colours$white, fg = colours$ink)
 box_main <- value_box_theme(bg = colours$main, fg = colours$white)
+# A class per style, so the box titles can be coloured to match (teal on white, white on teal)
+box_class <- function(theme) if (identical(theme, box_main)) "vb-main" else "vb-plain"
 
 # The four group rates of one filter combination (a row of group_cells), the
 # internet gaps and the difference between the gaps, each with a 95% confidence
@@ -172,7 +167,7 @@ rate_of <- function(e, education, internet) {
 }
 
 # The likely range of a gap and what it means: a range entirely above (or
-# below) 0 shows a real gap; a range that includes 0 means the gap may be chance
+# below) 0 shows a real gap. A range that includes 0 means the gap may be chance
 range_sentence <- function(x) {
   paste0("Likely range: ", signed(x$lower), " to ", signed(x$upper), " per 100. ",
          if (x$lower > 0 || x$upper < 0) "The whole range is on one side of 0, so this gap is real."
@@ -184,7 +179,7 @@ range_sentence <- function(x) {
 # the likely range shows the gap is real.
 gap_box <- function(title, gap, rate_with, rate_without, who, theme = box_plain) {
   value_box(
-    title = title, value = per_100(gap$estimate), theme = theme,
+    title = title, value = per_100(gap$estimate), theme = theme, class = box_class(theme),
     div(class = "box-facts",
         div(span("With home internet"), strong(pct(rate_with), " have a job")),
         div(span("Without home internet"), strong(pct(rate_without), " have a job"))),
@@ -197,7 +192,7 @@ gap_box <- function(title, gap, rate_with, rate_without, who, theme = box_plain)
 # The third box: how much bigger the internet gap is for people with matric
 both_box <- function(e, theme = box_main) {
   value_box(
-    title = "Extra boost from having both", value = per_100(e$interaction$estimate), theme = theme,
+    title = "Extra boost from having both", value = per_100(e$interaction$estimate), theme = theme, class = box_class(theme),
     div(class = "box-facts",
         div(span("Gap with matric"), strong(signed(e$gap_matric$estimate), " per 100")),
         div(span("Gap without matric"), strong(signed(e$gap_below$estimate), " per 100"))),
@@ -259,7 +254,43 @@ format_table <- input_columns |>
       TRUE ~ "Any text"
     )
   ) |>
-  select(Column, Needed, `Allowed values`, `What it means` = description, Example = example)
+  select(Column, Needed, `Allowed values`, `What it means` = description)
+
+# The candidate models compared on the About page. These are the test-set results
+# from Scripts/3.3) Model Evaluation.qmd. The app
+# itself only contains the selected model, so they are written in here.
+selected_badge <- '<span class="badge rounded-pill text-bg-success">Selected</span>'
+model_comparison <- tribble(
+  ~Model, ~`Ranking score (out of 100)`, ~`Balanced accuracy`,
+  ~`Answers "do education and internet work best together?"`, ~`Easy to explain?`, ~`In this app`,
+  "<strong>Survey-weighted logistic regression</strong>", "<strong>76.5</strong>", "69.3%",
+    "Yes, directly (odds ratio and test)", "Yes", selected_badge,
+  "Random forest", "77.4", "69.9%", "Only indirectly", "No (hundreds of trees)", "Not used",
+  "Decision tree", "71.0", "65.6%", "No (never uses education or internet)", "Yes", "Not used",
+  "Demographics only (benchmark)", "72.7", "66.4%", "No", "Yes", "Benchmark only"
+)
+
+# Every model in the project and what the app uses it for (About page)
+models_used <- tribble(
+  ~Question, ~Model, ~`Used in this app for`,
+  "Who has a job?", "<strong>Survey-weighted logistic regression</strong>",
+    "<strong>Everything:</strong> the Education × internet charts, the Province scenarios and the checks on new data",
+  "How much do employed people earn?", "Survey-weighted linear regression",
+    "Only the income result on the Overview page (no predictions)",
+  "Checking the employment model", "Random forest and decision tree",
+    "Not used: built only to compare against the logistic regression",
+  "Checking that the models add something", "Benchmarks that only know age, sex, population group and location",
+    "Not used: the models had to beat these to count as useful"
+)
+
+# The inputs of the employment model, grouped (About page)
+model_inputs <- tribble(
+  ~Group, ~`What the model looks at`,
+  "Education and internet", "Matric or not; home internet or not; both together; a computer at home; smartphones per household member",
+  "The person", "Age (in a curve, because the chance of a job rises and then falls with age); sex; population group",
+  "Where they live", "Province; type of area (metro, other urban, traditional area or farm)",
+  "Their household", "Household size; children under 15; anyone aged 65 or older; women with children; whether another adult has matric"
+)
 
 # Theme ------------------------------------------------------------------------------
 app_theme <- bs_theme(
@@ -277,9 +308,9 @@ app_theme <- bs_theme(
     .navbar .nav-link { font-weight: 500; }
     .card { box-shadow: 0 1px 3px rgba(15, 23, 42, .08), 0 4px 12px rgba(15, 23, 42, .04); }
     .card { background: #FEFFFF; }
-    .card-header { background: transparent; border-bottom: 1px solid #DEF2F1; font-weight: 600; font-size: 1.02rem; }
+    .card .card-header { background: #E6F5F4 !important; color: #1F5C5A !important; border-bottom: 2px solid #3AAFA9; font-weight: 700 !important; font-size: 1.2rem !important; padding: .75rem 1.1rem; }
     .guide { background: #FEFFFF; border-left: 5px solid #3AAFA9; box-shadow: 0 1px 3px rgba(23, 37, 42, .08); border-radius: .75rem; padding: .85rem 1.2rem; margin-bottom: 1rem; font-size: .95rem; }
-    .guide-title { font-weight: 700; color: #2B7A78; margin-bottom: .3rem; }
+    .guide-title { font-weight: 700; font-size: 1.15rem; color: #1F5C5A; margin-bottom: .35rem; }
     .guide li { margin-bottom: .2rem; }
     .hero { border-radius: 1rem; padding: 1.25rem 1.5rem; margin-bottom: 1.1rem; color: #FEFFFF; font-size: 1.05rem; line-height: 1.55; }
     .hero p:last-child { margin-bottom: 0; }
@@ -294,7 +325,10 @@ app_theme <- bs_theme(
     .hero .badge.text-bg-warning { color: #B45309 !important; }
     .hero .badge.text-bg-danger { color: #B91C1C !important; }
     .hero .badge.text-bg-secondary { color: #475569 !important; }
-    .bslib-value-box .value-box-title { font-size: .95rem; font-weight: 600; opacity: .9; }
+    .bslib-value-box .value-box-title { font-size: 1.25rem !important; font-weight: 700 !important; opacity: 1 !important; line-height: 1.3;
+      padding-bottom: .35rem; margin-bottom: .55rem !important; border-bottom: 2px solid rgba(58, 175, 169, .55); }
+    .vb-plain .value-box-title { color: #1F5C5A !important; }
+    .vb-main .value-box-title { color: #FEFFFF !important; border-bottom-color: rgba(254, 255, 255, .55); }
     .bslib-value-box .value-box-value { font-weight: 700; }
     .bslib-value-box p { margin-bottom: .35rem; font-size: .9rem; line-height: 1.4; }
     .bslib-value-box .range { font-size: .82rem; opacity: .8; margin-bottom: 0; }
@@ -302,12 +336,14 @@ app_theme <- bs_theme(
     .box-facts div { display: flex; justify-content: space-between; gap: .5rem; padding: .2rem 0; border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent); }
     .unit { font-size: .5em; font-weight: 500; opacity: .75; margin-left: .3rem; }
     .note { color: #4A5D63; font-size: .875rem; margin: .5rem 0 0; }
-    .section-title { font-weight: 700; color: #17252A; margin: 1.2rem 0 .6rem; }
+    .section-title { font-weight: 700; font-size: 1.4rem; color: #1F5C5A; margin: 1.5rem 0 .75rem; padding-left: .65rem; border-left: 4px solid #3AAFA9; }
+    .sidebar-title { font-weight: 700; font-size: 1.2rem; color: #1F5C5A; }
+    .sub-title { font-weight: 700; font-size: 1.15rem; color: #1F5C5A; margin-bottom: .5rem; }
     table.table { font-size: .9rem; margin-bottom: 0; }
     table.table th { background: #DEF2F1; color: #17252A; font-weight: 600; }
     .result-list { list-style: none; padding-left: 0; margin-bottom: .6rem; }
     .result-list li { margin-bottom: .35rem; }
-    .accordion-button { font-weight: 600; }
+    .accordion-button { font-weight: 600; font-size: 1.1rem; color: #1F5C5A; }
     dt { margin-top: .6rem; }
   ")
 
@@ -464,7 +500,9 @@ ui <- page_navbar(
         width = 290,
         open = list(desktop = "open", mobile = "always"), # filters stay visible on narrow screens
         sliderInput("target", "Share of people with home internet", min = 70, max = 100, value = 95, step = 1, post = "%"),
-        helpText("Provinces already above the target stay as they are.")
+        helpText(paste0("Only provinces below the target change. A province that already has more home internet than the target keeps its ",
+                        "current figures: for example ", app_data$provinces$province[which.max(app_data$provinces$internet_share)], " (",
+                        pct(max(app_data$provinces$internet_share), 0), " today) only gains once the target is set above that."))
       ),
       reading_guide(
         tags$li("Move the slider to choose a target: the share of people who would have home internet."),
@@ -543,10 +581,47 @@ ui <- page_navbar(
     hero(
       "The model in one minute",
       tags$ul(class = "mb-0",
+        tags$li(strong("It is a survey-weighted logistic regression:"), " the model selected from the three we built and tested (see below)."),
         tags$li("It estimates how likely groups of people are to have a job, based on their education, home internet and background."),
         tags$li(paste0("It is reasonably accurate: shown one person with a job and one without, it picks the one with the job ",
                        round(100 * app_data$baseline$auc), " times out of 100.")),
         tags$li("Use it to compare groups and provinces. Do not use it to make decisions about individual people.")
+      )
+    ),
+    card(
+      card_header("Which models does this app use?"),
+      p(strong("One model makes every prediction in this app: a survey-weighted logistic regression for employment."),
+        "Models are not combined or averaged. The other models in the project were built to check and compare against it:"),
+      tableOutput("models_used"),
+      h5(class = "sub-title mt-4", "What goes into the employment model"),
+      p("For each person, the model looks at 15 pieces of information, in four groups:"),
+      tableOutput("model_inputs"),
+      h5(class = "sub-title mt-4", "How it turns these into a prediction"),
+      tags$ul(class = "mb-0",
+        tags$li("Each piece of information pushes a person's chance of having a job up or down by a fixed amount that the model learned from the survey."),
+        tags$li("Those pushes are added up and turned into a chance between 0% and 100%."),
+        tags$li(strong("Matric and home internet together"), " is a separate input: the extra push for having both. Its size is what answers Treasury's question."),
+        tags$li("For a group of people (a province, an age band), the app averages the chances of everyone in that group.")
+      )
+    ),
+    card(
+      card_header("Why this model was chosen"),
+      p(strong("The app uses the survey-weighted logistic regression."),
+        "We built three candidate models and tested all of them on the same", num(key$test_people), "people:"),
+      tableOutput("model_comparison"),
+      tags$ol(class = "mt-3 mb-0",
+        tags$li(strong("It answers Treasury's question directly."), paste0(
+          " It is the only model that measures whether education and internet work best together, with a likely range and a test (odds ratio ",
+          round(key$odds_ratio, 2), ", p = ", round(key$employment_p, 3), ").")),
+        tags$li(strong("It is almost as accurate as the best model."),
+                " The random forest ranks people correctly 77.4 times in 100 and this model 76.5: a difference of about 1 pair in 100."),
+        tags$li(strong("Its results can be explained."),
+                " Every factor has a clear effect that can be shown to decision makers. The random forest averages hundreds of trees and cannot show how it reached an answer."),
+        tags$li(strong("It represents South Africa."),
+                " It uses the survey weights, so its results describe the whole population, not only the people surveyed."),
+        tags$li(strong("Why not the decision tree?"),
+                " It scored below a simple benchmark that only knows age, sex, population group and location (71.0 against 72.7),",
+                " and it never uses education or internet, so it cannot answer the question.")
       )
     ),
     layout_columns(
@@ -560,8 +635,7 @@ ui <- page_navbar(
         card_header("How it works"),
         p("It learned from", num(key$training_people), "people in the 2024 Stats SA survey how having a job relates to matric, home internet and the two together,",
           "taking into account age, sex, area, household and phone and computer access."),
-        p(class = "mb-0", "It was chosen over two other models (a decision tree and a random forest) because it is almost as accurate as the best of them",
-          "and is the only one that measures directly whether education and internet work best together.",
+        p(class = "mb-0", "For any group of people, it then gives the share expected to have a job.",
           span(class = "text-muted", "(Technical name: survey-weighted logistic regression.)"))
       )
     ),
@@ -570,8 +644,9 @@ ui <- page_navbar(
       p(paste0("While building the model we kept ", num(key$test_people), " surveyed people aside. Afterwards we asked the model about them and compared",
                " its answers with what really happened. These are the results. The first row is the most important.")),
       tableOutput("about_metrics"),
-      note(paste0("Some rows use yes/no labels: the model calls a person \"employed\" when it gives them a ",
-                  round(100 * app_data$threshold), "% chance or more of having a job."))
+      note(paste0("How the \"spotted\" and \"labels\" rows work: the model gives every person a chance of having a job. ",
+                  "Anyone with a chance of ", round(100 * app_data$threshold), "% or more is counted as \"employed\" and everyone else as \"unemployed\". ",
+                  round(100 * app_data$threshold), "% was chosen because it treats people with and without a job as equally important."))
     ),
     card(
       card_header("Does it work equally well for everyone?"),
@@ -582,7 +657,10 @@ ui <- page_navbar(
         tags$li("In traditional areas, where about half have a job, it misses many of the people who do.")
       ),
       tableOutput("about_subgroups"),
-      note("Groups with few people tested (for example Indian/Asian, farms) have less certain figures.")
+      note(paste0("Some groups had only a few people in the test, for example ",
+                  num(app_data$subgroups$people[app_data$subgroups$group == "Indian/Asian"]), " Indian/Asian people and ",
+                  num(app_data$subgroups$people[app_data$subgroups$group == "Farms"]), " people on farms. ",
+                  "A handful of extra people could change their figures noticeably, so treat them as rough estimates."))
     ),
     layout_columns(
       col_widths = c(5, 7),
@@ -619,10 +697,7 @@ ui <- page_navbar(
           tags$dt("Labour force"), tags$dd("Everyone aged 15–64 who is working or looking for work.")
         )
       )
-    ),
-    p(class = "note mt-3",
-      paste0("Model: ", app_data$built$model, ". App data built on ", app_data$built$date,
-             " by Scripts/3.4) Deployment Preparation.qmd. Data: Statistics South Africa, 2024 survey (isiBalo portal)."))
+    )
   )
 )
 
@@ -707,7 +782,7 @@ server <- function(input, output, session) {
 
   # For a target share t above a province's current share c, the fraction of
   # unconnected people who would be connected is (t - c) / (1 - c); each of them
-  # adds the average uplift for the unconnected (Deployment Preparation, section 7)
+  # adds the average uplift for the unconnected
   scenario <- reactive({
     target <- input$target / 100
     app_data$provinces |>
@@ -764,15 +839,15 @@ server <- function(input, output, session) {
     largest <- top_people$province == provinces$province[which.max(provinces$labour_force)]
     layout_columns(
       col_widths = c(4, 4, 4),
-      value_box(title = "South Africa", value = per_100(country$change), theme = box_main,
+      value_box(title = "South Africa", value = per_100(country$change), theme = box_main, class = "vb-main",
                 p(strong(paste0("About ", approx_num(country$additional_employed), " more people with a job."))),
                 p(paste0("Out of every 100 people in the labour force, about ", round(100 * country$change, 1),
                          " more would have a job: ", pct(country$employed_target), " instead of ", pct(country$employed_today), "."))),
-      value_box(title = "Biggest gain for its size", value = span(class = "fs-3", top_rate$province), theme = box_plain,
+      value_box(title = "Biggest gain for its size", value = span(class = "fs-3", top_rate$province), theme = box_plain, class = "vb-plain",
                 p(strong(paste0(signed(top_rate$change), " per 100"))),
                 p(paste0("Out of every 100 people there, about ", round(100 * top_rate$change), " more would have a job. Only ",
                          pct(top_rate$internet_share, 0), " have home internet today, so it has the most room to grow."))),
-      value_box(title = "Most extra people with a job", value = span(class = "fs-3", top_people$province), theme = box_plain,
+      value_box(title = "Most extra people with a job", value = span(class = "fs-3", top_people$province), theme = box_plain, class = "vb-plain",
                 p(strong(paste0("About ", approx_num(top_people$additional_employed), " people"))),
                 p(if (top_people$province == top_rate$province) "It has both the biggest gain per 100 and enough people for that gain to add up the most."
                   else if (largest) "Not the biggest gain per 100, but it has the largest labour force, so the gain adds up to the most people."
@@ -1047,6 +1122,10 @@ server <- function(input, output, session) {
     describe_metrics(app_data$baseline, app_data$baseline) |>
       select(Measure = measure, Result = in_short, `What this means` = meaning)
   )
+
+  output$model_comparison <- html_table(model_comparison)
+  output$models_used <- html_table(models_used)
+  output$model_inputs <- plain_table(model_inputs)
 
   output$about_subgroups <- plain_table(
     app_data$subgroups |>

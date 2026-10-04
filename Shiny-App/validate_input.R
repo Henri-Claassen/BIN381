@@ -1,20 +1,19 @@
 # ---- Run this if you need the packages ----------------------------------------
-# Only needed if the packages are not installed yet: remove the # in front of
-# install.packages() and run this line once.
+# Only needed if the packages are not installed yet: 
 # install.packages(c("tidyverse"))
 
 # Milestone 3: validation of new data for the deployed employment model
-#
+
 # Used by the Shiny app (Shiny-App/app.R) before any prediction is made, and documented
 # in Scripts/3.4) Deployment Preparation.qmd. The checks can also be run outside the
 # app, for example on a new Stats SA survey wave:
 #   raw <- read_csv("new_file.csv", col_types = cols(.default = col_character()))
 #   result <- validate_input(raw)
-#
+
 # The file must be read with every column as text, so that values of the wrong
 # type (for example "yes" in a 0/1 column) are reported instead of silently
 # becoming missing when R guesses the column types.
-#
+
 # Relies on Scripts/R/model_preparation.R (category_levels) and monitoring.R
 # (monitoring_thresholds$min_rows), which must be sourced first.
 
@@ -169,7 +168,7 @@ validate_input <- function(raw) {
   }
 
   # 2.3 Consistency between columns -----------------------------------------------
-  # Columns calculated from other columns must agree with them; a mismatch means
+  # Columns calculated from other columns must agree with them. A mismatch means
   # the file was built with a different rule than the training data.
   inconsistent <- function(condition) !is.na(condition) & condition # NA (a blank value) is reported above
   bad_square <- inconsistent(data$age_centred_squared != data$age_centred^2)
