@@ -154,7 +154,7 @@ The app has five pages: an overview of the findings, the employment rates of the
 |---|---|---|
 | 1. Business and Data Understanding | Business understanding, data understanding | ✅ Complete |
 | 2. Data Preprocessing | Data preparation | ✅ Complete |
-| 3. Modelling, Evaluation and Deployment | Modelling, evaluation, deployment (Shiny) | 🔄 In progress |
+| 3. Modelling, Evaluation and Deployment | Modelling, evaluation, deployment (Shiny) | ✅ Complete |
 | 4. Final Report and Presentation | Synthesis across all phases | ⏳ Upcoming |
 
 ---
