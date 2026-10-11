@@ -2,7 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-.RDataTmp
-.RDataTmp1
+.RDataTmp*
 # Quarto render cache
 .quarto/
