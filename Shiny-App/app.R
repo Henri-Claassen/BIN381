@@ -29,9 +29,11 @@ library(pROC)      # AUC (used by R/monitoring.R)
 
 # Shiny runs the app with its own folder (Shiny-App) as the working directory:
 # the app's helper files sit next to app.R, and model_preparation.R is shared
-# with the notebooks in Scripts/R
+# with the notebooks in Scripts/R. The online copy (deploy_app.R) puts
+# model_preparation.R next to app.R, because only that folder is uploaded.
 
-source("../Scripts/R/model_preparation.R") # category levels, predictor list, prepare_employment_frame()
+model_preparation_file <- if (file.exists("model_preparation.R")) "model_preparation.R" else "../Scripts/R/model_preparation.R"
+source(model_preparation_file) # category levels, predictor list, prepare_employment_frame()
 source("deployment_model.R")  # predict_slim(), delta_method_se()
 source("monitoring.R")        # accuracy measures, explanations, drift, thresholds
 source("validate_input.R")    # validate_input(), input_columns (the data format)
