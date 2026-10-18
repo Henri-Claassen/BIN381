@@ -68,7 +68,9 @@ BIN381/
 │   ├── app_data.rds                      What the app loads: slim model and aggregated tables only
 │   ├── deployment_model.R                The slim model the app predicts with
 │   ├── validate_input.R                  Checks uploaded data; defines the app's data format
-│   └── monitoring.R                      Accuracy measures, drift checks and monitoring thresholds
+│   ├── monitoring.R                      Accuracy measures, drift checks and monitoring thresholds
+│   ├── dummy_employment_test_data.csv    1,200 made-up people for testing the "Check new data" page
+│   └── deploy_app.R                      Publishes the app to shinyapps.io
 │
 ├── Models/                               Fitted models (.rds) and classification thresholds
 │
@@ -102,8 +104,10 @@ BIN381/
 │                                         named after the notebook that produced them
 │
 └── Power Bi/
+    ├── Final Power Bi.pbix               Milestone 4 decision-support dashboard (7 pages)
+    ├── BIN381_Theme.json                 Navy Panels theme used by the final dashboard
     ├── Initial Power Bi.pbix             Milestone 1 exploratory dashboard
-    └── Dashboard_*_Theme.json            Report colour themes
+    └── Dashboard_*_Theme.json            Colour themes of the Milestone 1 dashboard
 ```
 
 ---
@@ -128,11 +132,15 @@ BIN381/
 
 ### Running the Shiny app
 
-With `BIN381.Rproj` open, run:
+**Online:** https://henri123.shinyapps.io/bin381-digital-access/ (free hosting: the first visit after a quiet period takes 20 to 30 seconds to wake the app).
+
+**Locally:** with `BIN381.Rproj` open, run:
 
 ```r
 shiny::runApp("Shiny-App")
 ```
+
+The online copy was published with `source("Shiny-App/deploy_app.R")`, which needs the `rsconnect` package and a shinyapps.io account. It uploads only the app's files and `Scripts/R/model_preparation.R`, never survey records.
 
 The app has five pages: an overview of the findings, the employment rates of the four matric × internet groups, province scenarios, a page to check new data against the model (upload `Datasets/Analytical/model_test.csv` for a working example), and a page about the model. It loads only `app_data.rds`, which holds the slim model and aggregated tables, never survey microdata. It shows results for groups of people only, never for individuals.
 
@@ -155,7 +163,7 @@ The app has five pages: an overview of the findings, the employment rates of the
 | 1. Business and Data Understanding | Business understanding, data understanding | ✅ Complete |
 | 2. Data Preprocessing | Data preparation | ✅ Complete |
 | 3. Modelling, Evaluation and Deployment | Modelling, evaluation, deployment (Shiny) | ✅ Complete |
-| 4. Final Report and Presentation | Synthesis across all phases | ⏳ Upcoming |
+| 4. Final Report and Presentation | Synthesis across all phases | 🔄 In progress |
 
 ---
 
